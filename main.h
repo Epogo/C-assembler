@@ -5,6 +5,9 @@
 #define MAXLINELEN 80 /*sets the buffer size to 80*/
 #define ERROR 1
 #define NOERROR 0
+#define MAXLABELLEN 31 /*maximum length of label*/
+#define FLAGOFF 0
+#define FLAGON 1
 
 struct node {
 	int lineNumber;
@@ -16,4 +19,4 @@ typedef struct node NODE_T; /*node struct defined as type NODE_T*/
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd);
 void storeLines(NODE_T *ptrNode, FILE *fd);
-
+void firstPass(NODE_T *ptrNode);

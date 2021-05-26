@@ -1,8 +1,12 @@
 #include "main.h"
 
 
-void handleFileContents(FILE *fd){
+/*static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
 
+static char *directives[]={".db",".dw", ".dh", ".asciz", ".entry", ".extern"};*/
+
+
+void handleFileContents(FILE *fd){
 	NODE_T *ptrNode; /*initialize pointer to NODE_T, variable ptr_node*/
 	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
 
@@ -15,6 +19,8 @@ void handleFileContents(FILE *fd){
 	ptrNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
 
 	storeLines(ptrNode, fd);
+
+	firstPass(ptrNode);
 	
 }
 
@@ -35,11 +41,11 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 	while(1){
 		charFromFile = fgetc(fd); /*store character from file in charFromFile variable*/
 		if(!feof(fd)){
-			if(charFromFile != '\n'){
-				ptrNode->inputChar[index] = charFromFile;
-				index++;
-			}
-			else{
+			/*if(charFromFile != '\n'){*/
+			ptrNode->inputChar[index] = charFromFile;
+			index++;
+			/*}*/
+			if(charFromFile == '\n'){
 				ptrNode->lineNumber = lineCounter;
 				lineCounter++;
 				current = ptrNode; /*sets the "current" node equal to ptrNode, pointing to the element whose buffer was just filled*/
