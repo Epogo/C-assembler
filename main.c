@@ -9,6 +9,7 @@ int main(int argc, char** argv){
 	}
 	else{
 		readFile(argc,argv);
+		/*Hi david*/
 	}
 	return 0;
 }
