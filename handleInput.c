@@ -1,14 +1,10 @@
 #include "main.h"
 
+
 void handleFileContents(FILE *fd){
 
-	int charFromFile,lineCounter,index;
 	NODE_T *ptrNode; /*initialize pointer to NODE_T, variable ptr_node*/
-	NODE_T *head; /*initialize pointer to head of type NODE_T*/
-	NODE_T *current; /*initialize pointer to current node of type NODE_T*/
 	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
-	lineCounter = 1;
-	index = 0;
 
 	tmpPtr = (NODE_T*)calloc(1, sizeof(NODE_T));
 	if(!tmpPtr)
@@ -17,14 +13,28 @@ void handleFileContents(FILE *fd){
 		exit(0);
 	}
 	ptrNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
+
+	storeLines(ptrNode, fd);
+	
+}
+
+
+
+void storeLines(NODE_T *ptrNode, FILE *fd){
+	int charFromFile,lineCounter,index;
+	NODE_T *head; /*initialize pointer to head of type NODE_T*/
+	NODE_T *current; /*initialize pointer to current node of type NODE_T*/
+
+	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
+	lineCounter = 1;
+	index = 0;
+
 	head = ptrNode; /*sets head equal to ptrNode to point to the first element of the list*/
 	head->next = NULL; /*sets pointer to next element to NULL because there are no other elements at this point*/
-	/*head->lineNumber = lineCounter;*/
 
 	while(1){
 		charFromFile = fgetc(fd); /*store character from file in charFromFile variable*/
 		if(!feof(fd)){
-			/*printf("%c", charFromFile);*/ /*if the current character from the file is not EOF, then print the character*/
 			if(charFromFile != '\n'){
 				ptrNode->inputChar[index] = charFromFile;
 				index++;
@@ -51,9 +61,4 @@ void handleFileContents(FILE *fd){
 	}
 	ptrNode = head; /*set ptrNode equal to head to point to the first element of the list*/
 		
-
-
-
-
-	
 }
