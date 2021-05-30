@@ -8,6 +8,8 @@
 #define MAXLABELLEN 31 /*maximum length of label*/
 #define FLAGOFF 0
 #define FLAGON 1
+#define NUMDIRECTIVES 4
+#define NUMCOMMANDS 27
 
 struct node {
 	int lineNumber;
