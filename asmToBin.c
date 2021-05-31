@@ -86,69 +86,72 @@ int main(int argc, char *argv[])
 
 void Registers(char reg[NUMBIT])
 {
-    if (!strcmp(reg, "$0"))
+    char *p=reg;
+    p++;
+    
+    if (!strcmp(p, "0"))
         strcpy(reg, "00000");
-    else if (!strcmp(reg, "$1"))
+    else if (!strcmp(p, "1"))
         strcpy(reg, "00001");
-    else if (!strcmp(reg, "$2"))
+    else if (!strcmp(p, "2"))
         strcpy(reg, "00010");
-    else if (!strcmp(reg, "$3"))
+    else if (!strcmp(p, "3"))
         strcpy(reg, "00011");
-    else if (!strcmp(reg, "$4"))
+    else if (!strcmp(p, "4"))
         strcpy(reg, "00100");
-    else if (!strcmp(reg, "$5"))
+    else if (!strcmp(p, "5"))
         strcpy(reg, "00101");
-    else if (!strcmp(reg, "$6"))
+    else if (!strcmp(p, "6"))
         strcpy(reg, "00110");
-    else if (!strcmp(reg, "$7"))
+    else if (!strcmp(p, "7"))
         strcpy(reg, "00111");
-    else if (!strcmp(reg, "$8"))
+    else if (!strcmp(p, "8"))
         strcpy(reg, "01000");
-    else if (!strcmp(reg, "$9"))
+    else if (!strcmp(p, "9"))
         strcpy(reg, "01001");
-    else if (!strcmp(reg, "$10"))
+    else if (!strcmp(p, "10"))
         strcpy(reg, "01010");
-    else if (!strcmp(reg, "$11"))
+    else if (!strcmp(p, "11"))
         strcpy(reg, "01011");
-    else if (!strcmp(reg, "$12"))
+    else if (!strcmp(p, "12"))
         strcpy(reg, "01100");
-    else if (!strcmp(reg, "$13"))
+    else if (!strcmp(p, "13"))
         strcpy(reg, "01101");
-    else if (!strcmp(reg, "$14"))
+    else if (!strcmp(p, "14"))
         strcpy(reg, "01110");
-    else if (!strcmp(reg, "$15"))
+    else if (!strcmp(p, "15"))
         strcpy(reg, "01111");
-    else if (!strcmp(reg, "$16"))
+    else if (!strcmp(p, "16"))
         strcpy(reg, "10000");
-    else if (!strcmp(reg, "$17"))
+    else if (!strcmp(p, "17"))
         strcpy(reg, "10001");
-    else if (!strcmp(reg, "$18"))
+    else if (!strcmp(p, "18"))
         strcpy(reg, "10010");
-    else if (!strcmp(reg, "$19"))
+    else if (!strcmp(p, "19"))
         strcpy(reg, "10011");
-    else if (!strcmp(reg, "$20"))
+    else if (!strcmp(p, "20"))
         strcpy(reg, "10100");
-    else if (!strcmp(reg, "$21"))
+    else if (!strcmp(p, "21"))
         strcpy(reg, "10101");
-    else if (!strcmp(reg, "$22"))
+    else if (!strcmp(p, "22"))
         strcpy(reg, "10110");
-    else if (!strcmp(reg, "$23"))
+    else if (!strcmp(p, "23"))
         strcpy(reg, "10111");
-    else if (!strcmp(reg, "$24"))
+    else if (!strcmp(p, "24"))
         strcpy(reg, "11000");
-    else if (!strcmp(reg, "$25"))
+    else if (!strcmp(p, "25"))
         strcpy(reg, "11001");
-    else if (!strcmp(reg, "$26"))
+    else if (!strcmp(p, "26"))
         strcpy(reg, "11010");
-    else if (!strcmp(reg, "$27"))
+    else if (!strcmp(p, "27"))
         strcpy(reg, "11011");
-    else if (!strcmp(reg, "$28"))
+    else if (!strcmp(p, "28"))
         strcpy(reg, "11100");
-    else if (!strcmp(reg, "$29"))
+    else if (!strcmp(p, "29"))
         strcpy(reg, "11101");
-    else if (!strcmp(reg, "$30"))
+    else if (!strcmp(p, "30"))
         strcpy(reg, "11110");
-    else if (!strcmp(reg, "$31"))
+    else if (!strcmp(p, "31"))
         strcpy(reg, "11111");
     else
     {
