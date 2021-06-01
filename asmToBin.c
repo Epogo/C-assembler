@@ -46,37 +46,36 @@ int main(int argc, char *argv[])
         switch(command) 
         {
 	    case 0:
-            fprintf(fpout, "Bin: 000000%s%s%s000001000000\n",
+            fprintf(fpout, "Bin: 000000 %s %s %s 00001 000000\n",
                    rs, rt, rd);
 	    break;
 	    case 1:
-	    fprintf(fpout, "Bin: 000000%s%s%s000010000000\n",
+	    fprintf(fpout, "Bin: 000000 %s %s %s 00010 000000\n",
                    rs, rt, rd);
 	    break;
 	    case 2:
-	    fprintf(fpout, "Bin: 000000%s%s%s000011000000\n",
+	    fprintf(fpout, "Bin: 000000 %s %s %s 00011 000000\n",
                    rs, rt, rd);
 	    case 3:
-	    fprintf(fpout, "Bin: 000000%s%s%s000100000000\n",
+	    fprintf(fpout, "Bin: 000000 %s %s %s 00100 000000\n",
                    rs, rt, rd);
 	    case 4:
-	    fprintf(fpout, "Bin: 000000%s%s%s000101000000\n",
+	    fprintf(fpout, "Bin: 000000 %s %s %s 00101 000000\n",
                    rs, rt, rd);
 	    case 5:
-	    fprintf(fpout, "Bin: 000001%s%s%s000001000000\n",
+	    fprintf(fpout, "Bin: 000001 %s %s %s 00001 000000\n",
                    rs, rt, rd);
 	    case 6:
-	    fprintf(fpout, "Bin: 000001%s%s%s000010000000\n",
+	    fprintf(fpout, "Bin: 000001 %s %s %s 00010 000000\n",
                    rs, rt, rd);
 	    case 7:
-	    fprintf(fpout, "Bin: 000001%s%s%s000011000000\n",
+	    fprintf(fpout, "Bin: 000001 %s %s %s 00011 000000\n",
                    rs, rt, rd);
 	    break;
 	    default:
 	    break;
                                              
         }
-
     }
     fclose(fpin);
     fclose(fpout);
@@ -86,79 +85,30 @@ int main(int argc, char *argv[])
 
 void Registers(char reg[NUMBIT])
 {
-    char *p=reg;
+    int num;
+    char *p;
+    int i,j;
+    char *str=(char*)malloc(6);
+    str[5]='\0';
+    p=reg;
     p++;
-    
-    if (!strcmp(p, "0"))
-        strcpy(reg, "00000");
-    else if (!strcmp(p, "1"))
-        strcpy(reg, "00001");
-    else if (!strcmp(p, "2"))
-        strcpy(reg, "00010");
-    else if (!strcmp(p, "3"))
-        strcpy(reg, "00011");
-    else if (!strcmp(p, "4"))
-        strcpy(reg, "00100");
-    else if (!strcmp(p, "5"))
-        strcpy(reg, "00101");
-    else if (!strcmp(p, "6"))
-        strcpy(reg, "00110");
-    else if (!strcmp(p, "7"))
-        strcpy(reg, "00111");
-    else if (!strcmp(p, "8"))
-        strcpy(reg, "01000");
-    else if (!strcmp(p, "9"))
-        strcpy(reg, "01001");
-    else if (!strcmp(p, "10"))
-        strcpy(reg, "01010");
-    else if (!strcmp(p, "11"))
-        strcpy(reg, "01011");
-    else if (!strcmp(p, "12"))
-        strcpy(reg, "01100");
-    else if (!strcmp(p, "13"))
-        strcpy(reg, "01101");
-    else if (!strcmp(p, "14"))
-        strcpy(reg, "01110");
-    else if (!strcmp(p, "15"))
-        strcpy(reg, "01111");
-    else if (!strcmp(p, "16"))
-        strcpy(reg, "10000");
-    else if (!strcmp(p, "17"))
-        strcpy(reg, "10001");
-    else if (!strcmp(p, "18"))
-        strcpy(reg, "10010");
-    else if (!strcmp(p, "19"))
-        strcpy(reg, "10011");
-    else if (!strcmp(p, "20"))
-        strcpy(reg, "10100");
-    else if (!strcmp(p, "21"))
-        strcpy(reg, "10101");
-    else if (!strcmp(p, "22"))
-        strcpy(reg, "10110");
-    else if (!strcmp(p, "23"))
-        strcpy(reg, "10111");
-    else if (!strcmp(p, "24"))
-        strcpy(reg, "11000");
-    else if (!strcmp(p, "25"))
-        strcpy(reg, "11001");
-    else if (!strcmp(p, "26"))
-        strcpy(reg, "11010");
-    else if (!strcmp(p, "27"))
-        strcpy(reg, "11011");
-    else if (!strcmp(p, "28"))
-        strcpy(reg, "11100");
-    else if (!strcmp(p, "29"))
-        strcpy(reg, "11101");
-    else if (!strcmp(p, "30"))
-        strcpy(reg, "11110");
-    else if (!strcmp(p, "31"))
-        strcpy(reg, "11111");
-    else
+    num=atoi(p);
+    if (num>31)
     {
         printf("Error: register can be Ri, with i=0,1,...,31\n");
         exit(EXIT_FAILURE);
     }
-
+    str[5]='\0';
+    j=4;
+    while (j>=0)
+	   {
+		str[j--]=num%2+'0';
+                num=num/2;
+                i++;		
+	   }
+    p=str;
+    strcpy(reg,p);
+    free(str);
     return;
 }
 
@@ -175,6 +125,9 @@ void regScan(char *op,char *rs, char *rt, char *rd, FILE *fpin, FILE *fpout)
             Registers(rd);
 	
 }
+
+
+
 void DecToBin(int bin[NUMBIT], int dec, int n)
 {
     int i, k, j = n - 1;
