@@ -1,14 +1,16 @@
 #include "main.h"
 
-enum status {PREFW,FIRSTWORD,POSTFW,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY};
+enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY};
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
 
+int checkState(char *ptrFirstWord);
+
 
 void firstPass(NODE_T *ptrNode){
-	int index,firstWordIndex,labelFlag,i,labelIndex,midLabel,DC,IC;
+	int index,firstWordIndex,labelFlag,labelIndex,midLabel,DC,IC;
 	NODE_T *current;
 	char *ptrFirstWord;
 	char *ptrLabel;
@@ -19,7 +21,7 @@ void firstPass(NODE_T *ptrNode){
 	current = ptrNode;
 	labelFlag = FLAGOFF;
 	midLabel = FLAGOFF;
-	state = PREFW;
+	state = PREFIRSTWORD;
 
 	IC = 100;
 	DC = 0;
@@ -27,65 +29,70 @@ void firstPass(NODE_T *ptrNode){
 
 		if(current->inputChar[index] == '\0'){
 			if(current->next == NULL){
-				/*printf("entered Null condition");*/
 				break;
 			}
 			else{
-				/*printf("entered 0 condition \n");*/
-				/*switch(state)*/
 				current = current->next;
-				state = PREFW;
+				state = PREFIRSTWORD;
 				labelFlag = FLAGOFF;
 				index = 0;
 
 			}
 		}
 		if(current->inputChar[index] == '\t' || current->inputChar[index] == ' '){
-			/*printf("entered white space\n");*/
 			if(state == FIRSTWORD){
-				state = POSTFW;
+				state = POSTFIRSTWORD;
 			}
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
-				printf("%s \n",ptrFirstWord);
-				printf("%s \n",ptrLabel);
-				exit(0);
+				/*printf("%s \n",ptrFirstWord);
+				printf("%s \n",ptrLabel);*/
+				free(ptrFirstWord);
+				free(ptrLabel);
+				current = current->next;
+				state = PREFIRSTWORD;
+				labelFlag = FLAGOFF;
+				index = 0;
+				continue;
 			} 
 			else{
 				index++;
 				continue;
 			}
 		}
-		if(current->inputChar[index] == ';' && state == PREFW){
-			/*printf("entered comment\n");*/
+		if(current->inputChar[index] == ';' && state == PREFIRSTWORD){
 			current = current->next;
 			labelFlag = FLAGOFF;
 			index = 0;
 			continue;
 		}
 		if(current->inputChar[index] == '\n'){
-			/*printf("entered comment\n");*/
 			if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
 				/*printf("%s \n",ptrFirstWord);
-				printf("%s \n",ptrLabel);
-				exit(0);*/
+				printf("%s \n",ptrLabel);*/
+				free(ptrFirstWord);
+				free(ptrLabel);
 			} 
 			current = current->next;
+			state = PREFIRSTWORD;
 			labelFlag = FLAGOFF;
 			index = 0;
 			continue;
 		}
 		if(state == FIRSTWORD && current->inputChar[index] == ':'){
-			state = POSTFW;
+			state = POSTFIRSTWORD;
 			labelFlag = FLAGON;
 		}
 
+
+
+
 		switch(state){
-			case PREFW:
-				/*printf("entered PREFW\n");*/
+			case PREFIRSTWORD:
+				/*printf("entered PREFIRSTWORD\n");*/
 				ptrFirstWord = calloc(MAXLABELLEN,sizeof(char));
 				firstWordIndex = 0;
 				ptrFirstWord[firstWordIndex] = current->inputChar[index];
@@ -99,41 +106,46 @@ void firstPass(NODE_T *ptrNode){
 				firstWordIndex++;
 				index++;
 				break;
-			case POSTFW:
-				/*printf("entered POSTFW\n");*/
+			case POSTFIRSTWORD:
+				/*printf("entered POSTFIRSTWORD\n");*/
 				ptrFirstWord[firstWordIndex] = '\0';
 				/*printf("%s \n",ptrFirstWord);*/
 				if(labelFlag == FLAGON){
 					state = POSTLABEL;
-					index++;
-					break;
 				}
-				for(i=0;i<NUMDIRECTIVES;i++){
-					if(!strcmp(directives[i], ptrFirstWord)){
-						state = POSTDIRECTIVE;
-						index++;
-						break;
+				else{
+					state = checkState(ptrFirstWord);
+					if(state == -1){
+						printf("Error in Line %u: Invalid State \n",current->lineNumber);
+						exit(0);
 					}
 				}
-				if(!strcmp(".extern", ptrFirstWord)){
-					state = POSTEXTERN;
-					ptrLabel = calloc(MAXLABELLEN,sizeof(char));
-					index++;
-					break;
-				}
-				if(!strcmp(".entry", ptrFirstWord)){
-					state = POSTENTRY;
-					ptrLabel = calloc(MAXLABELLEN,sizeof(char));
-					labelIndex = 0;
-					index++;
-					break;
-				}
-				for(i=0;i<NUMCOMMANDS;i++){
-					if(!strcmp(commands[i], ptrFirstWord)){
-						state = POSTCOMMAND;
+				switch(state){
+					case PREFIRSTWORD:
+						break;
+					case FIRSTWORD:
+						break;
+					case POSTFIRSTWORD:
+						break;
+					case POSTDIRECTIVE:
 						index++;
 						break;
-					}
+					case POSTEXTERN:
+						ptrLabel = calloc(MAXLABELLEN,sizeof(char));
+						labelIndex = 0;
+						index++;
+						break;
+					case POSTENTRY:
+						ptrLabel = calloc(MAXLABELLEN,sizeof(char));
+						labelIndex = 0;
+						index++;
+						break;
+					case POSTCOMMAND:
+						index++;
+						break;
+					case POSTLABEL:
+						index++;
+						break;
 				}
 				break;
 			case POSTCOMMAND:
@@ -141,6 +153,15 @@ void firstPass(NODE_T *ptrNode){
 			case POSTDIRECTIVE:
 				break;
 			case POSTLABEL:
+				printf("entered postlabel state \n");
+				exit(0);
+				/*ptrPostLabel = calloc(MAXDATACODELEN,sizeof(char));
+				firstWordIndex = 0;
+				ptrFirstWord[firstWordIndex] = current->inputChar[index];
+				firstWordIndex++;
+				state = FIRSTWORD;
+				index++;*/
+
 				break;
 			case POSTEXTERN:
 				midLabel = FLAGON;
@@ -159,6 +180,32 @@ void firstPass(NODE_T *ptrNode){
 
 	}
 
-
 }
 
+
+int checkState(char *ptrFirstWord){
+	int i;
+	enum status state;
+
+	for(i=0;i<NUMDIRECTIVES;i++){
+		if(!strcmp(directives[i], ptrFirstWord)){
+			state = POSTDIRECTIVE;
+			return state;
+		}
+	}
+	if(!strcmp(".extern", ptrFirstWord)){
+		state = POSTEXTERN;
+		return state;
+	}
+	if(!strcmp(".entry", ptrFirstWord)){
+		state = POSTENTRY;
+		return state;
+	}
+	for(i=0;i<NUMCOMMANDS;i++){
+		if(!strcmp(commands[i], ptrFirstWord)){
+			state = POSTCOMMAND;
+			return state;
+		}
+	}
+	return -1;
+}

@@ -6,6 +6,7 @@
 #define ERROR 1
 #define NOERROR 0
 #define MAXLABELLEN 31 /*maximum length of label*/
+#define MAXDATACODELEN 6 /* maximum length of data or code command (.asciz is 6 chars)*/
 #define FLAGOFF 0
 #define FLAGON 1
 #define NUMDIRECTIVES 4
