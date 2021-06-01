@@ -1,19 +1,20 @@
 #include "main.h"
 
-enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY};
+enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE};
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
 
-int checkState(char *ptrFirstWord);
+int checkState(char *ptrInput);
 
 
 void firstPass(NODE_T *ptrNode){
-	int index,firstWordIndex,labelFlag,labelIndex,midLabel,DC,IC;
+	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,DC,IC;
 	NODE_T *current;
 	char *ptrFirstWord;
 	char *ptrLabel;
+	char *ptrCommandDirective;
 
 	enum status state;
 
@@ -42,6 +43,22 @@ void firstPass(NODE_T *ptrNode){
 		if(current->inputChar[index] == '\t' || current->inputChar[index] == ' '){
 			if(state == FIRSTWORD){
 				state = POSTFIRSTWORD;
+			}
+			if(state == COMMANDORDIRECTIVE){
+				ptrCommandDirective[CommandDirectiveIndex] = '\0';
+				state = checkState(ptrCommandDirective);
+				if(state == POSTDIRECTIVE){
+					printf("%s \n",ptrCommandDirective);
+				}
+				else if(state == POSTCOMMAND){
+					printf("%s \n",ptrCommandDirective);
+
+				}
+				else{
+					printf("Error: Invalid directive or command \n");
+
+				}
+				exit(0);
 			}
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
@@ -146,6 +163,8 @@ void firstPass(NODE_T *ptrNode){
 					case POSTLABEL:
 						index++;
 						break;
+					case COMMANDORDIRECTIVE:
+						break;
 				}
 				break;
 			case POSTCOMMAND:
@@ -153,14 +172,12 @@ void firstPass(NODE_T *ptrNode){
 			case POSTDIRECTIVE:
 				break;
 			case POSTLABEL:
-				printf("entered postlabel state \n");
-				exit(0);
-				/*ptrPostLabel = calloc(MAXDATACODELEN,sizeof(char));
-				firstWordIndex = 0;
-				ptrFirstWord[firstWordIndex] = current->inputChar[index];
-				firstWordIndex++;
-				state = FIRSTWORD;
-				index++;*/
+				ptrCommandDirective = calloc(MAXDATACODELEN,sizeof(char));
+				CommandDirectiveIndex = 0;
+				ptrCommandDirective[CommandDirectiveIndex] = current->inputChar[index];
+				CommandDirectiveIndex++;
+				state = COMMANDORDIRECTIVE;
+				index++;
 
 				break;
 			case POSTEXTERN:
@@ -175,6 +192,11 @@ void firstPass(NODE_T *ptrNode){
 				labelIndex++;
 				index++;
 				break;
+			case COMMANDORDIRECTIVE:
+				ptrCommandDirective[CommandDirectiveIndex] = current->inputChar[index];
+				CommandDirectiveIndex++;
+				index++;
+				break;
 			
 		}		
 
@@ -183,29 +205,33 @@ void firstPass(NODE_T *ptrNode){
 }
 
 
-int checkState(char *ptrFirstWord){
+int checkState(char *ptrInput){
 	int i;
 	enum status state;
 
 	for(i=0;i<NUMDIRECTIVES;i++){
-		if(!strcmp(directives[i], ptrFirstWord)){
+		if(!strcmp(directives[i], ptrInput)){
 			state = POSTDIRECTIVE;
 			return state;
 		}
 	}
-	if(!strcmp(".extern", ptrFirstWord)){
+	if(!strcmp(".extern", ptrInput)){
 		state = POSTEXTERN;
 		return state;
 	}
-	if(!strcmp(".entry", ptrFirstWord)){
+	if(!strcmp(".entry", ptrInput)){
 		state = POSTENTRY;
 		return state;
 	}
 	for(i=0;i<NUMCOMMANDS;i++){
-		if(!strcmp(commands[i], ptrFirstWord)){
+		if(!strcmp(commands[i], ptrInput)){
 			state = POSTCOMMAND;
 			return state;
 		}
 	}
 	return -1;
 }
+
+
+
+
