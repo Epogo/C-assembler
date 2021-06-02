@@ -20,7 +20,7 @@ void handleFileContents(FILE *fd){
 
 	storeLines(ptrNode, fd);
 
-	firstPass(ptrNode);
+	manageContents(ptrNode);
 	
 }
 

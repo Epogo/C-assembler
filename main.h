@@ -26,4 +26,5 @@ typedef struct node NODE_T; /*node struct defined as type NODE_T*/
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd);
 void storeLines(NODE_T *ptrNode, FILE *fd);
-void firstPass(NODE_T *ptrNode);
+void manageContents(NODE_T *ptrNode);
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
