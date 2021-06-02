@@ -5,7 +5,7 @@
 #define NUMBIT 16
 
 void Registers(char reg[NUMBIT]);
-void DecToBin(int bin[NUMBIT], int dec, int n);
+void DecToBin(char reg[NUMBIT]);
 void regScan(char *op,char *rs, char *rt, char *rd, FILE *fpin,FILE *fout);
 
 int main(int argc, char *argv[])
@@ -15,12 +15,12 @@ int main(int argc, char *argv[])
          rt[NUMBIT],
          rd[NUMBIT];
     int b[NUMBIT], dec, i, j, cnt = 0,cp,command;
-    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
+    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo","addi"};
     FILE *fpin, *fpout;
 
     if (argc != 3)
     {
-        printf("USAGE: MIPS32_encoder <input_file.ext> <output_file.ext>\n");
+        printf("encoder <input_file.ext> <output_file.ext>\n");
         exit(EXIT_FAILURE);
     }
     if ((fpin = fopen(argv[1], "r")) == NULL)
@@ -36,47 +36,55 @@ int main(int argc, char *argv[])
 
     while (fscanf(fpin, "%s", code) != EOF)
     {
-	for (i=0; i<3; i++){
+	for (i=0; i<9; i++){
 		if (!strcmp(code, commands[i])){
 			command=i;
 			break;
 		}
 	}
 	regScan(code,rs,rt,rd,fpin,fpout);		
-        switch(command) 
-        {
-	    case 0:
-            fprintf(fpout, "Bin: 000000 %s %s %s 00001 000000\n",
-                   rs, rt, rd);
-	    break;
-	    case 1:
-	    fprintf(fpout, "Bin: 000000 %s %s %s 00010 000000\n",
-                   rs, rt, rd);
-	    break;
-	    case 2:
-	    fprintf(fpout, "Bin: 000000 %s %s %s 00011 000000\n",
-                   rs, rt, rd);
-	    case 3:
-	    fprintf(fpout, "Bin: 000000 %s %s %s 00100 000000\n",
-                   rs, rt, rd);
-	    case 4:
-	    fprintf(fpout, "Bin: 000000 %s %s %s 00101 000000\n",
-                   rs, rt, rd);
-	    case 5:
-	    fprintf(fpout, "Bin: 000001 %s %s %s 00001 000000\n",
-                   rs, rt, rd);
-	    case 6:
-	    fprintf(fpout, "Bin: 000001 %s %s %s 00010 000000\n",
-                   rs, rt, rd);
-	    case 7:
-	    fprintf(fpout, "Bin: 000001 %s %s %s 00011 000000\n",
-                   rs, rt, rd);
-	    break;
-	    default:
-	    break;
-                                             
-        }
-    }
+	switch(command) 
+		{
+		    case 0:
+		    fprintf(fpout, "Bin: 000000 %s %s %s 00001 000000\n",
+		           rs, rt, rd);
+		    break;
+		    case 1:
+		    fprintf(fpout, "Bin: 000000 %s %s %s 00010 000000\n",
+		           rs, rt, rd);
+		    break;
+		    case 2:
+		    fprintf(fpout, "Bin: 000000 %s %s %s 00011 000000\n",
+		           rs, rt, rd);
+		    case 3:
+		    fprintf(fpout, "Bin: 000000 %s %s %s 00100 000000\n",
+		           rs, rt, rd);
+		    case 4:
+		    fprintf(fpout, "Bin: 000000 %s %s %s 00101 000000\n",
+		           rs, rt, rd);
+		    case 5:
+		    fprintf(fpout, "Bin: 000001 %s %s %s 00001 000000\n",
+		           rs, rt, rd);
+		    case 6:
+		    fprintf(fpout, "Bin: 000001 %s %s %s 00010 000000\n",
+		           rs, rt, rd);
+		    case 7:
+		    fprintf(fpout, "Bin: 000001 %s %s %s 00011 000000\n",
+		           rs, rt, rd);
+		    break;
+                    case 8:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001010 %s %s %s\n", rs, rt, rd);
+		    break;
+		    default:
+		    break;
+		                                     
+		}
+
+		           	
+     }
+	 
+
     fclose(fpin);
     fclose(fpout);
 
@@ -86,13 +94,15 @@ int main(int argc, char *argv[])
 void Registers(char reg[NUMBIT])
 {
     int num;
-    char *p;
+    char *temp;
     int i,j;
     char *str=(char*)malloc(6);
-    str[5]='\0';
-    p=reg;
-    p++;
-    num=atoi(p);
+    temp=reg;
+    if (reg[0]!='$'){
+    	return;	
+    }
+    temp++;
+    num=atoi(temp);
     if (num>31)
     {
         printf("Error: register can be Ri, with i=0,1,...,31\n");
@@ -106,8 +116,7 @@ void Registers(char reg[NUMBIT])
                 num=num/2;
                 i++;		
 	   }
-    p=str;
-    strcpy(reg,p);
+    strcpy(reg,str);
     free(str);
     return;
 }
@@ -128,25 +137,22 @@ void regScan(char *op,char *rs, char *rt, char *rd, FILE *fpin, FILE *fpout)
 
 
 
-void DecToBin(int bin[NUMBIT], int dec, int n)
+void DecToBin(char reg[NUMBIT])
 {
-    int i, k, j = n - 1;
+    int num;
+    int i,j;
+    char *str=(char*)malloc(16);
+    num=atoi(reg);
+    str[15]='\0';
+    j=14;
+    while (j>=0)
+	   {
+		str[j--]=num%2+'0';
+                num=num/2;
+                i++;		
+	   }
+    strcpy(reg,str);
+    free(str);
+    return;
 
-    for (i = 0; i < n; i++)
-    {
-        if (dec % 2 == 0)
-            bin[i] = 0;
-        else
-            bin[i] = 1;
-
-        dec /= 2;
-    }
-
-    for (i = 0; i < n / 2; i++)
-    {
-        k = bin[i];
-        bin[i] = bin[j];
-        bin[j] = k;
-        j--;
-    }
 }
