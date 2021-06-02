@@ -1,6 +1,6 @@
 #include "main.h"
 
-enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE};
+enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,DATA,CODE};
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
@@ -10,11 +10,13 @@ int checkState(char *ptrInput);
 
 
 void firstPass(NODE_T *ptrNode){
-	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,DC,IC;
+	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,quotesFlag,dataIndex,codeIndex;
 	NODE_T *current;
 	char *ptrFirstWord;
 	char *ptrLabel;
 	char *ptrCommandDirective;
+	char *ptrData;
+	char *ptrCode;
 
 	enum status state;
 
@@ -23,12 +25,16 @@ void firstPass(NODE_T *ptrNode){
 	labelFlag = FLAGOFF;
 	midLabel = FLAGOFF;
 	state = PREFIRSTWORD;
+	quotesFlag = NOQUOTES;
 
-	IC = 100;
-	DC = 0;
 	while(1){
 
 		if(current->inputChar[index] == '\0'){
+			if(state == CODE){
+				ptrCode[codeIndex] = '\0';
+				/*printf("%s\n",ptrCode);
+				exit(0);*/
+			}
 			if(current->next == NULL){
 				break;
 			}
@@ -47,7 +53,7 @@ void firstPass(NODE_T *ptrNode){
 			if(state == COMMANDORDIRECTIVE){
 				ptrCommandDirective[CommandDirectiveIndex] = '\0';
 				state = checkState(ptrCommandDirective);
-				if(state == POSTDIRECTIVE){
+				/*if(state == POSTDIRECTIVE){
 					printf("%s \n",ptrCommandDirective);
 				}
 				else if(state == POSTCOMMAND){
@@ -58,13 +64,14 @@ void firstPass(NODE_T *ptrNode){
 					printf("Error: Invalid directive or command \n");
 
 				}
-				exit(0);
+				exit(0);*/
 			}
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
-				/*printf("%s \n",ptrFirstWord);
-				printf("%s \n",ptrLabel);*/
+				/*printf("%s \n",ptrFirstWord);*/
+				/*printf("%s \n",ptrLabel);
+				exit(0)*/
 				free(ptrFirstWord);
 				free(ptrLabel);
 				current = current->next;
@@ -85,11 +92,17 @@ void firstPass(NODE_T *ptrNode){
 			continue;
 		}
 		if(current->inputChar[index] == '\n'){
+			if(state == CODE){
+				ptrCode[codeIndex] = '\0';
+				/*printf("%s\n",ptrCode);
+				exit(0);*/
+			}
 			if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
-				/*printf("%s \n",ptrFirstWord);
-				printf("%s \n",ptrLabel);*/
+				/*printf("%s \n",ptrFirstWord);*/
+				/*printf("%s \n",ptrLabel);
+				exit(0)*/
 				free(ptrFirstWord);
 				free(ptrLabel);
 			} 
@@ -126,7 +139,8 @@ void firstPass(NODE_T *ptrNode){
 			case POSTFIRSTWORD:
 				/*printf("entered POSTFIRSTWORD\n");*/
 				ptrFirstWord[firstWordIndex] = '\0';
-				/*printf("%s \n",ptrFirstWord);*/
+				/*printf("%s\n",ptrFirstWord);
+				exit(0);*/
 				if(labelFlag == FLAGON){
 					state = POSTLABEL;
 				}
@@ -150,12 +164,12 @@ void firstPass(NODE_T *ptrNode){
 					case POSTEXTERN:
 						ptrLabel = calloc(MAXLABELLEN,sizeof(char));
 						labelIndex = 0;
-						index++;
+						/*index++;*/
 						break;
 					case POSTENTRY:
 						ptrLabel = calloc(MAXLABELLEN,sizeof(char));
 						labelIndex = 0;
-						index++;
+						/*index++;*/
 						break;
 					case POSTCOMMAND:
 						index++;
@@ -165,11 +179,23 @@ void firstPass(NODE_T *ptrNode){
 						break;
 					case COMMANDORDIRECTIVE:
 						break;
+					case DATA:
+						break;
+					case CODE:
+						break;
 				}
 				break;
 			case POSTCOMMAND:
+				ptrCode = calloc(MAXLINELEN,sizeof(char));
+				codeIndex = 0;
+				state = CODE;			
 				break;
 			case POSTDIRECTIVE:
+				if(!strcmp(".asciz", ptrCommandDirective)){
+					ptrData = calloc(MAXLINELEN,sizeof(char));
+					dataIndex = 0;
+					state = DATA;
+				}
 				break;
 			case POSTLABEL:
 				ptrCommandDirective = calloc(MAXDATACODELEN,sizeof(char));
@@ -195,6 +221,45 @@ void firstPass(NODE_T *ptrNode){
 			case COMMANDORDIRECTIVE:
 				ptrCommandDirective[CommandDirectiveIndex] = current->inputChar[index];
 				CommandDirectiveIndex++;
+				index++;
+				break;
+			case DATA:
+				if(!strcmp(".asciz", ptrCommandDirective)){
+					if(quotesFlag == NOQUOTES){
+						if(current->inputChar[index] == '"'){
+							quotesFlag = OPENQUOTES;
+							index++;
+						}
+						else{
+							printf("Error: Unexpected character \n");
+							exit(0);
+						}
+					}
+					else if(quotesFlag == OPENQUOTES){
+						if(current->inputChar[index] == '"'){
+							ptrData[dataIndex] = '\0';
+							current = current->next;
+							state = PREFIRSTWORD;
+							labelFlag = FLAGOFF;
+							quotesFlag = NOQUOTES;
+							index = 0;
+							/*printf("%s \n", ptrData);
+							exit(0);*/
+						}
+						else{
+							ptrData[dataIndex] = current->inputChar[index];
+							dataIndex++;
+							index++;
+						}
+					
+					}
+					/*else if(quotesFlag == CLOSEDQUOTES){
+					}*/
+				}
+				break;
+			case CODE:
+				ptrCode[codeIndex] = current->inputChar[index];
+				codeIndex++;
 				index++;
 				break;
 			

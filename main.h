@@ -11,6 +11,10 @@
 #define FLAGON 1
 #define NUMDIRECTIVES 4
 #define NUMCOMMANDS 27
+#define NOQUOTES 0
+#define OPENQUOTES 1
+#define CLOSEDQUOTES 2
+
 
 struct node {
 	int lineNumber;
