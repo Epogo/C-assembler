@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
          rt[NUMBIT],
          rd[NUMBIT];
     int b[NUMBIT], dec, i, j, cnt = 0,cp,command;
-    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo","addi"};
+    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo","addi","subi","andi","ori","nori"};
     FILE *fpin, *fpout;
 
     if (argc != 3)
@@ -75,6 +75,22 @@ int main(int argc, char *argv[])
                     case 8:
                     DecToBin(rd);
 		    fprintf(fpout, "Bin: 001010 %s %s %s\n", rs, rt, rd);
+		    break;
+		    case 9:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001011 %s %s %s\n", rs, rt, rd);
+		    break;
+		    case 10:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001100 %s %s %s\n", rs, rt, rd);
+		    break;
+		    case 11:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001101 %s %s %s\n", rs, rt, rd);
+		    break;
+		    case 12:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001110 %s %s %s\n", rs, rt, rd);
 		    break;
 		    default:
 		    break;
@@ -141,10 +157,10 @@ void DecToBin(char reg[NUMBIT])
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(16);
+    char *str=(char*)malloc(17);
     num=atoi(reg);
-    str[15]='\0';
-    j=14;
+    str[16]='\0';
+    j=15;
     while (j>=0)
 	   {
 		str[j--]=num%2+'0';
