@@ -53,6 +53,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				}				
 				break;
 			case 7:
+				if(labelFlag == FLAGON){
+					/*symbolTable(ptrField1,DC,1);*/
+				}
 				step = 8;
 				break;
 			case 8:
@@ -81,6 +84,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				break;
 				
 		}
+		if(step == 11 || step == 12)
+			break;
 		if(endWhileFlag == FLAGON){
 			break;
 		}

@@ -23,8 +23,20 @@ struct node {
 };
 typedef struct node NODE_T; /*node struct defined as type NODE_T*/
 
+struct tableNode{
+	char *symbol;
+	int value;
+	int attribute[2];
+	struct tableNode* next;
+};
+typedef struct tableNode TABLE_NODE_T;
+
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd);
 void storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
+void symbolTable(char *symbol,int value,int attribute);
+
+
+
