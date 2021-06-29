@@ -36,7 +36,7 @@ void handleFileContents(FILE *fd);
 void storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
-void symbolTable(char *symbol,int value,int attribute);
+TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute);
 
 
 

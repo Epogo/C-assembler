@@ -3,9 +3,11 @@
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
-	static int IC,DC,step;
+	static int IC,DC,step,errorFlag;
 	int i,directiveFlag,endWhileFlag;
+	TABLE_NODE_T* tableHead;
 	step = 1;
+	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	/*printf("%s\n",ptrField1);
@@ -54,7 +56,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				break;
 			case 7:
 				if(labelFlag == FLAGON){
-					/*symbolTable(ptrField1,DC,1);*/
+					tableHead = symbolTable(ptrField1,DC,1);
 				}
 				step = 8;
 				break;
@@ -79,13 +81,53 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				}
 				break;
 			case 11:
+				tableHead = symbolTable(ptrField2,0,1);
+				step = 2;
+				endWhileFlag = FLAGON;
 				break;
 			case 12:
+				if(labelFlag == FLAGON){
+					tableHead = symbolTable(ptrField1,IC,1);
+				}
+				step = 13;
 				break;
+			case 13:
+				step = 14;
+				break;
+			case 14:
+				step = 15;
+				break;
+			case 15:
+				step = 16;
+				break;
+			case 16:
+				IC = IC + 4;
+				step = 2;
+				endWhileFlag = FLAGON;
+				break;
+			case 17:
+				if(errorFlag == FLAGON){
+					endWhileFlag = FLAGON;
+				}
+				else{
+					step = 18;
+				}
+				break;
+			case 18:
+				step = 19;
+				break;
+			case 19:
+				step = 20;
+				break;
+			case 20:
+				step = 21;
+				break;
+			case 21:
+				endWhileFlag = FLAGON;
+				break;
+	
 				
 		}
-		if(step == 11 || step == 12)
-			break;
 		if(endWhileFlag == FLAGON){
 			break;
 		}
