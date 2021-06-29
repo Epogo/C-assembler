@@ -63,13 +63,13 @@ int main(int argc, char *argv[])
 		    fprintf(fpout, "Bin: 000000 %s %s %s 00101 000000\n",
 		           rs, rt, rd);
 		    case 5:
-		    fprintf(fpout, "Bin: 000001 %s %s %s 00001 000000\n",
+		    fprintf(fpout, "Bin: 000001 %s 00000 %s 00001 000000\n",
 		           rs, rt, rd);
 		    case 6:
-		    fprintf(fpout, "Bin: 000001 %s %s %s 00010 000000\n",
+		    fprintf(fpout, "Bin: 000001 %s 00000 %s 00010 000000\n",
 		           rs, rt, rd);
 		    case 7:
-		    fprintf(fpout, "Bin: 000001 %s %s %s 00011 000000\n",
+		    fprintf(fpout, "Bin: 000001 %s 00000 %s 00011 000000\n",
 		           rs, rt, rd);
 		    break;
                     case 8:
