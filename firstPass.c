@@ -2,10 +2,13 @@
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
+enum Attributes {EMPTY,CODE,DATA,ENTRY,EXTERNAL};
+
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 	static int IC,DC,step,errorFlag;
 	int i,directiveFlag,endWhileFlag;
 	TABLE_NODE_T* tableHead;
+	/*enum Attributes Attribute;*/
 	step = 1;
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
@@ -56,7 +59,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				break;
 			case 7:
 				if(labelFlag == FLAGON){
-					tableHead = symbolTable(ptrField1,DC,1);
+					tableHead = symbolTable(ptrField1,DC,DATA,EMPTY);
 				}
 				step = 8;
 				break;
@@ -81,13 +84,13 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				}
 				break;
 			case 11:
-				tableHead = symbolTable(ptrField2,0,1);
+				tableHead = symbolTable(ptrField2,0,EXTERNAL,EMPTY);
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
 			case 12:
 				if(labelFlag == FLAGON){
-					tableHead = symbolTable(ptrField1,IC,1);
+					tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);
 				}
 				step = 13;
 				break;

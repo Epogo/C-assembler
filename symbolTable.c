@@ -1,7 +1,6 @@
 #include "main.h"
 
-
-TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute){
+TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2){
 	/*printf("\n%s\n",symbol);*/
 
 	TABLE_NODE_T *ptrTableNode; /*initialize pointer to TABLE_NODE_T, variable ptrTableNode*/
@@ -30,7 +29,8 @@ TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute){
 
 	ptrTableNode->symbol = symbol;
 	ptrTableNode->value = value;
-	ptrTableNode->attribute[0] = attribute;
+	ptrTableNode->attribute[0] = attribute1;
+	ptrTableNode->attribute[1] = attribute2;
 	ptrTableNode->next = NULL;
 
 	current = ptrTableNode;
