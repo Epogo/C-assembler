@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
          rt[NUMBIT],
          rd[NUMBIT];
     int b[NUMBIT], dec, i, j, cnt = 0,cp,command;
-    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo","addi","subi","andi","ori","nori"};
+    char *commands[]={"add","sub","and","or","nor","move","mvhi","mvlo","addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
     FILE *fpin, *fpout;
 
     if (argc != 3)
@@ -92,6 +92,55 @@ int main(int argc, char *argv[])
                     DecToBin(rd);
 		    fprintf(fpout, "Bin: 001110 %s %s %s\n", rs, rt, rd);
 		    break;
+					    
+			case 13:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 001111 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 14:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010000 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 14:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010001 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 15:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010010 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 16:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010011 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 17:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010100 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 18:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010101 %s %s %s\n", rs, rt, rd);
+		    break;
+			case 19:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010110 %s %s %s\n", rs, rd, rt);
+		    break;
+			case 20:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 010111 %s %s %s\n", rs, rd, rt);
+			case 21:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 011000 %s %s %s\n", rs, rd, rt);
+			case 22:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 011001 %s %s %s\n", rs, rd, rt);
+			case 23:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 011010 %s %s %s\n", rs, rd, rt);
+			case 24:
+                    DecToBin(rd);
+		    fprintf(fpout, "Bin: 011011 %s %s %s\n", rs, rd, rt);
+			
 		    default:
 		    break;
 		                                     
