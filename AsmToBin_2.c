@@ -2,36 +2,54 @@
 #include <stdlib.h>
 #include <string.h>
 #define NUMBIT 16
-void firstPass(char*,char*);
+#define RCOMLEN 8
+
+void firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
+
+char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
+char *rComFunct[]={"00001","00010","00011","00100","00101"};
+char *rOpCode[]={"000000","000001"};
 int main()
 {
-    firstPass("addi","$4,15,$6");
+    firstPass(NULL,"sub","$4,$5,$6");
     return 0;
 }
 
-void firstPass(char *ptrField1,char *ptrField2){
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *str;
     str = (char *)calloc(80, sizeof(char));
-    printf("%s ",ptrField1);
-    strcpy(str,ptrField2);
+    strcpy(str,ptrField3);
     const char s[2] = ",";
     char *token;
     char *reg;
     int count=0;
     char *imm;
     token = strtok(str, s);
-    
-        if(!strcmp(ptrField1,"add")){
-          while( token != NULL ) {
-            reg=Registers(token);
-            printf( "%s ", reg);
-            free(reg);
-            token = strtok(NULL, s);
+    for(int i=0;i<RCOMLEN;i++){
+        if(!strcmp(ptrField2,rCommands[i])){
+            if(i<5)
+                printf("%s ",rOpCode[0]);
+            else
+                printf("%s ",rOpCode[1]); 
+            while( token != NULL ) {
+                if (count!=1){
+                    reg=Registers(token);
+                    printf( "%s ", reg);
+                    free(reg);
+                }
+                else
+                    printf("%s","00000 ");
+                token = strtok(NULL, s);
+                if (i>4)
+                    count++;
             }
+            printf("%s",rComFunct[(i+5)%5]);
+            printf("%s"," 000000");
         }
-        else if(!strcmp(ptrField1,"addi")){
+    }
+     /*   else if(!strcmp(ptrField2,"addi")){
             while(token!=NULL){
                 if (count!=1)
                     reg=Registers(token);
@@ -44,14 +62,12 @@ void firstPass(char *ptrField1,char *ptrField2){
                 token = strtok(NULL, s);
                 count++;
             }
-        }
+        }*/
     
-    printf( "%s ", imm);
-    free(imm);
+    //printf( "%s ", imm);
+    //free(imm);
     free(str);
     count=0;
-
-
 }
 char *Registers(char *reg)
 {
