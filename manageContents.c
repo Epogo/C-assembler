@@ -38,8 +38,8 @@ void manageContents(NODE_T *ptrNode){
 					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag);
 				}
 				else if(labelFlag == FLAGOFF){
-					firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);
-					
+					/*firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);*/
+					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag);
 				}
 				/*printf("%s\n",ptrCode);
 				exit(0);*/
@@ -50,8 +50,8 @@ void manageContents(NODE_T *ptrNode){
 					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag);
 				}
 				else if(labelFlag == FLAGOFF){
-					firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);
-					
+					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
+					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag);				
 				}
 				/*printf("%s \n", ptrData);
 				exit(0);*/
@@ -120,8 +120,8 @@ void manageContents(NODE_T *ptrNode){
 					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag);
 				}
 				else if(labelFlag == FLAGOFF){
-					firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);
-					
+					/*firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);*/
+					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag);
 				}
 				/*printf("%s\n",ptrCode);
 				exit(0);*/
@@ -129,7 +129,8 @@ void manageContents(NODE_T *ptrNode){
 			if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
-				firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);
+				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
+				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag);
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/
@@ -142,8 +143,8 @@ void manageContents(NODE_T *ptrNode){
 					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag);
 				}
 				else if(labelFlag == FLAGOFF){
-					firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);
-					
+					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
+					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag);
 				}
 				/*printf("%s \n", ptrData);
 				exit(0);*/

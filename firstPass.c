@@ -13,9 +13,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
-	/*printf("%s\n",ptrField1);
-	printf("%s\n",ptrField2);
-	printf("%s\n",ptrField3);*/
+	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
 
 	while(1){
 		switch(step){
@@ -64,7 +62,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				step = 8;
 				break;
 			case 8:
-				step = 9;
+				step = 2;
+				endWhileFlag = FLAGON;
 				break;
 			case 9:
 				if(!strcmp(".extern", ptrField1) || !strcmp(".entry", ptrField1)){
