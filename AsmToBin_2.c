@@ -17,19 +17,18 @@ void firstPass(char *ptrField1,char *ptrField2){
     strcpy(str,ptrField2);
     const char s[2] = ",";
     char *token;
-    char *reg[3];
-    char const reg2[6];
-    int i=0;
+    char *reg;
     token = strtok(str, s);
-    reg[i++]=Registers(token);
     
         if(!strcmp(ptrField1,"add")){
           while( token != NULL ) {
-            printf( "%s ", reg[i]);
+            reg=Registers(token);
+            printf( "%s ", reg);
+            free(reg);
             token = strtok(NULL, s);
-            reg[i]=Registers(token);
         }
     }
+
 }
 
 char *Registers(char *reg)
