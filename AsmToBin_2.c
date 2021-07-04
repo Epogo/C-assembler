@@ -28,6 +28,7 @@ void firstPass(char *ptrField1,char *ptrField2){
             token = strtok(NULL, s);
         }
     }
+    free(str);
 
 }
 
