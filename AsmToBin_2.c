@@ -13,12 +13,14 @@ char *rComFunct[]={"00001","00010","00011","00100","00101"};
 char *rOpCode[]={"000000","000001"};
 int main()
 {
-    firstPass(NULL,"sub","$4,$5,$6");
+    
+    firstPass(NULL,"move","$20,$2");
     return 0;
 }
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *str;
+    
     str = (char *)calloc(80, sizeof(char));
     strcpy(str,ptrField3);
     const char s[2] = ",";
@@ -26,46 +28,51 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *reg;
     int count=0;
     char *imm;
+    char *registers[3];
+    
     token = strtok(str, s);
+    
     for(int i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
-            if(i<5)
-                printf("%s ",rOpCode[0]);
-            else
-                printf("%s ",rOpCode[1]); 
             while( token != NULL ) {
-                if (count!=1){
                     reg=Registers(token);
-                    printf( "%s ", reg);
+                    registers[count]=(char*) malloc(6 * sizeof(char));
+                    if((i>4)&&(count==1))
+                    {
+                        strcpy(registers[count],"00000");
+                        count++;
+                        continue;
+                    }
+                    strcpy(registers[count],reg);
                     free(reg);
-                }
-                else
-                    printf("%s","00000 ");
-                token = strtok(NULL, s);
-                if (i>4)
+                    token = strtok(NULL, s);
                     count++;
             }
-            printf("%s",rComFunct[(i+5)%5]);
+            if(i<5){
+                printf("%s",rOpCode[0]);
+                for (int j=0;j<3;j++)
+                {
+                    printf(" %s",registers[j]);
+                    free(registers[j]);
+                }
+                printf(" %s",rComFunct[(i+5)%5]);
+            }
+            else{
+                printf("%s",rOpCode[1]);
+                for (int k=2;k>=0;k--)
+                {
+                    if (k==1){
+                        printf(" %s","00000");
+                        free(registers[k]);
+                        continue;
+                    }
+                    printf(" %s",registers[k]);
+                    free(registers[k]);
+                }
+            }
             printf("%s"," 000000");
         }
     }
-     /*   else if(!strcmp(ptrField2,"addi")){
-            while(token!=NULL){
-                if (count!=1)
-                    reg=Registers(token);
-                printf( "%s ", reg);
-                if (count==1){
-                    imm=decToBin(token);
-                }
-                if (count!=1)
-                    free(reg);
-                token = strtok(NULL, s);
-                count++;
-            }
-        }*/
-    
-    //printf( "%s ", imm);
-    //free(imm);
     free(str);
     count=0;
 }
