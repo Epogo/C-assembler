@@ -57,6 +57,7 @@ void manageContents(NODE_T *ptrNode){
 				exit(0);*/
 			}
 			if(current->next == NULL){
+				firstPass(ptrTrash,ptrTrash,ptrTrash,-1); /*end of file*/	
 				break;
 			}
 			else{
@@ -90,7 +91,8 @@ void manageContents(NODE_T *ptrNode){
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
-				firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);
+				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
+				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag);
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/

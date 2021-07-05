@@ -2,18 +2,21 @@
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
+static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
+
 enum Attributes {EMPTY,CODE,DATA,ENTRY,EXTERNAL};
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 	static int IC,DC,step,errorFlag;
-	int i,directiveFlag,endWhileFlag;
+	int i,directiveFlag,commandFlag,endWhileFlag;
 	TABLE_NODE_T* tableHead;
 	/*enum Attributes Attribute;*/
 	step = 1;
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
+	commandFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
-	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
+	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
 
 	while(1){
 		switch(step){
@@ -23,7 +26,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				step = 2;
 				break;
 			case 2:
-				step = 6;
+				if(labelFlag == -1){
+					step = 17;
+				}
+				else{
+					step = 6;
+				}
 				break;
 			case 3:
 				break;
@@ -32,24 +40,15 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 			case 5:
 				break;
 			case 6:
-				if(labelFlag == FLAGON){
-					for(i=0;i<NUMDIRECTIVES;i++){
-						if(!strcmp(directives[i], ptrField2)){
-							directiveFlag = FLAGON;
-							
-						}
-					}
-				}
-				else if(labelFlag == FLAGOFF){
-					for(i=0;i<NUMDIRECTIVES;i++){
-						if(!strcmp(directives[i], ptrField1)){
-							directiveFlag = FLAGON;
-						}
+				for(i=0;i<NUMDIRECTIVES;i++){
+					if(!strcmp(directives[i], ptrField2)){
+						directiveFlag = FLAGON;
+						
 					}
 				}
 				if(directiveFlag == FLAGON){
 					step = 7;
-					directiveFlag = FLAGOFF;
+					directiveFlag = FLAGOFF; /*check if line necessary*/
 				}
 				else if(directiveFlag == FLAGOFF){
 					step = 9;
@@ -62,11 +61,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				step = 8;
 				break;
 			case 8:
+				/*Add to "Tmunat Hazikaron"*/
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
 			case 9:
-				if(!strcmp(".extern", ptrField1) || !strcmp(".entry", ptrField1)){
+				if(!strcmp(".extern", ptrField2) || !strcmp(".entry", ptrField2)){
 					step = 10;
 				}
 				else{
@@ -74,7 +74,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				}
 				break;
 			case 10:
-				if(!strcmp(".entry", ptrField1)){
+				if(!strcmp(".entry", ptrField2)){
 					step = 2;
 					endWhileFlag = FLAGON;
 				}
@@ -83,7 +83,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				}
 				break;
 			case 11:
-				tableHead = symbolTable(ptrField2,0,EXTERNAL,EMPTY);
+				tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
@@ -94,6 +94,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
 				step = 13;
 				break;
 			case 13:
+				for(i=0;i<NUMCOMMANDS;i++){
+					if(!strcmp(commands[i], ptrField2)){
+						commandFlag = FLAGON;
+					}
+				}
+				if(commandFlag == FLAGOFF){
+					errorFlag = FLAGON;
+				}
 				step = 14;
 				break;
 			case 14:
