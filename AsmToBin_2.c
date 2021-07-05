@@ -9,7 +9,11 @@ char *Registers(char*);
 char *decToBin(char*);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
+char *iCommands[]={"addi","subi","andi","ori","nori"};
 char *rComFunct[]={"00001","00010","00011","00100","00101"};
+char *rOpCode[]={"000000","000001"};
+char *iOpCode[]={"01010","01011","01100","01101","01110"};
+
 char *rOpCode[]={"000000","000001"};
 int main()
 {
