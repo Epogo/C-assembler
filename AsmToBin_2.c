@@ -4,20 +4,24 @@
 #define NUMBIT 16
 #define RCOMLEN 8
 #define ICOMLEN 15
+#define JCOMLEN 4
 
 void firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
+char *decToBinJ(char*);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
+char *jCommands[]={"jmp","la","call","stop"};
 char *rComFunct[]={"00001","00010","00011","00100","00101"};
 char *rOpCode[]={"000000","000001"};
-char *iOpCode[]={"01010","01011","01100","01101","01110","01111","10000","10001","10010","10011","10100","10101","10110","10111","11000"};
+char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};
+char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,"blt","$1,$5,100");
+    firstPass(NULL,"jmp","1000");
     return 0;
 }
 
@@ -30,7 +34,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *token;
     char *reg;
     int count=0;
-    char *imm=(char *)calloc(17, sizeof(char));;
+    char *imm=(char *)calloc(17, sizeof(char));
+    char *imm2=(char *)calloc(25, sizeof(char));
     char *registers[3];
     
     token = strtok(str, s);
@@ -57,7 +62,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                     printf(" %s",registers[j]);
                     free(registers[j]);
                 }
-                printf(" %s",rComFunct[(i+5)%5]);
+                printf(" %s",rComFunct[i]);
             }
             else{
                 printf("%s",rOpCode[1]);
@@ -79,7 +84,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     for(int i=0;i<ICOMLEN;i++){
 
         if(!strcmp(ptrField2,iCommands[i])){
-            if(i<5){
+            if(i<5||i>8){
                 while( token != NULL ) {
                         if (count==1)
                         {
@@ -135,6 +140,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         }    
     }
     
+    for(int i=0;i<JCOMLEN;i++){
+        if(!strcmp(ptrField2,jCommands[i])){
+            strcpy(imm2,decToBinJ(ptrField3));
+            printf("%s ",jOpCode[i]);
+            printf("0%s",imm2);
+        }
+    }
+    
     free(str);
     count=0;
 }
@@ -146,8 +159,9 @@ char *Registers(char *reg)
     char *str=(char*)malloc(6);
     temp=reg;
     if (reg[0]!='$'){
-        printf("Not a register!");
-    	exit(EXIT_FAILURE);	
+        /*printf("Not a register!");
+    	exit(EXIT_FAILURE);*/
+    	return NULL;
     }
     temp++;
     num=atoi(temp);
@@ -183,4 +197,21 @@ char *decToBin(char *number)
 	   }
     return str;
 
+}
+
+char *decToBinJ(char *number)
+{
+    int num;
+    int i,j;
+    char *str=(char*)malloc(25);
+    num=atoi(number);
+    str[24]='\0';
+    j=23;
+    while (j>=0)
+	   {
+		str[j--]=num%2+'0';
+                num=num/2;
+                i++;		
+	   }
+    return str;
 }
