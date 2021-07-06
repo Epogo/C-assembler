@@ -14,6 +14,7 @@
 #define NOQUOTES 0
 #define OPENQUOTES 1
 #define CLOSEDQUOTES 2
+#define LASTLINE -1
 
 
 struct node {
@@ -31,12 +32,21 @@ struct tableNode{
 };
 typedef struct tableNode TABLE_NODE_T;
 
+struct lineFields{
+	char label[MAXLABELLEN];
+	char comOrDir[MAXDATACODELEN];
+	char values[MAXLINELEN];
+	int labelFlag;
+	struct lineFields* next;
+};
+typedef struct lineFields LINE_FIELDS_T;
+
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd);
 void storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode);
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
-
+LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
 
 

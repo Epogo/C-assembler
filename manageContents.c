@@ -10,7 +10,7 @@ int checkState(char *ptrInput);
 
 
 void manageContents(NODE_T *ptrNode){
-	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,quotesFlag,dataIndex,codeIndex;
+	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,quotesFlag,dataIndex,codeIndex,errorDetected;
 	NODE_T *current;
 	char *ptrFirstWord;
 	char *ptrLabel;
@@ -28,6 +28,7 @@ void manageContents(NODE_T *ptrNode){
 	midLabel = FLAGOFF;
 	state = PREFIRSTWORD;
 	quotesFlag = NOQUOTES;
+	errorDetected = FLAGOFF;
 
 	while(1){
 
@@ -35,11 +36,11 @@ void manageContents(NODE_T *ptrNode){
 			if(state == CODE){
 				ptrCode[codeIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);
 				}
 				else if(labelFlag == FLAGOFF){
 					/*firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag);
+					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);
 				}
 				/*printf("%s\n",ptrCode);
 				exit(0);*/
@@ -47,17 +48,17 @@ void manageContents(NODE_T *ptrNode){
 			if(state == DATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag,errorDetected);
 				}
 				else if(labelFlag == FLAGOFF){
 					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag);				
+					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag,errorDetected);				
 				}
 				/*printf("%s \n", ptrData);
 				exit(0);*/
 			}
 			if(current->next == NULL){
-				firstPass(ptrTrash,ptrTrash,ptrTrash,-1); /*end of file*/	
+				firstPass(ptrTrash,ptrTrash,ptrTrash,LASTLINE,errorDetected); /*end of file*/	
 				break;
 			}
 			else{
@@ -92,7 +93,7 @@ void manageContents(NODE_T *ptrNode){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
 				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
-				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag);
+				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected);
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/
@@ -119,11 +120,11 @@ void manageContents(NODE_T *ptrNode){
 			if(state == CODE){
 				ptrCode[codeIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);
 				}
 				else if(labelFlag == FLAGOFF){
 					/*firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag);
+					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);
 				}
 				/*printf("%s\n",ptrCode);
 				exit(0);*/
@@ -132,7 +133,7 @@ void manageContents(NODE_T *ptrNode){
 				ptrLabel[labelIndex] = '\0';
 				midLabel = FLAGOFF;
 				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
-				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag);
+				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected);
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/
@@ -142,11 +143,11 @@ void manageContents(NODE_T *ptrNode){
 			if(state == DATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag,errorDetected);
 				}
 				else if(labelFlag == FLAGOFF){
 					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag);
+					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag,errorDetected);
 				}
 				/*printf("%s \n", ptrData);
 				exit(0);*/
@@ -192,8 +193,16 @@ void manageContents(NODE_T *ptrNode){
 				else{
 					state = checkState(ptrFirstWord);
 					if(state == -1){
-						printf("Error in Line %u: Invalid State \n",current->lineNumber);
-						exit(0);
+						printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+						errorDetected = FLAGOFF;
+						current = current->next;
+						state = PREFIRSTWORD;
+						labelFlag = FLAGOFF;
+						index = 0;
+						break;
+						/*exit(0);*/
 					}
 				}
 				switch(state){
@@ -270,14 +279,23 @@ void manageContents(NODE_T *ptrNode){
 							index++;
 						}
 						else{
-							printf("Error: Unexpected character \n");
-							exit(0);
+							/*printf("Error: Unexpected character \n");
+							exit(0);*/
+							printf("Line %u: Unexpected character\n",current->lineNumber);
+							errorDetected = FLAGON;
+							firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+							errorDetected = FLAGOFF;
+							current = current->next;
+							state = PREFIRSTWORD;
+							labelFlag = FLAGOFF;
+							index = 0;
+							break;
 						}
 					}
 					else if(quotesFlag == OPENQUOTES){
 						if(current->inputChar[index] == '"'){
 							ptrData[dataIndex] = '\0';
-							firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag);
+							firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag,errorDetected);
 							current = current->next;
 							state = PREFIRSTWORD;
 							labelFlag = FLAGOFF;
