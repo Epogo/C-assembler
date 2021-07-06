@@ -216,3 +216,23 @@ char *decToBinJ(char *number)
     str[25] = '\0';
     return str;
 }
+
+char *dec2hex(int num) {
+    int i = 1, j, temp, quotient;
+    quotient = num;
+    char *arr=(char*)malloc(8);
+
+    while(quotient!=0) {
+        temp = quotient % 16;
+        //To convert integer into character
+        if( temp < 10)
+            temp = temp + 48; 
+        else
+            temp = temp + 55;
+        arr[i++]= temp;
+        quotient = quotient / 16;
+    }
+
+    for (j = i - 1; j > 0; j--)
+        printf("%c", arr[j]);
+}
