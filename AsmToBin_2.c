@@ -21,7 +21,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,"stop",NULL);
+    firstPass(NULL,"jmp","-1");
     return 0;
 }
 
@@ -192,14 +192,15 @@ char *decToBin(char *number)
     int i,j;
     char *str=(char*)malloc(17);
     num=atoi(number);
-    str[16]='\0';
-    j=15;
-    while (j>=0)
-	   {
-		str[j--]=num%2+'0';
-                num=num/2;
-                i++;		
-	   }
+    const int BITS = 4*sizeof(num);
+    char binStr[BITS+1];
+    for(unsigned int i=0; i<BITS; i++)
+    {
+      unsigned int mask = 1 << (BITS - 1 - i);
+      binStr[i] = (num & mask) ? '1' : '0';
+    }
+    binStr[BITS] = '\0';
+    strcpy(str,binStr);
     return str;
 
 }
@@ -210,13 +211,14 @@ char *decToBinJ(char *number)
     int i,j;
     char *str=(char*)malloc(25);
     num=atoi(number);
-    str[24]='\0';
-    j=23;
-    while (j>=0)
-	   {
-		str[j--]=num%2+'0';
-                num=num/2;
-                i++;		
-	   }
+    const int BITS = 6*sizeof(num);
+    char binStr[BITS+1];
+    for(unsigned int i=0; i<BITS; i++)
+    {
+      unsigned int mask = 1 << (BITS - 1 - i);
+      binStr[i] = (num & mask) ? '1' : '0';
+    }
+    binStr[BITS] = '\0';
+    strcpy(str,binStr);
     return str;
 }
