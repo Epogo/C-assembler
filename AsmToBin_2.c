@@ -21,7 +21,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,"jmp","1000");
+    firstPass(NULL,"stop",NULL);
     return 0;
 }
 
@@ -29,7 +29,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *str;
     
     str = (char *)calloc(80, sizeof(char));
-    strcpy(str,ptrField3);
     const char s[2] = ",";
     char *token;
     char *reg;
@@ -38,6 +37,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *imm2=(char *)calloc(25, sizeof(char));
     char *registers[3];
     
+    if (ptrField3)
+        strcpy(str,ptrField3);
     token = strtok(str, s);
     for(int i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
@@ -142,7 +143,11 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     for(int i=0;i<JCOMLEN;i++){
         if(!strcmp(ptrField2,jCommands[i])){
-            strcpy(imm2,decToBinJ(ptrField3));
+            if (i<3){
+                strcpy(imm2,decToBinJ(ptrField3));
+            }
+            else
+                strcpy(imm2,decToBinJ("0"));
             printf("%s ",jOpCode[i]);
             printf("0%s",imm2);
         }
