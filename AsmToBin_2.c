@@ -192,15 +192,12 @@ char *decToBin(char *number)
     int i,j;
     char *str=(char*)malloc(17);
     num=atoi(number);
-    const int BITS = 4*sizeof(num);
-    char binStr[BITS+1];
-    for(unsigned int i=0; i<BITS; i++)
+    for(unsigned int i=0; i<17; i++)
     {
-      unsigned int mask = 1 << (BITS - 1 - i);
-      binStr[i] = (num & mask) ? '1' : '0';
+      unsigned int mask = 1 << (17 - 1 - i);
+      str[i] = (num & mask) ? '1' : '0';
     }
-    binStr[BITS] = '\0';
-    strcpy(str,binStr);
+    str[17] = '\0';
     return str;
 
 }
@@ -211,14 +208,11 @@ char *decToBinJ(char *number)
     int i,j;
     char *str=(char*)malloc(25);
     num=atoi(number);
-    const int BITS = 6*sizeof(num);
-    char binStr[BITS+1];
-    for(unsigned int i=0; i<BITS; i++)
+    for(unsigned int i=0; i<25; i++)
     {
-      unsigned int mask = 1 << (BITS - 1 - i);
-      binStr[i] = (num & mask) ? '1' : '0';
+      unsigned int mask = 1 << (25 - 1 - i);
+      str[i] = (num & mask) ? '1' : '0';
     }
-    binStr[BITS] = '\0';
-    strcpy(str,binStr);
+    str[25] = '\0';
     return str;
 }
