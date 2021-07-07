@@ -11,6 +11,7 @@ char *Registers(char*);
 char *decToBin(char*);
 char *decToBinJ(char*);
 char *ascizToBin(int);
+char *decToBinDir(char*);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
@@ -23,7 +24,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,".asciz","aBcdEF" );
+    firstPass(NULL,".db","6,-9" );
     return 0;
 }
 
@@ -185,6 +186,16 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         }
         printf("00000000");
     }
+    
+    if(!strcmp(ptrField2,".db"))
+    {
+        while( token != NULL ) {
+            char *s=decToBinDir(token);
+            printf("%s\n",s);
+            free(s);
+            token = strtok(NULL, s);
+        }
+    }
     free(str);
     count=0;
 }
@@ -253,6 +264,21 @@ char *ascizToBin(int num)
 {
     int i,j;
     char *str=(char*)malloc(8);
+    for(unsigned int i=0; i<8; i++)
+    {
+      unsigned int mask = 1 << (8 - 1 - i);
+      str[i] = (num & mask) ? '1' : '0';
+    }
+    str[8] = '\0';
+    return str;
+}
+
+char *decToBinDir(char *number)
+{
+    int num;
+    int i,j;
+    char *str=(char*)malloc(8);
+    num=atoi(number);
     for(unsigned int i=0; i<8; i++)
     {
       unsigned int mask = 1 << (8 - 1 - i);
