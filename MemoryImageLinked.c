@@ -46,7 +46,9 @@ int main()
                 //printf("%s ",mem);
                 hex=binToHex(mem);
                 j=0;
-                printf("%c ",hex);
+                printf("%c",hex);
+                if((i+1)%8==0)
+                    printf(" ");
                 bin++;
                 continue;
             }
