@@ -12,6 +12,8 @@ char *decToBin(char*);
 char *decToBinJ(char*);
 char *ascizToBin(int);
 char *decToBinDir(char*);
+char *decToBinDirW(char*);
+char *decToBinDirH(char*);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
@@ -24,7 +26,14 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,".db","6,-9" );
+    firstPass(NULL,".dh","27056");
+    firstPass(NULL,"stop",NULL);
+    firstPass(NULL,"addi","$4,-12,$17");
+    firstPass(NULL,"lw","$0,4,$10");
+    firstPass(NULL,"mvlo","$5,$10");
+    firstPass(NULL,".asciz","AbZ");
+    firstPass(NULL,"bgt","$5,$6,LOOP");
+    firstPass(NULL,".db","17,18,-1");
     return 0;
 }
 
@@ -80,8 +89,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                     printf(" %s",registers[k]);
                     free(registers[k]);
                 }
+                printf(" %s",rComFunct[i%5]);
             }
-            printf("%s"," 000000");
+            printf("%s"," 000000\n");
         }
     }
 
@@ -105,7 +115,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         count++;
                 }
                     
-                printf("%s",iOpCode[i]);
+                printf("%s ",iOpCode[i]);
                 for (int j=0;j<3;j++)
                     {
                         if (j==1)
@@ -113,7 +123,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         printf(" %s",registers[j]);
                         free(registers[j]);
                     }
-                    printf(" %s",imm);
+                    printf(" %s\n",imm);
                     free(imm);
             }
             else{
@@ -140,7 +150,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         printf(" %s",registers[j]);
                         free(registers[j]);
                     }
-                printf(" %s",imm);
+                printf(" %s\n",imm);
                 free(imm);
             }
         }    
@@ -170,7 +180,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             else{
                 printf("%s ",jOpCode[i]);
                 strcpy(imm2,decToBinJ("0"));
-                printf("0%s ",imm2);
+                printf("0%s \n",imm2);
             }
         }
     }
@@ -179,22 +189,44 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     {
         while (*ptrField3!='\0'){
             int asciCode=*ptrField3;
-            char *s=ascizToBin(asciCode);
-            printf("%s\n",s);
-            free(s);
+            char *letter=ascizToBin(asciCode);
+            printf("%s\n",letter);
+            free(letter);
             ptrField3++;
         }
-        printf("00000000");
+        printf("00000000\n");
     }
     
     if(!strcmp(ptrField2,".db"))
     {
         while( token != NULL ) {
-            char *s=decToBinDir(token);
-            printf("%s\n",s);
-            free(s);
+            char *binNum=decToBinDir(token);
+            printf("%s\n",binNum);
             token = strtok(NULL, s);
+            free(binNum);
         }
+        
+    }
+    if(!strcmp(ptrField2,".dw"))
+    {
+        while( token != NULL ) {
+            char *binNum=decToBinDirW(token);
+            printf("%s\n",binNum);
+            token = strtok(NULL, s);
+            free(binNum);
+        }
+        
+    }
+    
+    if(!strcmp(ptrField2,".dh"))
+    {
+        while( token != NULL ) {
+            char *binNum=decToBinDirH(token);
+            printf("%s\n",binNum);
+            token = strtok(NULL, s);
+            free(binNum);
+        }
+        
     }
     free(str);
     count=0;
@@ -285,6 +317,38 @@ char *decToBinDir(char *number)
       str[i] = (num & mask) ? '1' : '0';
     }
     str[8] = '\0';
+    return str;
+}
+
+char *decToBinDirW(char *number)
+{
+    int num;
+    int i,j;
+    char *str=(char*)malloc(32);
+    num=atoi(number);
+    for(unsigned int i=0; i<32; i++)
+    {
+      unsigned int mask = 1 << (32 - 1 - i);
+      str[i] = (num & mask) ? '1' : '0';
+    }
+    str[32] = '\0';
+    return str;
+}
+
+char *decToBinDirH(char *number)
+{
+    int num;
+    int i,j;
+    char *str=(char*)malloc(16);
+    num=atoi(number);
+    for(unsigned int i=0; i<32; i++)
+    {
+      unsigned int mask = 1 << (32 - 1 - i);
+      if(i<16)
+        continue;
+      str[i-16] = (num & mask) ? '1' : '0';
+    }
+    str[16] = '\0';
     return str;
 }
 
