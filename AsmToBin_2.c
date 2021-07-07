@@ -21,7 +21,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,"stop", NULL);
+    firstPass(NULL,"bne","$31,$9,LOOP" );
     return 0;
 }
 
@@ -83,7 +83,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     }
 
     for(int i=0;i<ICOMLEN;i++){
-
         if(!strcmp(ptrField2,iCommands[i])){
             if(i<5||i>8){
                 while( token != NULL ) {
@@ -111,13 +110,16 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         printf(" %s",registers[j]);
                         free(registers[j]);
                     }
-                printf(" %s",imm);
-                free(imm);
+                    printf(" %s",imm);
+                    free(imm);
             }
             else{
                 while( token != NULL ) {
                         if (count==2){
-                            strcpy(imm,decToBin(token));
+                            if (*token>='A'&&*token<='Z')
+                                strcpy(imm,"?");
+                            else
+                                strcpy(imm,decToBin(token));
                             registers[2]=NULL;
                             break;
                         }
@@ -169,7 +171,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             }
         }
     }
-    
     free(str);
     count=0;
 }
