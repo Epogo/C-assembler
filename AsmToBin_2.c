@@ -10,10 +10,12 @@ void firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
 char *decToBinJ(char*);
+char *ascizToBin(int);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
 char *jCommands[]={"jmp","la","call","stop"};
+char *directives[]={".db",".dw",".dh",".data",".asciz",".entry",".extern"};
 char *rComFunct[]={"00001","00010","00011","00100","00101"};
 char *rOpCode[]={"000000","000001"};
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};
@@ -21,7 +23,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,"bne","$31,$9,LOOP" );
+    firstPass(NULL,".asciz","aBcdEF" );
     return 0;
 }
 
@@ -171,6 +173,18 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             }
         }
     }
+    
+    if(!strcmp(ptrField2,".asciz"))
+    {
+        while (*ptrField3!='\0'){
+            int asciCode=*ptrField3;
+            char *s=ascizToBin(asciCode);
+            printf("%s\n",s);
+            free(s);
+            ptrField3++;
+        }
+        printf("00000000");
+    }
     free(str);
     count=0;
 }
@@ -208,14 +222,14 @@ char *decToBin(char *number)
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(17);
+    char *str=(char*)malloc(16);
     num=atoi(number);
-    for(unsigned int i=0; i<17; i++)
+    for(unsigned int i=0; i<16; i++)
     {
-      unsigned int mask = 1 << (17 - 1 - i);
+      unsigned int mask = 1 << (16 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
     }
-    str[17] = '\0';
+    str[16] = '\0';
     return str;
 
 }
@@ -224,14 +238,27 @@ char *decToBinJ(char *number)
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(25);
+    char *str=(char*)malloc(24);
     num=atoi(number);
-    for(unsigned int i=0; i<25; i++)
+    for(unsigned int i=0; i<24; i++)
     {
-      unsigned int mask = 1 << (25 - 1 - i);
+      unsigned int mask = 1 << (24 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
     }
-    str[25] = '\0';
+    str[24] = '\0';
+    return str;
+}
+
+char *ascizToBin(int num)
+{
+    int i,j;
+    char *str=(char*)malloc(8);
+    for(unsigned int i=0; i<8; i++)
+    {
+      unsigned int mask = 1 << (8 - 1 - i);
+      str[i] = (num & mask) ? '1' : '0';
+    }
+    str[8] = '\0';
     return str;
 }
 
