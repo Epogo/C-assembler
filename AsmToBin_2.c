@@ -26,14 +26,15 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    firstPass(NULL,".dh","27056");
+    /*firstPass(NULL,".dh","27056");
     firstPass(NULL,"stop",NULL);
     firstPass(NULL,"addi","$4,-12,$17");
     firstPass(NULL,"lw","$0,4,$10");
     firstPass(NULL,"mvlo","$5,$10");
     firstPass(NULL,".asciz","AbZ");
-    firstPass(NULL,"bgt","$5,$6,LOOP");
-    firstPass(NULL,".db","17,18,-1");
+    firstPass(NULL,"bgt","$5,$6,LOOP");*/
+    //firstPass(NULL,"bgt","$7,$12,64");
+    firstPass(NULL,".dh","1028");
     return 0;
 }
 
