@@ -23,6 +23,7 @@ char *decToBinDirH(char*);
 void deleteNode(memIm*);
 void addNode(memIm *head, memIm *node);
 void printList(memIm *head);
+char binToHex(char *bin);
 
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
@@ -388,9 +389,30 @@ void printList(memIm *head)
 {
     memIm *q;
     q=head;
+    char *bin;
+    char mem[5];
+    int j=0;
+    char hex;
     while(q!=NULL)
     {
-        printf("%s\n",q->op);
+        bin=q->op;
+        for(int i=0;i<32;i++){
+            mem[j]=*bin;
+            if((i+1)%4==0){
+                mem[4]='\0';
+                //printf("%s ",mem);
+                hex=binToHex(mem);
+                j=0;
+                printf("%c",hex);
+                if((i+1)%8==0)
+                    printf(" ");
+                bin++;
+                continue;
+            }
+            j++;
+            bin++;
+        }
+        printf("\n");
         q=q->next;
     }
 
@@ -408,5 +430,40 @@ void deleteNode(memIm *node){
     }
 }
 
-
-
+char binToHex(char *bin)
+{
+    char hex;
+    if(!strcmp(bin, "0000"))
+        hex='0';
+    else if(!strcmp(bin, "0001"))
+        hex='1';
+    else if(!strcmp(bin, "0010"))
+        hex='2';
+    else if(!strcmp(bin, "0011"))
+        hex='3';
+    else if(!strcmp(bin, "0100"))
+        hex='4';
+    else if(!strcmp(bin, "0101"))
+        hex='5';
+    else if(!strcmp(bin, "0110"))
+        hex='6';
+    else if(!strcmp(bin, "0111"))
+        hex='7';
+    else if(!strcmp(bin, "1000"))
+        hex='8';
+    else if(!strcmp(bin, "1001"))
+        hex='9';
+    else if(!strcmp(bin, "1010"))
+        hex='A';
+    else if(!strcmp(bin, "1011"))
+        hex='B';
+    else if(!strcmp(bin, "1100"))
+        hex='C';
+    else if(!strcmp(bin, "1101"))
+        hex='D';
+    else if(!strcmp(bin, "1110"))
+        hex='E';
+    else if(!strcmp(bin, "1111"))
+        hex='F';
+    return hex;
+}
