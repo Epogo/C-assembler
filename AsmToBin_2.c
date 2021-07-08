@@ -52,6 +52,8 @@ int main()
     addNode(head,firstPass(NULL,"move","$23,$2"));
     addNode(head,firstPass(NULL,"addi","$23,11,$2"));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2"));
+    addNode(head,firstPass(NULL,"bgt","$0,$0,11"));
+    addNode(head,firstPass(NULL,"stop",NULL));
     printList(head);
     deleteNode(head);
 
@@ -95,47 +97,30 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                     count++;
             }
             if(i<5){
-                //printf("%s",rOpCode[0]);
                 strcpy(pointer,rOpCode[0]);
                 pointer+=strlen(rOpCode[0]);
                 for (int j=0;j<3;j++)
                 {
-                    //printf(" %s",registers[j]);
-                    strcpy(pointer,registers[j]);
-                    pointer+=strlen(registers[j]);
+                    strcat(pointer,registers[j]);
                     free(registers[j]);
                 }
-                //printf(" %s",rComFunct[i]);
-                strcpy(pointer,rComFunct[i]);
-                pointer+=strlen(rComFunct[i]);
-                
-                
+                strcat(pointer,rComFunct[i]);
             }
             else{
-                //printf("%s",rOpCode[1]);
                 strcpy(pointer,rOpCode[1]);
-                pointer+=strlen(rOpCode[1]);
                 for (int k=2;k>=0;k--)
                 {
                     if (k==1){
-                        //printf(" %s","00000");
-                        strcpy(pointer,emptyPointer);
-                        pointer+=strlen(emptyPointer);
+                        strcat(pointer,emptyPointer);
                         free(registers[k]);
                         continue;
                     }
-                    //printf(" %s",registers[k]);
-                    strcpy(pointer,registers[k]);
-                    pointer+=strlen(registers[k]);
+                    strcat(pointer,registers[k]);
                     free(registers[k]);
                 }
-                //printf(" %s",rComFunct[i%5]);
-                strcpy(pointer,rComFunct[i%5]);
-                pointer+=strlen(rComFunct[i%5]);
+                strcat(pointer,rComFunct[i%5]);
             }
-            //printf("%s"," 000000\n");
-            strcpy(pointer,notInUse);
-            //*pointer='\0';
+            strcat(pointer,notInUse);
         }
     }
 
@@ -158,22 +143,16 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         token = strtok(NULL, s);
                         count++;
                 }
-                    
-                //printf("%s ",iOpCode[i]);
+
                 strcpy(pointer,iOpCode[i]);
-                pointer+=strlen(iOpCode[i]);
                 for (int j=0;j<3;j++)
                     {
                         if (j==1)
                             continue;
-                        //printf(" %s",registers[j]);
-                        strcpy(pointer,registers[j]);
-                        pointer+=strlen(registers[j]);
+                        strcat(pointer,registers[j]);
                         free(registers[j]);
                     }
-                    //printf(" %s\n",imm);
-                    strcpy(pointer,imm);
-                    pointer+=strlen(imm);
+                    strcat(pointer,imm);
                     free(imm);
             }
             else{
@@ -194,48 +173,33 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         count++;
                 }
                     
-                //printf("%s",iOpCode[i]);
                 strcpy(pointer,iOpCode[i]);
-                pointer+=strlen(iOpCode[i]);
                 for (int j=0;j<2;j++)
                     {
-                        //printf(" %s",registers[j]);
-                        strcpy(pointer,registers[j]);
-                        pointer+=strlen(registers[j]);
+                        strcat(pointer,registers[j]);
                         free(registers[j]);
                     }
-                strcpy(pointer,imm);
-                pointer+=strlen(imm);
+                strcat(pointer,imm);
                 free(imm);
             }
         }    
     }
     
-    /*for(int i=0;i<JCOMLEN;i++){
-        if(!strcmp(ptrField2,jCommands[i])){
-            if (i<3){
-                strcpy(imm2,decToBinJ(ptrField3));
-            }
-            else
-                strcpy(imm2,decToBinJ("0"));
-            printf("%s ",jOpCode[i]);
-            printf("0%s",imm2);
-        }
-    }*/
-    
     for(int i=0;i<JCOMLEN;i++){
         if(!strcmp(ptrField2,jCommands[i])){
             if (i<3){
-                printf("%s ",jOpCode[i]);
-                if(*ptrField3!='$')
-                    printf("0 ?");
-                else
-                    printf("1 ?");
+                strcpy(pointer,jOpCode[i]);
+                if(*ptrField3!='$'){
+                    strcat(pointer,"0?");
+                }
+                else{
+                    strcat(pointer,"1?");
+                }
             }
             else{
-                printf("%s ",jOpCode[i]);
+                strcpy(pointer,jOpCode[i]);
                 strcpy(imm2,decToBinJ("0"));
-                printf("0%s \n",imm2);
+                strcat(pointer,imm2);
             }
         }
     }
@@ -338,14 +302,14 @@ char *decToBinJ(char *number)
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(24);
+    char *str=(char*)malloc(26);
     num=atoi(number);
-    for(unsigned int i=0; i<24; i++)
+    for(unsigned int i=0; i<26; i++)
     {
-      unsigned int mask = 1 << (24 - 1 - i);
+      unsigned int mask = 1 << (26 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
     }
-    str[24] = '\0';
+    str[26] = '\0';
     return str;
 }
 
