@@ -6,7 +6,13 @@
 #define ICOMLEN 15
 #define JCOMLEN 4
 
-void firstPass(char*,char*,char*);
+typedef struct memoryImage{
+    int address;
+    char op[33];
+    struct memoryImage *next;
+} memIm;
+
+memIm *firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
 char *decToBinJ(char*);
@@ -14,6 +20,10 @@ char *ascizToBin(int);
 char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
+void deleteNode(memIm*);
+void addNode(memIm *head, memIm *node);
+void printList(memIm *head);
+
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
@@ -24,8 +34,12 @@ char *rOpCode[]={"000000","000001"};
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};
 char *jOpCode[]={"011110","011111","100000","111111"};
 
+
+
 int main()
 {
+    char *pointer;
+    memIm *head;
     /*firstPass(NULL,".dh","27056");
     firstPass(NULL,"stop",NULL);
     firstPass(NULL,"addi","$4,-12,$17");
@@ -34,13 +48,19 @@ int main()
     firstPass(NULL,".asciz","AbZ");
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
-    firstPass(NULL,".dh","1028");
+    head=firstPass(NULL,"add","$3,$5,$9");
+    addNode(head,firstPass(NULL,"move","$23,$2"));
+    addNode(head,firstPass(NULL,"addi","$23,11,$2"));
+    addNode(head,firstPass(NULL,"lw","$23,-2,$2"));
+    printList(head);
+    deleteNode(head);
+
     return 0;
 }
 
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
+memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *str;
-    
+    char string[33];
     str = (char *)calloc(80, sizeof(char));
     const char s[2] = ",";
     char *token;
@@ -48,7 +68,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     int count=0;
     char *imm=(char *)calloc(17, sizeof(char));
     char *imm2=(char *)calloc(25, sizeof(char));
+    memIm *node=(memIm *)malloc(sizeof(memIm));
     char *registers[3];
+    char *pointer;
+    pointer=string;
+    char *notInUse="000000";
+    char *emptyPointer="00000";
     
     if (ptrField3)
         strcpy(str,ptrField3);
@@ -70,29 +95,47 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                     count++;
             }
             if(i<5){
-                printf("%s",rOpCode[0]);
+                //printf("%s",rOpCode[0]);
+                strcpy(pointer,rOpCode[0]);
+                pointer+=strlen(rOpCode[0]);
                 for (int j=0;j<3;j++)
                 {
-                    printf(" %s",registers[j]);
+                    //printf(" %s",registers[j]);
+                    strcpy(pointer,registers[j]);
+                    pointer+=strlen(registers[j]);
                     free(registers[j]);
                 }
-                printf(" %s",rComFunct[i]);
+                //printf(" %s",rComFunct[i]);
+                strcpy(pointer,rComFunct[i]);
+                pointer+=strlen(rComFunct[i]);
+                
+                
             }
             else{
-                printf("%s",rOpCode[1]);
+                //printf("%s",rOpCode[1]);
+                strcpy(pointer,rOpCode[1]);
+                pointer+=strlen(rOpCode[1]);
                 for (int k=2;k>=0;k--)
                 {
                     if (k==1){
-                        printf(" %s","00000");
+                        //printf(" %s","00000");
+                        strcpy(pointer,emptyPointer);
+                        pointer+=strlen(emptyPointer);
                         free(registers[k]);
                         continue;
                     }
-                    printf(" %s",registers[k]);
+                    //printf(" %s",registers[k]);
+                    strcpy(pointer,registers[k]);
+                    pointer+=strlen(registers[k]);
                     free(registers[k]);
                 }
-                printf(" %s",rComFunct[i%5]);
+                //printf(" %s",rComFunct[i%5]);
+                strcpy(pointer,rComFunct[i%5]);
+                pointer+=strlen(rComFunct[i%5]);
             }
-            printf("%s"," 000000\n");
+            //printf("%s"," 000000\n");
+            strcpy(pointer,notInUse);
+            //*pointer='\0';
         }
     }
 
@@ -116,15 +159,21 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         count++;
                 }
                     
-                printf("%s ",iOpCode[i]);
+                //printf("%s ",iOpCode[i]);
+                strcpy(pointer,iOpCode[i]);
+                pointer+=strlen(iOpCode[i]);
                 for (int j=0;j<3;j++)
                     {
                         if (j==1)
                             continue;
-                        printf(" %s",registers[j]);
+                        //printf(" %s",registers[j]);
+                        strcpy(pointer,registers[j]);
+                        pointer+=strlen(registers[j]);
                         free(registers[j]);
                     }
-                    printf(" %s\n",imm);
+                    //printf(" %s\n",imm);
+                    strcpy(pointer,imm);
+                    pointer+=strlen(imm);
                     free(imm);
             }
             else{
@@ -145,13 +194,18 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                         count++;
                 }
                     
-                printf("%s",iOpCode[i]);
+                //printf("%s",iOpCode[i]);
+                strcpy(pointer,iOpCode[i]);
+                pointer+=strlen(iOpCode[i]);
                 for (int j=0;j<2;j++)
                     {
-                        printf(" %s",registers[j]);
+                        //printf(" %s",registers[j]);
+                        strcpy(pointer,registers[j]);
+                        pointer+=strlen(registers[j]);
                         free(registers[j]);
                     }
-                printf(" %s\n",imm);
+                strcpy(pointer,imm);
+                pointer+=strlen(imm);
                 free(imm);
             }
         }    
@@ -229,6 +283,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         }
         
     }
+    strcpy(node->op,string);
+    return node;
     free(str);
     count=0;
 }
@@ -353,22 +409,40 @@ char *decToBinDirH(char *number)
     return str;
 }
 
-char *dec2hex(int num) {
-    int i = 1, j, temp, quotient;
-    quotient = num;
-    char *arr=(char*)malloc(8);
+void addNode(memIm *head, memIm *node)
+{
+    memIm *q;
+    q=head;
+    while(q->next!=NULL)
+    {
+        q = q->next;
+    }
+    q->next=node;
+}
 
-    while(quotient!=0) {
-        temp = quotient % 16;
-        //To convert integer into character
-        if( temp < 10)
-            temp = temp + 48; 
-        else
-            temp = temp + 55;
-        arr[i++]= temp;
-        quotient = quotient / 16;
+void printList(memIm *head)
+{
+    memIm *q;
+    q=head;
+    while(q!=NULL)
+    {
+        printf("%s\n",q->op);
+        q=q->next;
     }
 
-    for (j = i - 1; j > 0; j--)
-        printf("%c", arr[j]);
 }
+
+void deleteNode(memIm *node){
+    memIm *temp;
+    temp=node;
+    while(1){
+        temp=node;
+        if (temp==NULL)
+            break;
+        node=node->next;
+        free(temp);
+    }
+}
+
+
+
