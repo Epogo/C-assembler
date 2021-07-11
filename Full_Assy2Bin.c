@@ -411,12 +411,15 @@ void printList(memIm *head)
     char mem[5];
     int j=0;
     char hex;
+    data *temp;
     while(q!=NULL)
     {
         if((q->p)!=NULL){
             while((q->p)!=NULL){
+                temp=q->p;
                 printf("%s\n",q->p->byte);
                 q->p=q->p->next;
+                free(temp);
             }
         }
         else
