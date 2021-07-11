@@ -7,7 +7,7 @@
 #define JCOMLEN 4
 
 typedef struct data{
-    char byte[9];
+    char byte[33];
     struct data *next;
 }data;
 
@@ -58,7 +58,7 @@ int main()
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
    // head=firstPass(NULL,".asciz","abcdefg");
-    head=firstPass(NULL,".db","80,2,3");
+    head=firstPass(NULL,".dw","80,2,3");
     addNode(head,firstPass(NULL,"move","$23,$2"));
     addNode(head,firstPass(NULL,"addi","$23,11,$2"));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2"));
@@ -257,9 +257,17 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     }
     if(!strcmp(ptrField2,".dw"))
     {
-        while( token != NULL ) {
-            char *binNum=decToBinDirW(token);
-            printf("%s\n",binNum);
+        data *first=(data*)malloc(sizeof(data));
+        node->p=first;
+        head=node->p;
+        temp=head;
+        data *n;
+        while( token != NULL ){
+            char *binNum=decToBinDir(token);
+            strcat(temp->byte,binNum);
+            n=(data*)malloc(sizeof(data));
+            temp->next=n;
+            temp=n;
             token = strtok(NULL, s);
             free(binNum);
         }
@@ -443,11 +451,12 @@ void printList(memIm *head)
                     j++;
                     bin++;
                 }
-                    printf("\n");
-                    temp=q->p;
+                    
+                temp=q->p;
                 //printf("%s\n",q->p->byte);
                 q->p=q->p->next;
                 free(temp);
+                printf("\n");
             }
         }
         else
@@ -468,9 +477,11 @@ void printList(memIm *head)
                 }
                 j++;
                 bin++;
+               
             }
-            printf("\n");
+             printf("\n");
         }
+        
         q=q->next;
     }
 
