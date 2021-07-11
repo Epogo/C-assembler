@@ -63,12 +63,12 @@ int main()
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
    // head=firstPass(NULL,".asciz","abcdefg");
-    head=firstPass(NULL,".dw","80,2,3",&ic);
-    addNode(head,firstPass(NULL,"move","$23,$2",&ic));
-    addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
+    head=firstPass(NULL,"add","$3,$5,$9",&ic);
+    addNode(head,firstPass(NULL,"ori","$9,-5,$2",&ic));
+    /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
     addNode(head,firstPass(NULL,"bgt","$0,$0,11",&ic));
-    addNode(head,firstPass(NULL,"stop",NULL,&ic));
+    addNode(head,firstPass(NULL,"stop",NULL,&ic));*/
     printList(head);
     deleteNode(head);
 
@@ -434,6 +434,7 @@ void printList(memIm *head)
     q=head;
     char *bin;
     char mem[5];
+    char printArr[8];
     int j=0;
     char hex;
     data *temp;
@@ -450,9 +451,7 @@ void printList(memIm *head)
                 //printf("%s ",mem);
                     hex=binToHex(mem);
                     j=0;
-                    printf("%c",hex);
-                    if((i+1)%8==0)
-                        printf(" ");
+                    printArr[i]=hex;
                     bin++;
                     continue;
                     }
@@ -466,30 +465,35 @@ void printList(memIm *head)
                 free(temp);
                 printf("\n");
             }
+
         }
         else
             {
             bin=q->op;
+            int k=0;
             for(int i=0;i<32;i++){
                 mem[j]=*bin;
                 if((i+1)%4==0){
                 mem[4]='\0';
                 //printf("%s ",mem);
                 hex=binToHex(mem);
+                printArr[k]=hex;
                 j=0;
-                printf("%c",hex);
-                if((i+1)%8==0)
-                    printf(" ");
                 bin++;
+                k++;
                 continue;
                 }
                 j++;
                 bin++;
                
             }
-             printf("\n");
         }
-        
+            for(int k=7;k>=0;){
+                printf("%c",printArr[k-1]);
+                printf("%c ",printArr[k]);
+                k-=2;
+            }
+            printf("\n");
         q=q->next;
     }
 
