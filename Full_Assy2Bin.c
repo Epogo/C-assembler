@@ -5,6 +5,7 @@
 #define RCOMLEN 8
 #define ICOMLEN 15
 #define JCOMLEN 4
+#define INITIC 100
 
 typedef struct data{
     char byte[33];
@@ -19,9 +20,7 @@ typedef struct memoryImage{
     struct memoryImage *next;
 } memIm;
 
-
-
-memIm *firstPass(char*,char*,char*);
+memIm *firstPass(char*,char*,char*,int*);
 char *Registers(char*);
 char *decToBin(char*);
 char *decToBinJ(char*);
@@ -34,7 +33,6 @@ void addNode(memIm *head, memIm *node);
 void printList(memIm *head);
 char binToHex(char *bin);
 
-
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
 char *jCommands[]={"jmp","la","call","stop"};
@@ -44,11 +42,10 @@ char *rOpCode[]={"000000","000001"};
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};
 char *jOpCode[]={"011110","011111","100000","111111"};
 
-
-
 int main()
 {
     memIm *head;
+    int ic=INITIC;
     /*firstPass(NULL,".dh","27056");
     firstPass(NULL,"stop",NULL);
     firstPass(NULL,"addi","$4,-12,$17");
@@ -58,19 +55,19 @@ int main()
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
    // head=firstPass(NULL,".asciz","abcdefg");
-    head=firstPass(NULL,".dw","80,2,3");
-    addNode(head,firstPass(NULL,"move","$23,$2"));
-    addNode(head,firstPass(NULL,"addi","$23,11,$2"));
-    addNode(head,firstPass(NULL,"lw","$23,-2,$2"));
-    addNode(head,firstPass(NULL,"bgt","$0,$0,11"));
-    addNode(head,firstPass(NULL,"stop",NULL));
+    head=firstPass(NULL,".dw","80,2,3",&ic);
+    addNode(head,firstPass(NULL,"move","$23,$2",&ic));
+    addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
+    addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
+    addNode(head,firstPass(NULL,"bgt","$0,$0,11",&ic));
+    addNode(head,firstPass(NULL,"stop",NULL,&ic));
     printList(head);
     deleteNode(head);
 
     return 0;
 }
 
-memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
+memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
     char *str;
     char string[33];
     str = (char *)calloc(80, sizeof(char));
@@ -285,6 +282,8 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         
     }
     strcpy(node->op,string);
+    node->address=*ic;
+    *ic=*ic+4;
     return node;
     free(str);
     count=0;
@@ -432,6 +431,7 @@ void printList(memIm *head)
     data *temp;
     while(q!=NULL)
     {
+        printf("%d ",q->address);
         if((q->p)!=NULL){
             while((q->p)!=NULL){
                 bin=q->p->byte;
