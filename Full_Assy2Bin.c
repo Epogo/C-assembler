@@ -56,7 +56,8 @@ int main()
     firstPass(NULL,".asciz","AbZ");
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
-    head=firstPass(NULL,".asciz","abcdefg");
+   // head=firstPass(NULL,".asciz","abcdefg");
+    head=firstPass(NULL,".db","80,2,3");
     addNode(head,firstPass(NULL,"move","$23,$2"));
     addNode(head,firstPass(NULL,"addi","$23,11,$2"));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2"));
@@ -237,9 +238,17 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".db"))
     {
-        while( token != NULL ) {
+        data *first=(data*)malloc(sizeof(data));
+        node->p=first;
+        head=node->p;
+        temp=head;
+        data *n;
+        while( token != NULL ){
             char *binNum=decToBinDir(token);
-            printf("%s\n",binNum);
+            strcat(temp->byte,binNum);
+            n=(data*)malloc(sizeof(data));
+            temp->next=n;
+            temp=n;
             token = strtok(NULL, s);
             free(binNum);
         }
