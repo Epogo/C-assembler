@@ -11,6 +11,7 @@ typedef struct data{
     struct data *next;
 }data;
 
+/*Maybe a union should be added*/
 typedef struct memoryImage{
     int address;
     char op[33];
