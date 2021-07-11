@@ -416,8 +416,26 @@ void printList(memIm *head)
     {
         if((q->p)!=NULL){
             while((q->p)!=NULL){
-                temp=q->p;
-                printf("%s\n",q->p->byte);
+                bin=q->p->byte;
+                for(int i=0;i<8;i++){
+                    mem[j]=*bin;
+                    if((i+1)%4==0){
+                    mem[4]='\0';
+                //printf("%s ",mem);
+                    hex=binToHex(mem);
+                    j=0;
+                    printf("%c",hex);
+                    if((i+1)%8==0)
+                        printf(" ");
+                    bin++;
+                    continue;
+                    }
+                    j++;
+                    bin++;
+                }
+                    printf("\n");
+                    temp=q->p;
+                //printf("%s\n",q->p->byte);
                 q->p=q->p->next;
                 free(temp);
             }
