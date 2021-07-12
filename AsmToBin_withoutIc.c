@@ -456,6 +456,7 @@ void printList(memIm *head)
     int k=0;
     char hex;
     data *temp;
+    static int ic=100;
     while(q!=NULL)
     {
         //printf("%d ",q->address);
@@ -497,6 +498,8 @@ void printList(memIm *head)
         }
         else
             {
+            printf("%d ",ic);
+            ic+=4;
             bin=q->op;
             k=0;
             for(int i=0;i<32;i++){
