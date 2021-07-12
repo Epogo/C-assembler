@@ -48,5 +48,5 @@ void manageContents(NODE_T *ptrNode);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
-
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF);
 

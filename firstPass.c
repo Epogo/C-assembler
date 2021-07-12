@@ -7,12 +7,13 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 enum Attributes {EMPTY,CODE,DATA,ENTRY,EXTERNAL};
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected){
-	static int IC,DC,step,errorFlag;
+	static int IC,DC,errorFlag;
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
 	static TABLE_NODE_T* tableHead;
 	static LINE_FIELDS_T* linesHead;
+	TABLE_NODE_T* tableTmp;
 	/*enum Attributes Attribute;*/
-	step = 1;
+	static int step = 1;
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
@@ -93,7 +94,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 				break;
 			case 11:
-				tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);
+				if(!strcmp(".extern", ptrField2)){
+					tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);
+				}
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
@@ -139,6 +142,23 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 19;
 				break;
 			case 19:
+				tableTmp = tableHead;
+				while(1){
+					/*printf("\nSymbol: %s, Value: %d, Attribute 1: %d\n",tableTmp->symbol,tableTmp->value,tableTmp->attribute[0]);*/
+					if(tableTmp->next == NULL){
+						if(tableTmp->attribute[0] == DATA){
+							tableTmp->value = tableTmp->value + ICF;
+						}
+						break;
+					}
+					else{
+						if(tableTmp->attribute[0] == DATA){
+							tableTmp->value = tableTmp->value + ICF;
+						}
+						tableTmp = tableTmp->next;
+					}
+					
+				}
 				step = 20;
 				break;
 			case 20:
@@ -146,7 +166,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-				/*begin second pass*/
+				secondPass(linesHead,tableHead,ICF,DCF);
 				break;
 	
 				

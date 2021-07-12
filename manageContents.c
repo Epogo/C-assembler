@@ -97,8 +97,8 @@ void manageContents(NODE_T *ptrNode){
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/
-				free(ptrFirstWord);
-				free(ptrLabel);
+				/*free(ptrFirstWord);
+				free(ptrLabel);*/
 				current = current->next;
 				state = PREFIRSTWORD;
 				labelFlag = FLAGOFF;
@@ -137,8 +137,8 @@ void manageContents(NODE_T *ptrNode){
 				/*printf("%s \n",ptrFirstWord);*/
 				/*printf("%s \n",ptrLabel);
 				exit(0)*/
-				free(ptrFirstWord);
-				free(ptrLabel);
+				/*free(ptrFirstWord);
+				free(ptrLabel);*/
 			} 
 			if(state == DATA){
 				ptrData[dataIndex] = '\0';
@@ -151,6 +151,13 @@ void manageContents(NODE_T *ptrNode){
 				}
 				/*printf("%s \n", ptrData);
 				exit(0);*/
+			}
+			if(state == COMMANDORDIRECTIVE){
+				ptrCommandDirective[CommandDirectiveIndex] = '\0';
+				if(!strcmp("stop", ptrCommandDirective)){
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected);
+				}
+
 			}
 			current = current->next;
 			state = PREFIRSTWORD;
