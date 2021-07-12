@@ -1,4 +1,3 @@
-1.לתקן באג:מודפס ic חדש כשממלאים שורה
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -491,7 +490,7 @@ void printList(memIm *head)
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
                 count+=2;
-                if (count%8==0){
+                if ((count%8==0)&&(count!=k)){
                     printf("\n");
                     printf("%d ",ic);
                     ic+=4;
