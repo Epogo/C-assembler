@@ -58,11 +58,8 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","abcdefg");
-    addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
-    addNode(headCom,headData,firstPass(NULL,".asciz","ab"));
-    addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
-    addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
+    headData=firstPass(NULL,".asciz","aBcd");
+    //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     //addNode(0,headCom,headData,firstPass(NULL,"lw","$7,-4,$2",&ic));
     /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
@@ -463,6 +460,8 @@ void printList(memIm *head)
         if((q->p)!=NULL){
             k=0;
             int count=0;
+            printf("%d ",ic);
+            ic+=4;
             while((q->p)!=NULL){
                 bin=q->p->byte;
                 for(int i=0;i<8;i++){
@@ -487,13 +486,15 @@ void printList(memIm *head)
                 free(temp);
             }
 
-            for(k=k-1;k>=0;){
+            for(int i=0;i<=k;i+=2){
                 count+=2;
-                printf("%c",printArr[k-1]);
-                printf("%c ",printArr[k]);
-                if (count%8==0)
+                printf("%c",printArr[i]);
+                printf("%c ",printArr[i+1]);
+                if (count%8==0){
                     printf("\n");
-                k-=2;
+                    printf("%d ",ic);
+                    ic+=4;
+                }
             }
         }
         else
