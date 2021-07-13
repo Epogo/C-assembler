@@ -1,3 +1,11 @@
+/******************************************************************************
+
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,8 +66,10 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","aBcdefg");
-    //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
+    headData=firstPass(NULL,".asciz","abcd");
+    addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
+    addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","efgh"));
     //addNode(0,headCom,headData,firstPass(NULL,"lw","$7,-4,$2",&ic));
     /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
@@ -414,6 +424,7 @@ char *decToBinDirH(char *number)
 void addNode(memIm *headCom,memIm *headData, memIm *node)
 {
     memIm *q;
+    data *r;
     if (node->p==NULL){
         q=headCom;
         while(q->next!=NULL)
@@ -423,12 +434,12 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
         q->next=node;
     }
     else{
-        q=headData;
-        while(q->next!=NULL)
+        r=headData->p;
+        while(r->next!=NULL)
         {
-            q = q->next;
+            r = r->next;
         }
-        q->next=node;
+        r->next=node->p;
     }
 }
 
