@@ -66,10 +66,10 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","abcd");
+    headData=firstPass(NULL,".db","-1,100,109,104,119,255");
     addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
-    addNode(headCom,headData,firstPass(NULL,".asciz","efgh"));
+    //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
     //addNode(0,headCom,headData,firstPass(NULL,"lw","$7,-4,$2",&ic));
     /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
@@ -501,13 +501,14 @@ void printList(memIm *head)
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
                 count+=2;
-                if ((count%8==0)&&(count!=k)){
+                if ((count%8==0)&&(count!=k-2)){
                     printf("\n");
                     printf("%d ",ic);
                     ic+=4;
                 }
                    
             }
+
         }
         else
             {
