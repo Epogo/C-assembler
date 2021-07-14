@@ -6,6 +6,12 @@
 	לבסוף, צריך לקחת את הצומת האחרון ואת הנקסט שלו לשלוח לראש של הרשימה המקושרת של הנתונים, כך תתקבל רשימה מקושרת מאוחדת.
 	5.צריך להוסיף עוד ארגומנטים-צריך להוסיף ארגומנט שמכיל את טבלת הסמלים
 	6.אולי צריך לעשות שני ארגומנטים-אחד רשימה מקושרת שמכילה הוראות ואחד רשימה מקושרת שמכילה נתונים.
+/******************************************************************************
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+*******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,13 +28,13 @@ typedef struct data{
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    int address;
+    int dataType;
     char op[33];
     data *p;
     struct memoryImage *next;
 } memIm;
 
-memIm *firstPass(char*,char*,char*,int*);
+memIm *firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
 char *decToBinJ(char*);
@@ -37,9 +43,10 @@ char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
 void deleteNode(memIm*);
-void addNode(memIm *head, memIm *node);
+void addNode(memIm *headCom,memIm *headData, memIm *node);
 void printList(memIm *head);
 char binToHex(char *bin);
+void concatNodes(memIm *headCom,memIm *headData);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
 char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
@@ -52,30 +59,35 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 
 int main()
 {
-    memIm *head;
+    memIm *headCom,*headData;
     int ic=INITIC;
     /*firstPass(NULL,".dh","27056");
     firstPass(NULL,"stop",NULL);
     firstPass(NULL,"addi","$4,-12,$17");
     firstPass(NULL,"lw","$0,4,$10");
     firstPass(NULL,"mvlo","$5,$10");
-    firstPass(NULL,".asciz","AbZ");
+    
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
-   // head=firstPass(NULL,".asciz","abcdefg");
-    head=firstPass(NULL,"add","$3,$5,$9",&ic);
-    addNode(head,firstPass(NULL,"ori","$9,-5,$2",&ic));
+    //head=firstPass(NULL,".asciz","abcdefg",&ic);
+    headCom=firstPass(NULL,"add","$3,$5,$9");
+    //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
+    headData=firstPass(NULL,".asciz","abc");
+    addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
+    addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
+    //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
+    //addNode(0,headCom,headData,firstPass(NULL,"lw","$7,-4,$2",&ic));
     /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
     addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
     addNode(head,firstPass(NULL,"bgt","$0,$0,11",&ic));
     addNode(head,firstPass(NULL,"stop",NULL,&ic));*/
-    printList(head);
-    deleteNode(head);
-
+    concatNodes(headCom,headData);
+    printList(headCom);
+    deleteNode(headCom);
     return 0;
 }
 
-memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
+memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     char *str;
     char string[33];
     str = (char *)calloc(80, sizeof(char));
@@ -223,6 +235,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
     
     if(!strcmp(ptrField2,".asciz"))
     {
+        node->dataType=1;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -244,6 +257,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
     
     if(!strcmp(ptrField2,".db"))
     {
+        node->dataType=2;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -262,6 +276,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
     }
     if(!strcmp(ptrField2,".dw"))
     {
+        node->dataType=3;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -281,6 +296,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
     
     if(!strcmp(ptrField2,".dh"))
     {
+        node->dataType=4;
         while( token != NULL ) {
             char *binNum=decToBinDirH(token);
             printf("%s\n",binNum);
@@ -290,8 +306,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int *ic){
         
     }
     strcpy(node->op,string);
-    node->address=*ic;
-    *ic=*ic+4;
     return node;
     free(str);
     count=0;
@@ -417,15 +431,36 @@ char *decToBinDirH(char *number)
     return str;
 }
 
-void addNode(memIm *head, memIm *node)
+void addNode(memIm *headCom,memIm *headData, memIm *node)
 {
     memIm *q;
-    q=head;
-    while(q->next!=NULL)
-    {
-        q = q->next;
+    data *r;
+    if (node->p==NULL){
+        q=headCom;
+        while(q->next!=NULL)
+        {
+            q = q->next;
+        }
+        q->next=node;
     }
-    q->next=node;
+    else{
+        r=headData->p;
+        while(r->next!=NULL)
+        {
+            r = r->next;
+        }
+        r->next=node->p;
+    }
+}
+
+void concatNodes(memIm *headCom,memIm *headData){
+        memIm *q;
+        q=headCom;
+        while(q->next!=NULL)
+        {
+            q = q->next;
+        }
+        q->next=headData;
 }
 
 void printList(memIm *head)
@@ -434,43 +469,80 @@ void printList(memIm *head)
     q=head;
     char *bin;
     char mem[5];
-    char printArr[8];
+    char* printArr=(char *) malloc(8);
     int j=0;
+    int k=0;
     char hex;
     data *temp;
+    static int ic=100;
     while(q!=NULL)
     {
-        printf("%d ",q->address);
-        if((q->p)!=NULL){
-            while((q->p)!=NULL){
-                bin=q->p->byte;
-                for(int i=0;i<8;i++){
-                    mem[j]=*bin;
-                    if((i+1)%4==0){
-                    mem[4]='\0';
-                //printf("%s ",mem);
-                    hex=binToHex(mem);
-                    j=0;
-                    printArr[i]=hex;
-                    bin++;
-                    continue;
+        //printf("%d ",q->address);
+        if((q->dataType==1)||(q->dataType==2)){
+            if((q->p)!=NULL){
+                k=0;
+                int count=0;
+                printf("%d ",ic);
+                ic+=4;
+                while((q->p)!=NULL){
+                    bin=q->p->byte;
+                    for(int i=0;i<8;i++){
+                        mem[j]=*bin;
+                        if((i+1)%4==0){
+                        mem[4]='\0';
+                    //printf("%s ",mem);
+                        hex=binToHex(mem);
+                        j=0;
+                        printArr[k++]=hex;
+                        bin++;
+                        continue;
+                        }
+                        j++;
+                        bin++;
                     }
-                    j++;
-                    bin++;
+                    if (k%8==0)
+                        printArr = (char *) realloc(printArr, k+8);
+                    temp=q->p;
+                    //printf("%s\n",q->p->byte);
+                    q->p=q->p->next;
+                    free(temp);
                 }
-                    
-                temp=q->p;
-                //printf("%s\n",q->p->byte);
-                q->p=q->p->next;
-                free(temp);
-                printf("\n");
+    
+                if (q->dataType==1){
+                for(int i=0;i<k;i+=2){
+                    printf("%c",printArr[i]);
+                    printf("%c ",printArr[i+1]);
+                    count+=2;
+                    if ((count%8==0)&&(count!=k)){
+                        printf("\n");
+                        printf("%d ",ic);
+                        ic+=4;
+                    }
+                       
+                }
+                }
+                
+                if (q->dataType==2){
+                for(int i=0;i<k;i+=2){
+                    printf("%c",printArr[i]);
+                    printf("%c ",printArr[i+1]);
+                    count+=2;
+                    if ((count%8==0)&&(count!=k-2)){
+                        printf("\n");
+                        printf("%d ",ic);
+                        ic+=4;
+                    }
+                       
+                }
+                }
             }
-
         }
         else
             {
+            printf("%d ",ic);
+            ic+=4;
             bin=q->op;
-            int k=0;
+            k=0;
             for(int i=0;i<32;i++){
                 mem[j]=*bin;
                 if((i+1)%4==0){
@@ -487,16 +559,24 @@ void printList(memIm *head)
                 bin++;
                
             }
-        }
-            for(int k=7;k>=0;){
+            int count=0;
+            for(k=7;k>0;){
+                count++;
                 printf("%c",printArr[k-1]);
                 printf("%c ",printArr[k]);
+                if (count%8==0)
+                    printf("\n");
                 k-=2;
+
             }
             printf("\n");
+        }
+            
+
+
         q=q->next;
     }
-
+    free(printArr);
 }
 
 void deleteNode(memIm *node){
