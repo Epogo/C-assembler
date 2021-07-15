@@ -6,12 +6,6 @@
 	לבסוף, צריך לקחת את הצומת האחרון ואת הנקסט שלו לשלוח לראש של הרשימה המקושרת של הנתונים, כך תתקבל רשימה מקושרת מאוחדת.
 	5.צריך להוסיף עוד ארגומנטים-צריך להוסיף ארגומנט שמכיל את טבלת הסמלים
 	6.אולי צריך לעשות שני ארגומנטים-אחד רשימה מקושרת שמכילה הוראות ואחד רשימה מקושרת שמכילה נתונים.
-/******************************************************************************
-                            Online C Compiler.
-                Code, Compile, Run and Debug C program online.
-Write your code in this editor and press "Run" button to compile and execute it.
-*******************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,12 +17,13 @@ Write your code in this editor and press "Run" button to compile and execute it.
 
 typedef struct data{
     char byte[33];
+    int dataType;
     struct data *next;
 }data;
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    int dataType;
+    int address;
     char op[33];
     data *p;
     struct memoryImage *next;
@@ -72,7 +67,7 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","abc");
+    headData=firstPass(NULL,".dw","31,-1");
     addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -235,7 +230,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".asciz"))
     {
-        node->dataType=1;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -245,6 +239,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             int asciCode=*ptrField3;
             char *letter=ascizToBin(asciCode);
             strcat(temp->byte,letter);
+            temp->dataType=1;
             n=(data*)malloc(sizeof(data));
             temp->next=n;
             temp=n;
@@ -257,7 +252,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".db"))
     {
-        node->dataType=2;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -266,6 +260,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         while( token != NULL ){
             char *binNum=decToBinDir(token);
             strcat(temp->byte,binNum);
+            temp->dataType=2;
             n=(data*)malloc(sizeof(data));
             temp->next=n;
             temp=n;
@@ -276,15 +271,15 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     }
     if(!strcmp(ptrField2,".dw"))
     {
-        node->dataType=3;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
         temp=head;
         data *n;
         while( token != NULL ){
-            char *binNum=decToBinDir(token);
+            char *binNum=decToBinDirW(token);
             strcat(temp->byte,binNum);
+            temp->dataType=3;
             n=(data*)malloc(sizeof(data));
             temp->next=n;
             temp=n;
@@ -296,7 +291,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".dh"))
     {
-        node->dataType=4;
         while( token != NULL ) {
             char *binNum=decToBinDirH(token);
             printf("%s\n",binNum);
@@ -478,14 +472,15 @@ void printList(memIm *head)
     while(q!=NULL)
     {
         //printf("%d ",q->address);
-        if((q->dataType==1)||(q->dataType==2)){
-            if((q->p)!=NULL){
-                k=0;
-                int count=0;
-                printf("%d ",ic);
-                ic+=4;
-                while((q->p)!=NULL){
+        if((q->p)!=NULL){
+            k=0;
+            int count=0;
+            printf("%d ",ic);
+            ic+=4;
+            while((q->p)!=NULL){
+                if(q->p->dataType==1){
                     bin=q->p->byte;
+                    j=0;
                     for(int i=0;i<8;i++){
                         mem[j]=*bin;
                         if((i+1)%4==0){
@@ -500,42 +495,47 @@ void printList(memIm *head)
                         j++;
                         bin++;
                     }
-                    if (k%8==0)
-                        printArr = (char *) realloc(printArr, k+8);
-                    temp=q->p;
-                    //printf("%s\n",q->p->byte);
-                    q->p=q->p->next;
-                    free(temp);
                 }
-    
-                if (q->dataType==1){
-                for(int i=0;i<k;i+=2){
-                    printf("%c",printArr[i]);
-                    printf("%c ",printArr[i+1]);
-                    count+=2;
-                    if ((count%8==0)&&(count!=k)){
-                        printf("\n");
-                        printf("%d ",ic);
-                        ic+=4;
+                else if(q->p->dataType==3){
+                    bin=q->p->byte;
+                    char temp;
+                    j=0;
+                    for(int i=0;i<32;i++){
+                        mem[j]=*bin;
+                        if((i+1)%4==0){
+                        mem[4]='\0';
+                    //printf("%s ",mem);
+                        hex=binToHex(mem);
+                        j=0;
+                        printArr[k++]=hex;
+                        bin++;
+                        continue;
+                        }
+                        j++;
+                        bin++;
                     }
-                       
                 }
-                }
-                
-                if (q->dataType==2){
-                for(int i=0;i<k;i+=2){
-                    printf("%c",printArr[i]);
-                    printf("%c ",printArr[i+1]);
-                    count+=2;
-                    if ((count%8==0)&&(count!=k-2)){
-                        printf("\n");
-                        printf("%d ",ic);
-                        ic+=4;
-                    }
-                       
-                }
-                }
+                if (k%8==0)
+                    printArr = (char *) realloc(printArr, k+8);
+                temp=q->p;
+                //printf("%s\n",q->p->byte);
+                q->p=q->p->next;
+                free(temp);
             }
+
+            
+            for(int i=0;i<k;i+=2){
+                printf("%c",printArr[i]);
+                printf("%c ",printArr[i+1]);
+                count+=2;
+                if ((count%8==0)&&(count!=k-2)){
+                    printf("\n");
+                    printf("%d ",ic);
+                    ic+=4;
+                }
+                   
+            }
+
         }
         else
             {
