@@ -37,6 +37,7 @@ char *ascizToBin(int);
 char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
+data* reverse(data *node);
 void deleteNode(memIm*);
 void addNode(memIm *headCom,memIm *headData, memIm *node);
 void printList(memIm *head);
@@ -68,7 +69,7 @@ int main()
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=firstPass(NULL,".asciz","aBcdefg");
-    addNode(headCom,headData,firstPass(NULL,".db","1,2,3,4,5,6,7"));
+    addNode(headCom,headData,firstPass(NULL,".dw","1,2,7888"));
     addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -270,22 +271,26 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".dw"))
     {
-        data *first=(data*)malloc(sizeof(data));
-        node->p=first;
-        head=node->p;
-        temp=head;
+        //How to free the memory?
+        data *temp=(data*)calloc(1, sizeof(data));
+        node->p=temp;
         data *n;
+        data *head;
+        char *binNum,*binNumStart;
         while( token != NULL ){
-            char *binNum=decToBinDirW(token);
-            strcat(temp->byte,binNum);
-            temp->dataType=3;
-            n=(data*)malloc(sizeof(data));
-            temp->next=n;
-            temp=n;
+            binNum=decToBinDirW(token);
+            binNumStart=binNum;
+            for(int i=0;i<4;i++){
+                strncpy(temp->byte,binNum,8);
+                temp->dataType=3;
+                n=(data*)calloc(1, sizeof(data));
+                temp->next=n;
+                temp=n;
+                binNum+=8;
+            }
+            free(binNumStart);
             token = strtok(NULL, s);
-            free(binNum);
         }
-        
     }
     
     if(!strcmp(ptrField2,".dh"))
@@ -396,9 +401,9 @@ char *decToBinDirW(char *number)
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(32);
+    char *str=(char*)calloc(33,sizeof(char));
     num=atoi(number);
-    for(unsigned int i=0; i<32; i++)
+    for(unsigned int i=0; i<33; i++)
     {
       unsigned int mask = 1 << (32 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
@@ -446,6 +451,21 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
     }
 }
 
+data* reverse(data *node)
+    {
+        data* prev = NULL;
+        data* current = node;
+        data* next = NULL;
+        while (current != NULL) {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+        node = prev;
+        return node;
+}
+
 void concatNodes(memIm *headCom,memIm *headData){
         memIm *q;
         q=headCom;
@@ -479,11 +499,7 @@ void printList(memIm *head)
             ic+=4;
             while((q->p)!=NULL){
                 bin=q->p->byte;
-                if(q->p->dataType==1||q->p->dataType==2)
-                    bitsNum=8;
-                if(q->p->dataType==3)
-                    bitsNum=32;
-                for(int i=0;i<bitsNum;i++){
+                for(int i=0;i<8;i++){
                     mem[j]=*bin;
                     if((i+1)%4==0){
                     mem[4]='\0';
