@@ -280,13 +280,14 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         while( token != NULL ){
             binNum=decToBinDirW(token);
             binNumStart=binNum;
+            binNum+=24;
             for(int i=0;i<4;i++){
                 strncpy(temp->byte,binNum,8);
                 temp->dataType=3;
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
-                binNum+=8;
+                binNum-=8;
             }
             free(binNumStart);
             token = strtok(NULL, s);
