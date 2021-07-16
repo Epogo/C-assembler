@@ -23,7 +23,7 @@ typedef struct data{
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    int address;
+    int dataType;
     char op[33];
     data *p;
     struct memoryImage *next;
@@ -67,7 +67,8 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".dw","31,-1");
+    headData=firstPass(NULL,".asciz","aBcd");
+    addNode(headCom,headData,firstPass(NULL,".db","1,2,3,4,5,6,7"));
     addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -230,6 +231,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".asciz"))
     {
+        node->dataType=1;
         data *first=(data*)malloc(sizeof(data));
         node->p=first;
         head=node->p;
@@ -247,6 +249,7 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             ptrField3++;
         }
         strcat(n->byte,"00000000");
+        n->dataType=1;
         n->next=NULL;
     }
     
@@ -474,63 +477,49 @@ void printList(memIm *head)
         //printf("%d ",q->address);
         if((q->p)!=NULL){
             k=0;
+            int bitsNum;
             int count=0;
             printf("%d ",ic);
             ic+=4;
             while((q->p)!=NULL){
-                if(q->p->dataType==1){
-                    bin=q->p->byte;
+                bin=q->p->byte;
+                if(q->p->dataType==1||q->p->dataType==2)
+                    bitsNum=8;
+                if(q->p->dataType==3)
+                    bitsNum=32;
+                for(int i=0;i<bitsNum;i++){
+                    mem[j]=*bin;
+                    if((i+1)%4==0){
+                    mem[4]='\0';
+                //printf("%s ",mem);
+                    hex=binToHex(mem);
                     j=0;
-                    for(int i=0;i<8;i++){
-                        mem[j]=*bin;
-                        if((i+1)%4==0){
-                        mem[4]='\0';
-                    //printf("%s ",mem);
-                        hex=binToHex(mem);
-                        j=0;
-                        printArr[k++]=hex;
-                        bin++;
-                        continue;
-                        }
-                        j++;
-                        bin++;
+                    printArr[k++]=hex;
+                    bin++;
+                    continue;
                     }
+                    j++;
+                    bin++;
                 }
-                else if(q->p->dataType==3){
-                    bin=q->p->byte;
-                    char temp;
-                    j=0;
-                    for(int i=0;i<32;i++){
-                        mem[j]=*bin;
-                        if((i+1)%4==0){
-                        mem[4]='\0';
-                    //printf("%s ",mem);
-                        hex=binToHex(mem);
-                        j=0;
-                        printArr[k++]=hex;
-                        bin++;
-                        continue;
-                        }
-                        j++;
-                        bin++;
-                    }
-                }
-                if (k%8==0)
+                if (k%8==0){
                     printArr = (char *) realloc(printArr, k+8);
+                }
                 temp=q->p;
                 //printf("%s\n",q->p->byte);
                 q->p=q->p->next;
                 free(temp);
             }
 
-            
             for(int i=0;i<k;i+=2){
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
                 count+=2;
-                if ((count%8==0)&&(count!=k-2)){
+                //printf(" count: %d k is:%d ",count,k);
+                if ((count%8==0)){
                     printf("\n");
-                    printf("%d ",ic);
+                    //printf(" count: %d k is:%d ",count,k);
+                    if((count!=k-2)&&(count!=k))
+                        printf("%d ",ic);
                     ic+=4;
                 }
                    
@@ -578,6 +567,7 @@ void printList(memIm *head)
     }
     free(printArr);
 }
+
 
 void deleteNode(memIm *node){
     memIm *temp;
