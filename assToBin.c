@@ -16,7 +16,7 @@
 #define INITIC 100
 
 typedef struct data{
-    char byte[33];
+    char byte[9];
     int dataType;
     struct data *next;
 }data;
@@ -67,7 +67,7 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","aBcd");
+    headData=firstPass(NULL,".asciz","aBcdefg");
     addNode(headCom,headData,firstPass(NULL,".db","1,2,3,4,5,6,7"));
     addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
@@ -231,47 +231,43 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     
     if(!strcmp(ptrField2,".asciz"))
     {
-        node->dataType=1;
-        data *first=(data*)malloc(sizeof(data));
-        node->p=first;
-        head=node->p;
-        temp=head;
+        data *temp=(data*)calloc(1, sizeof(data));
+        node->p=temp;
         data *n;
+        char *null="00000000";
         while (*ptrField3!='\0'){
             int asciCode=*ptrField3;
             char *letter=ascizToBin(asciCode);
             strcat(temp->byte,letter);
             temp->dataType=1;
-            n=(data*)malloc(sizeof(data));
+            n=(data*)calloc(1, sizeof(data));
             temp->next=n;
             temp=n;
             free(letter);
             ptrField3++;
         }
-        strcat(n->byte,"00000000");
+        strcat(temp->byte,null);
         n->dataType=1;
         n->next=NULL;
     }
     
     if(!strcmp(ptrField2,".db"))
     {
-        data *first=(data*)malloc(sizeof(data));
-        node->p=first;
-        head=node->p;
-        temp=head;
+        data *temp=(data*)calloc(1, sizeof(data));
+        node->p=temp;
         data *n;
         while( token != NULL ){
             char *binNum=decToBinDir(token);
             strcat(temp->byte,binNum);
             temp->dataType=2;
-            n=(data*)malloc(sizeof(data));
+            n=(data*)calloc(1, sizeof(data));;
             temp->next=n;
             temp=n;
             token = strtok(NULL, s);
             free(binNum);
         }
-        
     }
+    
     if(!strcmp(ptrField2,".dw"))
     {
         data *first=(data*)malloc(sizeof(data));
@@ -371,7 +367,7 @@ char *decToBinJ(char *number)
 char *ascizToBin(int num)
 {
     int i,j;
-    char *str=(char*)malloc(8);
+    char *str=(char*)malloc(9);
     for(unsigned int i=0; i<8; i++)
     {
       unsigned int mask = 1 << (8 - 1 - i);
