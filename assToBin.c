@@ -23,12 +23,12 @@ typedef struct data{
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    int dataType;
     char op[33];
     data *p;
     struct memoryImage *next;
 } memIm;
 
+void printList2(data *head);
 memIm *firstPass(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(char*);
@@ -68,10 +68,12 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=firstPass(NULL,".asciz","aBcd");
-    addNode(headCom,headData,firstPass(NULL,".db","6,-9"));
-    addNode(headCom,headData,firstPass(NULL,".dh","27056"));
-    addNode(headCom,headData,firstPass(NULL,".dw","31,-12"));
+    headData=firstPass(NULL,".asciz","aBc");
+    addNode(headCom,headData,firstPass(NULL,".dw","6,-9"));
+    //addNode(headCom,headData,firstPass(NULL,".dh","899"));
+    addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
+    addNode(headCom,headData,firstPass(NULL,".db","5,4,6,7"));
+    
     //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     //addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -258,16 +260,16 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
     {
         data *temp=(data*)calloc(1, sizeof(data));
         node->p=temp;
-        data *n;
         while( token != NULL ){
             char *binNum=decToBinDir(token);
             strcat(temp->byte,binNum);
-            temp->dataType=2;
-            n=(data*)calloc(1, sizeof(data));;
+            free(binNum);
+            token = strtok(NULL, s);
+            if (token==NULL)
+                break;
+            data *n=(data*)calloc(1, sizeof(data));
             temp->next=n;
             temp=n;
-            token = strtok(NULL, s);
-            free(binNum);
         }
     }
     
@@ -282,17 +284,19 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             binNum=decToBinDirW(token);
             binNumStart=binNum;
             binNum+=24;
-            for(int i=0;i<4;i++){
-                strncpy(temp->byte,binNum,8);
+            for(int i=0;i<3;i++){
+                strncat(temp->byte,binNum,8);
                 temp->dataType=3;
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
                 binNum-=8;
             }
+            strncat(temp->byte,binNum,8);
             free(binNumStart);
             token = strtok(NULL, s);
         }
+        n->next=NULL;
     }
     
     if(!strcmp(ptrField2,".dh"))
@@ -300,23 +304,23 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         data *temp=(data*)calloc(1, sizeof(data));
         node->p=temp;
         data *n;
-        data *head;
         char *binNum,*binNumStart;
         while( token != NULL ){
             binNum=decToBinDirH(token);
             binNumStart=binNum;
             binNum+=8;
-            for(int i=0;i<2;i++){
-                strncpy(temp->byte,binNum,8);
-                temp->dataType=3;
+            for(int i=0;i<1;i++){
+                strncat(temp->byte,binNum,8);
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
                 binNum-=8;
             }
+            strncat(temp->byte,binNum,8);
             free(binNumStart);
             token = strtok(NULL, s);
         }
+        n->next=NULL;
     }
     strcpy(node->op,string);
     return node;
@@ -401,7 +405,7 @@ char *decToBinDir(char *number)
 {
     int num;
     int i,j;
-    char *str=(char*)malloc(8);
+    char *str=(char*)malloc(9);
     num=atoi(number);
     for(unsigned int i=0; i<8; i++)
     {
@@ -418,7 +422,7 @@ char *decToBinDirW(char *number)
     int i,j;
     char *str=(char*)calloc(33,sizeof(char));
     num=atoi(number);
-    for(unsigned int i=0; i<33; i++)
+    for(unsigned int i=0; i<32; i++)
     {
       unsigned int mask = 1 << (32 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
@@ -464,6 +468,14 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
         }
         r->next=node->p;
     }
+    /*else{
+        q=headData;
+        while(q->next!=NULL)
+        {
+            q = q->next;
+        }
+        q->next=node;
+    }*/
 }
 
 void concatNodes(memIm *headCom,memIm *headData){
@@ -502,6 +514,7 @@ void printList(memIm *head)
             while((q->p)!=NULL){
                 j=0;
                 bin=q->p->byte;
+                //printf("%s\n",bin);
                 for(int i=0;i<8;i++){
                     mem[j]=*bin;
                     if((i+1)%4==0){
@@ -517,7 +530,6 @@ void printList(memIm *head)
                     j++;
                     bin++;
                 }
-                printf("k is:%d ", k);
                 if (k%8==0){
                     printArr = (char *) realloc(startArr, k+8);
                 }
@@ -577,8 +589,6 @@ void printList(memIm *head)
             printf("\n");
         }
             
-
-
         q=q->next;
     }
     free(startArr);
@@ -634,3 +644,12 @@ char binToHex(char *bin)
         hex='F';
     return hex;
 }
+
+void printList2(data *head)
+    {
+        data *n = head;
+        while (n != NULL) {
+            printf("%s",head->byte);
+            n = n->next;
+        }
+    }
