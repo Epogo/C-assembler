@@ -70,13 +70,15 @@ int main()
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=firstPass(NULL,".asciz","aBc");
     //addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
+    addNode(headCom,headData,firstPass(NULL,".dh","5,4,6,7"));
+    //headData=firstPass(NULL,".asciz","aBc");
+    addNode(headCom,headData,firstPass(NULL,".dw","1"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","dvc"));
+    addNode(headCom,headData,firstPass(NULL,".db","1,2,3,4"));
+    addNode(headCom,headData,firstPass(NULL,".dh","5,4,6,7"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","murkaaaa"));
+    addNode(headCom,headData,firstPass(NULL,".db","102,203,89,-1,7,8"));
     
-    //addNode(headCom,headData,firstPass(NULL,".db","5,4,6,7"));
-    addNode(headCom,headData,firstPass(NULL,".asciz","aBc"));
-    addNode(headCom,headData,firstPass(NULL,".dh","27056,78,1"));
-    addNode(headCom,headData,firstPass(NULL,".dw","31,-12"));
-    addNode(headCom,headData,firstPass(NULL,".dw","1,2"));
-    addNode(headCom,headData,firstPass(NULL,".dh","1"));
     
     
     //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
@@ -249,7 +251,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             int asciCode=*ptrField3;
             char *letter=ascizToBin(asciCode);
             strcat(temp->byte,letter);
-            temp->dataType=1;
             n=(data*)calloc(1, sizeof(data));
             temp->next=n;
             temp=n;
@@ -257,13 +258,12 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             ptrField3++;
         }
         strcat(temp->byte,null);
-        n->dataType=1;
-        n->next=NULL;
     }
     
     if(!strcmp(ptrField2,".db"))
     {
         data *temp=(data*)calloc(1, sizeof(data));
+        data *n;
         node->p=temp;
         while( token != NULL ){
             char *binNum=decToBinDir(token);
@@ -272,10 +272,11 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             token = strtok(NULL, s);
             if (token==NULL)
                 break;
-            data *n=(data*)calloc(1, sizeof(data));
+            n=(data*)calloc(1, sizeof(data));
             temp->next=n;
             temp=n;
         }
+        n->next=NULL;
     }
     
     if(!strcmp(ptrField2,".dw"))
@@ -326,8 +327,6 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             temp=n;
             binNum-=8;
             strncpy(temp->byte,binNum,8);
-            printf("is: %s\n",temp->byte);
-            
             token = strtok(NULL, s);
             if (token != NULL)
             {
@@ -477,22 +476,22 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
         }
         q->next=node;
     }
-    else{
+    /*else{
         r=headData->p;
         while(r->next!=NULL)
         {
             r = r->next;
         }
         r->next=node->p;
-    }
-    /*else{
+    }*/
+    else{
         q=headData;
         while(q->next!=NULL)
         {
             q = q->next;
         }
         q->next=node;
-    }*/
+    }
 }
 
 void concatNodes(memIm *headCom,memIm *headData){
@@ -505,7 +504,9 @@ void concatNodes(memIm *headCom,memIm *headData){
         q->next=headData;
 }
 
-void printList(memIm *head)
+void printList
+
+(memIm *head)
 {
     memIm *q;
     q=head;
@@ -516,18 +517,17 @@ void printList(memIm *head)
     startArr=printArr;
     int j=0;
     int k=0;
+    int count=0;
     char hex;
     data *temp;
     static int ic=100;
+    printf("%d ",ic);
     while(q!=NULL)
     {
         //printf("%d ",q->address);
         if((q->p)!=NULL){
             k=0;
             int bitsNum;
-            int count=0;
-            printf("%d ",ic);
-            ic+=4;
             while((q->p)!=NULL){
                 j=0;
                 bin=q->p->byte;
@@ -539,9 +539,8 @@ void printList(memIm *head)
                 //printf("%s ",mem);
                     hex=binToHex(mem);
                     j=0;
-                    printArr[k]=hex;
+                    printArr[k++]=hex;
                     bin++;
-                    k++;
                     continue;
                     }
                     j++;
@@ -555,6 +554,9 @@ void printList(memIm *head)
                 q->p=temp->next;
                 free(temp);
             }
+            //printf("k is:%d\n", k);
+            if (count==0)
+                printf("%d ",ic);
             for(int i=0;i<k;i+=2){
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
@@ -563,9 +565,8 @@ void printList(memIm *head)
                 if ((count%8==0)){
                     printf("\n");
                     //printf(" count: %d k is:%d ",count,k);
-                    if((count!=k-2)&&(count!=k))
-                        printf("%d ",ic);
                     ic+=4;
+                    printf("%d ",ic);
                 }
                    
             }
@@ -573,7 +574,6 @@ void printList(memIm *head)
         }
         else
             {
-            printf("%d ",ic);
             ic+=4;
             bin=q->op;
             k=0;
@@ -598,8 +598,10 @@ void printList(memIm *head)
                 count++;
                 printf("%c",printArr[k-1]);
                 printf("%c ",printArr[k]);
-                if (count%8==0)
+                if (count%8==0){
                     printf("\n");
+                    printf("%d ",ic);
+                }
                 k-=2;
 
             }
