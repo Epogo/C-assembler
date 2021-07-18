@@ -69,10 +69,16 @@ int main()
     headCom=firstPass(NULL,"add","$3,$5,$9");
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=firstPass(NULL,".asciz","aBc");
-    addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
+    //addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
+    
+    //addNode(headCom,headData,firstPass(NULL,".db","5,4,6,7"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","aBc"));
+    addNode(headCom,headData,firstPass(NULL,".dh","27056,78,1"));
     addNode(headCom,headData,firstPass(NULL,".dw","31,-12"));
-    addNode(headCom,headData,firstPass(NULL,".db","5,4,6,7"));
-    //addNode(headCom,headData,firstPass(NULL,".dh","27056"));
+    addNode(headCom,headData,firstPass(NULL,".dw","1,2"));
+    addNode(headCom,headData,firstPass(NULL,".dh","1"));
+    
+    
     //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     //addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -284,15 +290,14 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             binNumStart=binNum;
             binNum+=24;
             for(int i=0;i<3;i++){
-                strncat(temp->byte,binNum,8);
-                temp->dataType=3;
+                strncpy(temp->byte,binNum,8);
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
                 binNum-=8;
             }
-            strncat(temp->byte,binNum,8);
-            free(binNumStart);
+            strncpy(temp->byte,binNum,8);
+            
             token = strtok(NULL, s);
             if (token!=NULL)
             {
@@ -300,9 +305,8 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
                 temp->next=n;
                 temp=n;
             }
-                
+            free(binNumStart);    
         }
-        n->next=NULL;
     }
     
     if(!strcmp(ptrField2,".dh"))
@@ -313,29 +317,27 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
         data *head;
         char *binNum,*binNumStart;
         while( token != NULL ){
-            binNum=decToBinDirW(token);
+            binNum=decToBinDirH(token);
             binNumStart=binNum;
             binNum+=8;
-            for(int i=0;i<1;i++){
-                strncat(temp->byte,binNum,8);
-                temp->dataType=3;
-                n=(data*)calloc(1, sizeof(data));
-                temp->next=n;
-                temp=n;
-                binNum-=8;
-            }
-            strncat(temp->byte,binNum,8);
-            free(binNumStart);
+            strncpy(temp->byte,binNum,8);
+            n=(data*)calloc(1, sizeof(data));
+            temp->next=n;
+            temp=n;
+            binNum-=8;
+            strncpy(temp->byte,binNum,8);
+            printf("is: %s\n",temp->byte);
+            
             token = strtok(NULL, s);
-            if (token!=NULL)
+            if (token != NULL)
             {
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
             }
-                
+            free(binNumStart);
         }
-        n->next=NULL;
+        
     }
     strcpy(node->op,string);
     return node;
@@ -659,12 +661,3 @@ char binToHex(char *bin)
         hex='F';
     return hex;
 }
-
-void printList2(data *head)
-    {
-        data *n = head;
-        while (n != NULL) {
-            printf("%s",head->byte);
-            n = n->next;
-        }
-    }
