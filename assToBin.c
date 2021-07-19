@@ -78,6 +78,9 @@ int main()
     addNode(headCom,headData,firstPass(NULL,".asciz","murkaaaaa"));
     addNode(headCom,headData,firstPass(NULL,".db","102,203,89,-1,7,8"));
     addNode(headCom,headData,firstPass(NULL,".dw","178,6,8"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","abcd"));
+    addNode(headCom,headData,firstPass(NULL,".dw","6"));
+    addNode(headCom,headData,firstPass(NULL,".dh","12,8,1"));
     
     
     
@@ -290,23 +293,20 @@ memIm *firstPass(char *ptrField1,char *ptrField2,char *ptrField3){
             binNum=decToBinDirW(token);
             binNumStart=binNum;
             binNum+=24;
-            for(int i=0;i<3;i++){
-                strncpy(temp->byte,binNum,8);
-                n=(data*)calloc(1, sizeof(data));
-                temp->next=n;
-                temp=n;
-                binNum-=8;
-            }
             strncpy(temp->byte,binNum,8);
-            
+            n=(data*)calloc(1, sizeof(data));
+            temp->next=n;
+            temp=n;
+            binNum-=8;
+            strncpy(temp->byte,binNum,8);
             token = strtok(NULL, s);
-            if (token!=NULL)
+            if (token != NULL)
             {
                 n=(data*)calloc(1, sizeof(data));
                 temp->next=n;
                 temp=n;
             }
-            free(binNumStart);    
+            free(binNumStart);
         }
     }
     
