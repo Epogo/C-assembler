@@ -17,7 +17,6 @@
 
 typedef struct data{
     char byte[9];
-    int dataType;
     struct data *next;
 }data;
 
@@ -76,8 +75,9 @@ int main()
     addNode(headCom,headData,firstPass(NULL,".asciz","dvc"));
     addNode(headCom,headData,firstPass(NULL,".db","1,2,3,4"));
     addNode(headCom,headData,firstPass(NULL,".dh","5,4,6,7"));
-    addNode(headCom,headData,firstPass(NULL,".asciz","murkaaaa"));
+    addNode(headCom,headData,firstPass(NULL,".asciz","murkaaaaa"));
     addNode(headCom,headData,firstPass(NULL,".db","102,203,89,-1,7,8"));
+    addNode(headCom,headData,firstPass(NULL,".dw","178,6,8"));
     
     
     
@@ -504,9 +504,9 @@ void concatNodes(memIm *headCom,memIm *headData){
         q->next=headData;
 }
 
-void printList
+void printList (memIm *head)
 
-(memIm *head)
+
 {
     memIm *q;
     q=head;
@@ -518,12 +518,16 @@ void printList
     int j=0;
     int k=0;
     int count=0;
+    int inCount;
+    int lastNodeFlag=0;
     char hex;
     data *temp;
     static int ic=100;
     printf("%d ",ic);
     while(q!=NULL)
     {
+        if (q->next==NULL)
+            lastNodeFlag=1;
         //printf("%d ",q->address);
         if((q->p)!=NULL){
             k=0;
@@ -555,18 +559,24 @@ void printList
                 free(temp);
             }
             //printf("k is:%d\n", k);
+            inCount=0;
             if (count==0)
                 printf("%d ",ic);
+            
             for(int i=0;i<k;i+=2){
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
+                inCount+=2;
                 count+=2;
                 //printf(" count: %d k is:%d ",count,k);
                 if ((count%8==0)){
                     printf("\n");
                     //printf(" count: %d k is:%d ",count,k);
                     ic+=4;
+                    if ((lastNodeFlag==1)&&(inCount==k))
+                        break;
                     printf("%d ",ic);
+                    
                 }
                    
             }
