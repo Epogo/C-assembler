@@ -17,7 +17,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
-	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
+	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
 
 	
 

@@ -49,4 +49,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF);
+void errorMsg(int error,int lineNumber,char *fieldName);
+int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
+int checkExtraneousChars(NODE_T **current,int *index);
+char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber);
+char* checkCommandR1(char *ptrCode,int lineNumber);
+char* checkCommandR2(char *ptrCode,int lineNumber);
+char* checkCommandI1(char *ptrCode,int lineNumber);
+char* checkCommandI2(char *ptrCode,int lineNumber);
+
+
+
+
+
 
