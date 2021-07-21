@@ -21,6 +21,7 @@ void manageContents(NODE_T *ptrNode){
 	char *ptrData;
 	char *ptrCode;
 	char *ptrCodeChecked;
+	char *ptrDataChecked;
 	char ptrTrash[1];
 
 	enum status state;
@@ -36,29 +37,98 @@ void manageContents(NODE_T *ptrNode){
 	while(1){
 
 		if(current->inputChar[index] == '\0'){
+			if(state == FIRSTWORD){
+				errorMsg(22,current->lineNumber,NULL);
+				errorDetected = FLAGON;
+				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				state = newLine(&errorDetected,&current,&labelFlag,&index);
+				continue;
+			}
+			if(state == POSTFIRSTWORD){
+				state = checkState(ptrFirstWord);
+				if(state == -1){
+					errorMsg(21,current->lineNumber,ptrFirstWord);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+				else{
+					errorMsg(22,current->lineNumber,NULL);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+			}
+			
+			if(state == COMMANDORDIRECTIVE){
+				ptrCommandDirective[CommandDirectiveIndex] = '\0';
+				if(!strcmp("stop", ptrCommandDirective)){
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected);
+				}
+				else if(state != -1){
+					errorMsg(22,current->lineNumber,ptrCommandDirective);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				}
+				else{
+					errorMsg(20,current->lineNumber,ptrCommandDirective);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				}
+
+				state = newLine(&errorDetected,&current,&labelFlag,&index);
+				continue;
+			}
 			if(state == CODE){
 				ptrCode[codeIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);
+					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber);
+					if(ptrCodeChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected);
+					}
+					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);*/
 				}
 				else if(labelFlag == FLAGOFF){
-					/*firstPass(ptrFirstWord,ptrCode,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);
+					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber);
+					if(ptrCodeChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected);
+					}
+					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);*/
 				}
-				/*printf("%s\n",ptrCode);
-				exit(0);*/
 			}
 			if(state == DATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag,errorDetected);
+					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
+					if(ptrDataChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected);
+					}
 				}
 				else if(labelFlag == FLAGOFF){
-					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag,errorDetected);				
-				}
+					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber);
+					if(ptrDataChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected);
+					}
 
-				/*exit(0);*/
+				}
 			}
 			if(current->next == NULL){
 				firstPass(ptrTrash,ptrTrash,ptrTrash,LASTLINE,errorDetected); /*end of file*/	
@@ -75,6 +145,13 @@ void manageContents(NODE_T *ptrNode){
 			if(state == COMMANDORDIRECTIVE){
 				ptrCommandDirective[CommandDirectiveIndex] = '\0';
 				state = checkState(ptrCommandDirective);
+				if(state == -1){
+					errorMsg(20,current->lineNumber,ptrCommandDirective);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
 				if(!strcmp("stop", ptrCommandDirective)){
 					errorDetected = checkExtraneousChars(&current,&index);
 					if(errorDetected == FLAGON){
@@ -85,6 +162,7 @@ void manageContents(NODE_T *ptrNode){
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected);
 					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
 				}
 			}
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
@@ -108,6 +186,12 @@ void manageContents(NODE_T *ptrNode){
 				index++;
 				continue;
 			}
+			else if(state == DATA){
+				ptrData[dataIndex] = current->inputChar[index];
+				dataIndex++;
+				index++;
+				continue;
+			}
 			else{
 				index++;
 				continue;
@@ -118,34 +202,54 @@ void manageContents(NODE_T *ptrNode){
 			continue;
 		}
 		if(current->inputChar[index] == '\n'){
+			if(state == FIRSTWORD){
+				errorMsg(22,current->lineNumber,NULL);
+				errorDetected = FLAGON;
+				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				state = newLine(&errorDetected,&current,&labelFlag,&index);
+				continue;
+			}
+			if(state == POSTFIRSTWORD){
+				state = checkState(ptrFirstWord);
+				if(state == -1){
+					errorMsg(21,current->lineNumber,ptrFirstWord);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+				else{
+					errorMsg(22,current->lineNumber,NULL);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+			}
 			if(state == CODE){
 				ptrCode[codeIndex] = '\0';
 				if(labelFlag == FLAGON){
 					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber);
-					/*if(ptrCodeChecked == NULL){
+					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
 						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
 					}
 					else{
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected);
-					}*/
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);
+					}
+					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected);*/
 				}
 				else if(labelFlag == FLAGOFF){
 					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber);
-					/*if(ptrCodeChecked == NULL){
+					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
 						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
 					}
 					else{
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected);
-					}*/
-					firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);
+						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected);
+					}
+					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);*/
 				}
-				/*if(ptrCodeChecked == NULL)
-					printf("\nNull mf\n");
-				else
-					printf("\n|%s|\n",ptrCodeChecked);*/
 			}
 			if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
@@ -156,11 +260,25 @@ void manageContents(NODE_T *ptrNode){
 			if(state == DATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrData,labelFlag,errorDetected);
+					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
+					if(ptrDataChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected);
+					}
 				}
 				else if(labelFlag == FLAGOFF){
-					/*firstPass(ptrFirstWord,ptrData,ptrTrash,labelFlag);*/
-					firstPass(ptrTrash,ptrFirstWord,ptrData,labelFlag,errorDetected);
+					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber);
+					if(ptrDataChecked == NULL){
+						errorDetected = FLAGON;
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+					}
+					else{
+						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected);
+					}
+
 				}
 			}
 			if(state == COMMANDORDIRECTIVE){
@@ -168,7 +286,16 @@ void manageContents(NODE_T *ptrNode){
 				if(!strcmp("stop", ptrCommandDirective)){
 					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected);
 				}
-
+				else if(state != -1){
+					errorMsg(22,current->lineNumber,ptrCommandDirective);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				}
+				else{
+					errorMsg(20,current->lineNumber,ptrCommandDirective);
+					errorDetected = FLAGON;
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
+				}
 			}
 			state = newLine(&errorDetected,&current,&labelFlag,&index);
 			continue;
@@ -238,7 +365,7 @@ void manageContents(NODE_T *ptrNode){
 				else{
 					state = checkState(ptrFirstWord);
 					if(state == -1){
-						printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);
+						errorMsg(21,current->lineNumber,ptrFirstWord);
 						errorDetected = FLAGON;
 						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected);
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
@@ -327,6 +454,10 @@ int checkState(char *ptrInput){
 		state = POSTENTRY;
 		return state;
 	}
+	if(!strcmp("stop", ptrInput)){
+		state = POSTCOMMAND;
+		return state;
+	}
 	for(i=0;i<NUMCOMMANDS;i++){
 		if(!strcmp(commands[i], ptrInput)){
 			state = POSTCOMMAND;
@@ -382,6 +513,33 @@ void errorMsg(int error,int lineNumber,char *fieldName)
 			break;
 		case 13:
 			printf("Line %u: Missing label\n",lineNumber);
+			break;
+		case 14:
+			printf("Line %u: Expected register or (legal) label after jmp command\n",lineNumber);
+			break;
+		case 15:
+			printf("Line %u: Expected (legal) label after la or call command\n",lineNumber);
+			break;
+		case 16:
+			printf("Line %u: Expected quotation marks after .asciz directive\n",lineNumber);
+			break;
+		case 17:
+			printf("Line %u: Expected addtional quotation marks to close initial quotation marks\n",lineNumber);
+			break;
+		case 18:
+			printf("Line %u: Expected number or + or - after .db/.dw/.dh directive\n",lineNumber);
+			break;
+		case 19:
+			printf("Line %u: Expected number after +/- sign\n",lineNumber);
+			break;
+		case 20:
+			printf("Line %u: Unrecognized command or directive \"%s\"\n",lineNumber,fieldName);
+			break;
+		case 21:
+			printf("Line %u: Unrecognized command or directive \"%s\" (or label with missing :)\n",lineNumber,fieldName);
+			break;
+		case 22:
+			printf("Line %u: Line incomplete\n",lineNumber);
 			break;
 		default:
 			printf("Default error message!\n");

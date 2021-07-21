@@ -5,13 +5,13 @@ static char *Rcommands1[]={"add","sub", "and", "or", "nor"};
 
 static char *Rcommands2[]={"move", "mvhi","mvlo"};
 
-static char *Icommands1[]={"addi", "subi", "andi", "ori","nori"};
+static char *Icommands1[]={"addi", "subi", "andi", "ori","nori","lb", "sb", "lw", "sw", "lh","sh"};
 
 static char *Icommands2[]={"bne", "beq", "blt", "bgt"};
 
-static char *Icommands3[]={"lb", "sb", "lw", "sw", "lh","sh"};
 
-enum comType {Rcom1,Rcom2,Icom1,Icom2,Icom3};
+
+enum comType {Rcom1,Rcom2,Icom1,Icom2,jumpCom,laOrcallCom};
 
 
 
@@ -29,7 +29,7 @@ char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber){
 			currentComType = Rcom2;
 		}
 	}
-	for(i=0;i<5;i++){
+	for(i=0;i<11;i++){
 		if(!strcmp(Icommands1[i], ptrCommand)){
 			currentComType = Icom1;
 		}
@@ -39,10 +39,11 @@ char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber){
 			currentComType = Icom2;
 		}
 	}
-	for(i=0;i<6;i++){
-		if(!strcmp(Icommands3[i], ptrCommand)){
-			currentComType = Icom3;
-		}
+	if(!strcmp("jmp",ptrCommand)){
+		currentComType = jumpCom;
+	}
+	else if(!strcmp("la",ptrCommand) || !strcmp("call",ptrCommand)){
+		currentComType = laOrcallCom;
 	}
 
 
@@ -58,8 +59,11 @@ char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber){
 	else if(currentComType == Icom2){
 		ptrCodeChecked = checkCommandI2(ptrCode,lineNumber);
 	}
-	else{
-		return NULL;
+	else if(currentComType == jumpCom){
+		ptrCodeChecked = checkCommandjump(ptrCode,lineNumber);
+	}
+	else if(currentComType == laOrcallCom){
+		ptrCodeChecked = checkCommandlaOrcall(ptrCode,lineNumber);
 	}
 	return ptrCodeChecked;
 
@@ -372,6 +376,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else{
+				printf("Okayyy: %c,%c\n",ptrCode[index],ptrCode[index+1]);
 				errorMsg(10,lineNumber,NULL);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -629,7 +634,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 		if((ptrCode[index] == '\t') || (ptrCode[index] == ' ')){
 			index++;
 			if(dollarCount>=numDollars){
-				endLineFlag = FLAGON;
+				expectCommaFlag = FLAGON;
 			}
 		}
 		else if((expectCommaFlag == FLAGON) && (ptrCode[index] != ',')){
@@ -697,4 +702,141 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 	ptrCodeChecked[newIndex] = '\0';
 	return ptrCodeChecked;
 }
+
+
+char* checkCommandjump(char *ptrCode,int lineNumber){
+	int index,newIndex,labelFlag;
+	char *ptrCodeChecked;
+
+	index = 0;
+	newIndex = 0;
+	labelFlag = FLAGOFF;
+
+	ptrCodeChecked = calloc(MAXLINELEN,sizeof(char));
+		
+	if(ptrCode[index] == '$'){
+		ptrCodeChecked[newIndex] = ptrCode[index];
+		index++;
+		newIndex++;
+		if(ptrCode[index] >= '0' && ptrCode[index] <= '9'){
+			ptrCodeChecked[newIndex] = ptrCode[index];
+			index++;
+			newIndex++;
+		}
+		else{
+			errorMsg(7,lineNumber,NULL);
+			ptrCodeChecked = NULL;
+			return ptrCodeChecked;
+		}
+		while(ptrCode[index] >= '0' && ptrCode[index] <= '9'){
+			ptrCodeChecked[newIndex] = ptrCode[index];
+			index++;
+			newIndex++;
+		}
+		while(ptrCode[index] != '\0' && ptrCode[index] != '\n'){
+			if((ptrCode[index] == '\t') || (ptrCode[index] == ' ')){
+				index++;
+				newIndex++;
+			}
+			else{
+				errorMsg(9,lineNumber,NULL);
+				ptrCodeChecked = NULL;
+				return ptrCodeChecked;
+			}
+		}
+	}
+	else if((ptrCode[index] >= 'a' && ptrCode[index] <= 'z') || (ptrCode[index] >= 'A' && ptrCode[index]<= 'Z')){
+		ptrCodeChecked[newIndex] = ptrCode[index];
+		index++;
+		newIndex++;
+		labelFlag = FLAGON;
+		while(((ptrCode[index] >= 'a' && ptrCode[index] <= 'z') || (ptrCode[index] >= 'A' && ptrCode[index] <= 'Z') || (ptrCode[index] >= '0' && ptrCode[index] <= '9'))){
+			ptrCodeChecked[newIndex] = ptrCode[index];
+			index++;
+			newIndex++;
+		}
+		while(ptrCode[index] != '\0' && ptrCode[index] != '\n'){
+			if((ptrCode[index] == '\t') || (ptrCode[index] == ' ')){
+				labelFlag = FLAGOFF;
+				index++;
+				newIndex++;
+			}
+			else{
+				if(labelFlag == FLAGON){
+					errorMsg(2,lineNumber,"");
+					ptrCodeChecked = NULL;
+					return ptrCodeChecked;
+				}
+				else if(labelFlag == FLAGOFF){
+					errorMsg(9,lineNumber,NULL);
+					ptrCodeChecked = NULL;
+					return ptrCodeChecked;
+				}
+			}
+		}
+	}
+	else{
+		errorMsg(14,lineNumber,NULL);
+		ptrCodeChecked = NULL;
+		return ptrCodeChecked;	
+	}
+
+	ptrCodeChecked[newIndex] = '\0';
+	return ptrCodeChecked;
+}
+
+
+char* checkCommandlaOrcall(char *ptrCode,int lineNumber){
+	int index,newIndex,labelFlag;
+	char *ptrCodeChecked;
+
+	index = 0;
+	newIndex = 0;
+	labelFlag = FLAGOFF;
+
+	ptrCodeChecked = calloc(MAXLINELEN,sizeof(char));
+		
+	if((ptrCode[index] >= 'a' && ptrCode[index] <= 'z') || (ptrCode[index] >= 'A' && ptrCode[index]<= 'Z')){
+		ptrCodeChecked[newIndex] = ptrCode[index];
+		index++;
+		newIndex++;
+		labelFlag = FLAGON;
+		while(((ptrCode[index] >= 'a' && ptrCode[index] <= 'z') || (ptrCode[index] >= 'A' && ptrCode[index] <= 'Z') || (ptrCode[index] >= '0' && ptrCode[index] <= '9'))){
+			ptrCodeChecked[newIndex] = ptrCode[index];
+			index++;
+			newIndex++;
+		}
+		while(ptrCode[index] != '\0' && ptrCode[index] != '\n'){
+			if((ptrCode[index] == '\t') || (ptrCode[index] == ' ')){
+				labelFlag = FLAGOFF;
+				index++;
+				newIndex++;
+			}
+			else{
+				if(labelFlag == FLAGON){
+					errorMsg(2,lineNumber,"");
+					ptrCodeChecked = NULL;
+					return ptrCodeChecked;
+				}
+				else if(labelFlag == FLAGOFF){
+					errorMsg(9,lineNumber,NULL);
+					ptrCodeChecked = NULL;
+					return ptrCodeChecked;
+				}
+			}
+		}
+	}
+	else{
+		errorMsg(15,lineNumber,NULL);
+		ptrCodeChecked = NULL;
+		return ptrCodeChecked;	
+	}
+
+	ptrCodeChecked[newIndex] = '\0';
+	return ptrCodeChecked;
+}
+
+
+
+
 

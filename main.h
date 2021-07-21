@@ -57,8 +57,9 @@ char* checkCommandR1(char *ptrCode,int lineNumber);
 char* checkCommandR2(char *ptrCode,int lineNumber);
 char* checkCommandI1(char *ptrCode,int lineNumber);
 char* checkCommandI2(char *ptrCode,int lineNumber);
-
-
+char* checkCommandjump(char *ptrCode,int lineNumber);
+char* checkCommandlaOrcall(char *ptrCode,int lineNumber);
+char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
 
 
 
