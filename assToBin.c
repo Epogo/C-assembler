@@ -25,7 +25,7 @@ typedef struct memoryImage{
 } memIm;
 
 struct tableNode{
-	char symbol[31];
+	char symbol[32];
 	int value;
 	int attribute[2];
 	struct tableNode* next;
@@ -36,7 +36,7 @@ void printList2(data *head);
 memIm *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
 char *decToBin(char*);
-char *decToBinJ(char*);
+char *decToBinJ(int);
 char *ascizToBin(int);
 char *decToBinDir(char*);
 char *decToBinDirW(char*);
@@ -62,7 +62,7 @@ char *jOpCode[]={"011110","011111","100000","111111"};
 int main()
 {
     memIm *headCom,*headData;
-    TABLE_NODE_T *symbolTable2;
+    TABLE_NODE_T *tableHead;
     int ic=INITIC;
     /*firstPass(NULL,".dh","27056");
     firstPass(NULL,"stop",NULL);
@@ -73,20 +73,19 @@ int main()
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
-    headCom=memAdd(NULL,"add","$3,$5,$9",symbolTable2);
+    tableHead = symbolTable("YU",100,0,0);
+    tableHead = symbolTable("ALL2",0,0,0);
+    headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
-    headData=memAdd(NULL,".asciz","a",symbolTable2);
+    headData=memAdd(NULL,".asciz","a",tableHead);
     //addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
     //headData=firstPass(NULL,".asciz","aBc");
-    addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",symbolTable2));
-    addNode(headCom,headData,memAdd("ALL2",".asciz","abcyun",symbolTable2));
-    addNode(headCom,headData,memAdd(NULL,".dw","6,4,1,7,10,12,13",symbolTable2));
-    addNode(headCom,headData,memAdd(NULL,".dw","102,384,55",symbolTable2));
-    addNode(headCom,headData,memAdd(NULL,".asciz","aaacz",symbolTable2));
-    addNode(headCom,headData,memAdd(NULL,".db","102,384,55",symbolTable2));
-    addNode(headCom,headData,memAdd(NULL,".dh","1",symbolTable2));
-    symbolTable2=symbolTable("STR1",0,0,0);
-    symbolTable2=symbolTable("STR2",0,0,0);
+    addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
+    addNode(headCom,headData,memAdd("ALL2","jmp","YU",tableHead));
+
+
+    //symbolTable2=symbolTable("STR1",0,0,0);
+
     //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     //addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -96,9 +95,8 @@ int main()
     addNode(head,firstPass(NULL,"bgt","$0,$0,11",&ic));
     addNode(head,firstPass(NULL,"stop",NULL,&ic));*/
     concatNodes(headCom,headData);
-    printSymbolTable(symbolTable2);
+    //printSymbolTable(symbolTable2);
     printList(headCom);
-    
     deleteNode(headCom);
     return 0;
 }
@@ -113,6 +111,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     int count=0;
     char *imm=(char *)calloc(17, sizeof(char));
     char *imm2=(char *)calloc(25, sizeof(char));
+    char *immJ;
     memIm *node=(memIm *)malloc(sizeof(memIm));
     char *registers[3];
     char *pointer;
@@ -121,13 +120,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     pointer=string;
     char *notInUse="000000";
     char *emptyPointer="00000";
-    
-    if(ptrField1!=NULL){
-        strcpy(node->symbol,ptrField1);
-        symTable=symbolTable(ptrField1,0,0,0);
-        //printf("%s\n",symTable->symbol);
-    }
-    
+
     if (ptrField3)
         strcpy(str,ptrField3);
     token = strtok(str, s);
@@ -238,10 +231,21 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     for(int i=0;i<JCOMLEN;i++){
         if(!strcmp(ptrField2,jCommands[i])){
+            
             if (i<3){
                 strcpy(pointer,jOpCode[i]);
+                
+                while (symTable!=NULL){
+                    if (!strcmp(symTable->symbol,ptrField3))
+                    {
+                        immJ=decToBinJ(symTable->value);
+                        //printf("\n%s ",immJ);
+                    }
+                    symTable=symTable->next;
+                }
                 if(*ptrField3!='$'){
-                    strcat(pointer,"0?");
+                        strcat(pointer,"0");
+                        strcat(pointer,immJ);
                 }
                 else{
                     strcat(pointer,"1?");
@@ -249,10 +253,11 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             }
             else{
                 strcpy(pointer,jOpCode[i]);
-                strcpy(imm2,decToBinJ("0"));
+                strcpy(imm2,decToBinJ(0));
                 strcat(pointer,imm2);
             }
         }
+
     }
     
     if(!strcmp(ptrField2,".asciz"))
@@ -404,18 +409,16 @@ char *decToBin(char *number)
 
 }
 
-char *decToBinJ(char *number)
+char *decToBinJ(int num)
 {
-    int num;
     int i,j;
     char *str=(char*)malloc(26);
-    num=atoi(number);
-    for(unsigned int i=0; i<26; i++)
+    for(unsigned int i=0; i<25; i++)
     {
-      unsigned int mask = 1 << (26 - 1 - i);
+      unsigned int mask = 1 << (25 - 1 - i);
       str[i] = (num & mask) ? '1' : '0';
     }
-    str[26] = '\0';
+    str[25] = '\0';
     return str;
 }
 
