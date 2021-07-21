@@ -35,7 +35,7 @@ typedef struct tableNode TABLE_NODE_T;
 void printList2(data *head);
 memIm *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
-char *decToBin(char*);
+char *decToBin(int);
 char *decToBinJ(int);
 char *ascizToBin(int);
 char *decToBinDir(char*);
@@ -73,8 +73,8 @@ int main()
     firstPass(NULL,"bgt","$5,$6,LOOP");*/
     //firstPass(NULL,"bgt","$7,$12,64");
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
-    tableHead = symbolTable("YU",100,0,0);
-    tableHead = symbolTable("ALL2",0,0,0);
+    tableHead = symbolTable("YU",122,0,0);
+    tableHead = symbolTable("ALL2",187,0,0);
     headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=memAdd(NULL,".asciz","a",tableHead);
@@ -82,6 +82,7 @@ int main()
     //headData=firstPass(NULL,".asciz","aBc");
     addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
     addNode(headCom,headData,memAdd("ALL2","jmp","YU",tableHead));
+    addNode(headCom,headData,memAdd("ALL3","bgt","$4,$5,ALL2",tableHead));
 
 
     //symbolTable2=symbolTable("STR1",0,0,0);
@@ -175,7 +176,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         if (count==1)
                         {
                             registers[count]=NULL;
-                            strcpy(imm,decToBin(token));
+                            strcpy(imm,decToBin(atoi(token)));
                             count++;
                             token = strtok(NULL, s);
                             continue;
@@ -200,12 +201,16 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     free(imm);
             }
             else{
-                while( token != NULL ) {
-                        if (count==2){
-                            if (*token>='A'&&*token<='Z')
-                                strcpy(imm,"?");
-                            else
-                                strcpy(imm,decToBin(token));
+                    while( token != NULL ) {
+                                if (count==2){
+                        while (symTable!=NULL){
+                            if (!strcmp(symTable->symbol,token))
+                            {
+                                imm=decToBin(symTable->value);
+                                //printf("\n%s ",immJ);
+                            }
+                            symTable=symTable->next;
+                        }    
                             registers[2]=NULL;
                             break;
                         }
@@ -393,12 +398,10 @@ char *Registers(char *reg)
     return str;
 }
 
-char *decToBin(char *number)
+char *decToBin(int num)
 {
-    int num;
     int i,j;
-    char *str=(char*)malloc(16);
-    num=atoi(number);
+    char *str=(char*)malloc(17);
     for(unsigned int i=0; i<16; i++)
     {
       unsigned int mask = 1 << (16 - 1 - i);
