@@ -6,18 +6,24 @@
 #define ICOMLEN 15
 #define JCOMLEN 4
 #define INITIC 100
-
+#define BITSINBYTE 9
+#define SYMBOL_NUM_OF_CHARS 32
+#define NUM_OF_BITS_OP 33
+#define NUM_OF_CHARS_IN_LINE 80
+#define SYMBOL_NUM_OF_CHARS 32
+#define NUM_OF_BITS_IMM 17
+#define NUM_OF_BITS_IMM_STOP 27
 
 
 typedef struct data{
-    char byte[9];
+    char byte[BITSINBYTE];
     struct data *next;
 }data;
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    char symbol[32];
-    char op[33];
+    char symbol[SYMBOL_NUM_OF_CHARS];
+    char op[NUM_OF_BITS_OP];
     data *p;
     int ic;
     int dc;
@@ -25,14 +31,13 @@ typedef struct memoryImage{
 } memIm;
 
 struct tableNode{
-	char symbol[32];
+	char symbol[SYMBOL_NUM_OF_CHARS];
 	int value;
 	int attribute[2];
 	struct tableNode* next;
 };
 typedef struct tableNode TABLE_NODE_T;
 
-void printList2(data *head);
 memIm *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
 char *decToBin(int);
@@ -75,6 +80,9 @@ int main()
     //head=firstPass(NULL,".asciz","abcdefg",&ic);
     tableHead = symbolTable("YU",122,0,0);
     tableHead = symbolTable("ALL2",187,0,0);
+    tableHead = symbolTable("ALL4",210,0,0);
+    tableHead = symbolTable("YU2",152,0,0);
+    tableHead = symbolTable("ALL6",214,0,0);
     headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
     //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=memAdd(NULL,".asciz","a",tableHead);
@@ -82,11 +90,11 @@ int main()
     //headData=firstPass(NULL,".asciz","aBc");
     addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
     addNode(headCom,headData,memAdd("ALL2","jmp","YU",tableHead));
-    addNode(headCom,headData,memAdd("ALL3","bgt","$4,$5,ALL2",tableHead));
-
-
+    addNode(headCom,headData,memAdd("ALL3","blt","$4,$5,ALL6",tableHead));
+    addNode(headCom,headData,memAdd("ALL4","bne","$7,$8,ALL4",tableHead));
+    addNode(headCom,headData,memAdd("YU2","add","$4,$8,$9",tableHead));
+    addNode(headCom,headData,memAdd(NULL,"stop",NULL,tableHead));
     //symbolTable2=symbolTable("STR1",0,0,0);
-
     //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
     //addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
     //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
@@ -104,14 +112,14 @@ int main()
 
 memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
     char *str;
-    char string[33];
-    str = (char *)calloc(80, sizeof(char));
+    char string[NUM_OF_BITS_OP];
+    str = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
     const char s[2] = ",";
     char *token;
     char *reg;
     int count=0;
-    char *imm=(char *)calloc(17, sizeof(char));
-    char *imm2=(char *)calloc(25, sizeof(char));
+    char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));
+    char *imm2=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));
     char *immJ;
     memIm *node=(memIm *)malloc(sizeof(memIm));
     char *registers[3];
@@ -259,6 +267,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             else{
                 strcpy(pointer,jOpCode[i]);
                 strcpy(imm2,decToBinJ(0));
+                strcat(imm2,"0");
                 strcat(pointer,imm2);
             }
         }
