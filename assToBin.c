@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #define NUMBIT 16
 #define RCOMLEN 8
 #define ICOMLEN 15
@@ -674,39 +675,19 @@ void printSymbolTable(TABLE_NODE_T *symbolTable){
 
 char binToHex(char *bin)
 {
-    char hex;
-    if(!strcmp(bin, "0000"))
-        hex='0';
-    else if(!strcmp(bin, "0001"))
-        hex='1';
-    else if(!strcmp(bin, "0010"))
-        hex='2';
-    else if(!strcmp(bin, "0011"))
-        hex='3';
-    else if(!strcmp(bin, "0100"))
-        hex='4';
-    else if(!strcmp(bin, "0101"))
-        hex='5';
-    else if(!strcmp(bin, "0110"))
-        hex='6';
-    else if(!strcmp(bin, "0111"))
-        hex='7';
-    else if(!strcmp(bin, "1000"))
-        hex='8';
-    else if(!strcmp(bin, "1001"))
-        hex='9';
-    else if(!strcmp(bin, "1010"))
-        hex='A';
-    else if(!strcmp(bin, "1011"))
-        hex='B';
-    else if(!strcmp(bin, "1100"))
-        hex='C';
-    else if(!strcmp(bin, "1101"))
-        hex='D';
-    else if(!strcmp(bin, "1110"))
-        hex='E';
-    else if(!strcmp(bin, "1111"))
-        hex='F';
+   char hex;
+   int count=3;
+   int num=0;
+   int digit;
+   for(char *i=bin;*i;i++){
+        num+=(pow(2,count))*(*i - '0');
+        count--;
+    }
+    if(num<10){
+        hex = num+48;
+    }
+    else
+        hex = num+55;
     return hex;
 }
 
