@@ -111,33 +111,33 @@ int main()
 }
 
 memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
-    char *str;
-    char string[NUM_OF_BITS_OP];
-    str = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
+    char *lineStr;/**/
+    char opString[NUM_OF_BITS_OP];/*Operation string*/
+    lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
     const char s[2] = ",";/*A comma token*/
     char *token;/*A pointer to a token*/
-    char *reg;
-    int count=0;
-    char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));
-    char *imm2=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));
-    char *immJ;
-    memIm *node=(memIm *)malloc(sizeof(memIm));
-    char *registers[3];
+    char *reg;/*A char pointer to a register*/
+    int count=0;/*A counter*/
+    char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
+    char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
+    char *immJ;/*A pointer to an immediate value of type j.*/
+    memIm *node=(memIm *)malloc(sizeof(memIm));/*Memory allocation for memory image node.*/
+    char *registers[3];/*An array of pointers of registers.*/
     char *pointer;
-    data *head;
-    data *temp;
-    pointer=string;
-    char *notInUse="000000";
-    char *emptyPointer="00000";
+    pointer=opString;
+    char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot*/
+    char *emptyPointer="00000";/*An array of bin chars for "empty" bits within the 32bits slot*/
 
     if (ptrField3)
-        strcpy(str,ptrField3);
-    token = strtok(str, s);
+        strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
+    token = strtok(lineStr, s);/*A definition of a token*/
+    
+    /*Check if the command is an RCOMMAND*/
     for(int i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
             while( token != NULL ) {
-                    reg=Registers(token);
-                    registers[count]=(char*) malloc(6 * sizeof(char));
+                    reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+                    registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
                     if((i>4)&&(count==1))
                     {
                         strcpy(registers[count],"00000");
@@ -267,9 +267,9 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             }
             else{
                 strcpy(pointer,jOpCode[i]);
-                strcpy(imm2,decToBinJ(0));
-                strcat(imm2,"0");
-                strcat(pointer,imm2);
+                strcpy(immStop,decToBinJ(0));
+                strcat(immStop,"0");
+                strcat(pointer,immStop);
             }
         }
 
@@ -373,9 +373,9 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         }
         
     }
-    strcpy(node->op,string);
+    strcpy(node->op,opString);
     return node;
-    free(str);
+    free(lineStr);
     count=0;
 }
 char *Registers(char *reg)
