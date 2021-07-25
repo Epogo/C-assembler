@@ -17,19 +17,19 @@
 
 
 typedef struct data{
-    char byte[BITSINBYTE];
+    char byte[BITSINBYTE];/*Chars array with length of 8 bits (for a byte) and a NULL terminator*/
     struct data *next;
-}data;
+}DATA;
 
 /*Maybe a union should be added*/
 typedef struct memoryImage{
-    char symbol[SYMBOL_NUM_OF_CHARS];
-    char op[NUM_OF_BITS_OP];
-    data *p;
-    int ic;
+    char symbol[SYMBOL_NUM_OF_CHARS];/*The symbol of a node*/
+    char op[NUM_OF_BITS_OP];/*An operation (expressed by binary bits)*/
+    DATA *p;/*A pointer to data*/
+    int ic;/*Instruction counter.*/
     int dc;
     struct memoryImage *next;
-} memIm;
+} MEMIM;
 
 struct tableNode{
 	char symbol[SYMBOL_NUM_OF_CHARS];
@@ -39,7 +39,7 @@ struct tableNode{
 };
 typedef struct tableNode TABLE_NODE_T;
 
-memIm *memAdd(char*,char*,char*,TABLE_NODE_T*);
+MEMIM *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
 char *decToBin(int);
 char *decToBinJ(int);
@@ -47,73 +47,51 @@ char *ascizToBin(int);
 char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
-void deleteNode(memIm*);
-void addNode(memIm *headCom,memIm *headData, memIm *node);
-void printList(memIm *head);
+void deleteNode(MEMIM*);
+void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node);
+void printList(MEMIM *head);
 char binToHex(char *bin);
-void concatNodes(memIm *headCom,memIm *headData);
+void concatNodes(MEMIM *headCom,MEMIM *headData);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
 
-char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};
-char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};
-char *jCommands[]={"jmp","la","call","stop"};
-char *directives[]={".db",".dw",".dh",".data",".asciz",".entry",".extern"};
-char *rComFunct[]={"00001","00010","00011","00100","00101"};
-char *rOpCode[]={"000000","000001"};
-char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};
-char *jOpCode[]={"011110","011111","100000","111111"};
+char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};/*R commands*/
+char *iCommands[]={"addi","subi","andi","ori","nori","bne","beq","blt","bgt","lb","sb","lw","sw","lh","sh"};/*I commands*/
+char *jCommands[]={"jmp","la","call","stop"};/*J commands*/
+char *directives[]={".db",".dw",".dh",".data",".asciz",".entry",".extern"};/*Directives*/
+char *rComFunct[]={"00001","00010","00011","00100","00101"};/*A list of functs for r commands*/
+char *rOpCode[]={"000000","000001"};/*A list of opcodes for r commands*/
+char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};/*A list of opcodes for i commands*/
+char *jOpCode[]={"011110","011111","100000","111111"};/*A list of opcodes for j commands*/
 
 int main()
 {
-    memIm *headCom,*headData;
+    MEMIM *headCom,*headData;
     TABLE_NODE_T *tableHead;
     int ic=INITIC;
-    /*firstPass(NULL,".dh","27056");
-    firstPass(NULL,"stop",NULL);
-    firstPass(NULL,"addi","$4,-12,$17");
-    firstPass(NULL,"lw","$0,4,$10");
-    firstPass(NULL,"mvlo","$5,$10");
-    
-    firstPass(NULL,"bgt","$5,$6,LOOP");*/
-    //firstPass(NULL,"bgt","$7,$12,64");
-    //head=firstPass(NULL,".asciz","abcdefg",&ic);
     tableHead = symbolTable("YU",122,0,0);
     tableHead = symbolTable("ALL2",187,0,0);
     tableHead = symbolTable("ALL4",210,0,0);
     tableHead = symbolTable("YU2",152,0,0);
     tableHead = symbolTable("ALL6",214,0,0);
     headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
-    //addNode(0,headCom,headData,firstPass(NULL,"ori","$9,-5,$2",&ic));
     headData=memAdd(NULL,".asciz","a",tableHead);
-    //addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
-    //headData=firstPass(NULL,".asciz","aBc");
     addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
     addNode(headCom,headData,memAdd("ALL2","jmp","$9",tableHead));
     addNode(headCom,headData,memAdd("ALL3","blt","$4,$5,ALL6",tableHead));
     addNode(headCom,headData,memAdd("ALL4","bne","$7,$8,ALL4",tableHead));
     addNode(headCom,headData,memAdd("YU2","add","$4,$8,$9",tableHead));
     addNode(headCom,headData,memAdd(NULL,"stop",NULL,tableHead));
-    //symbolTable2=symbolTable("STR1",0,0,0);
-    //addNode(headCom,headData,firstPass(NULL,"or","$7,$5,$2"));
-    //addNode(headCom,headData,firstPass(NULL,"addi","$7,-1,$6"));
-    //addNode(headCom,headData,firstPass(NULL,".asciz","hijklmnopq"));
-    //addNode(0,headCom,headData,firstPass(NULL,"lw","$7,-4,$2",&ic));
-    /*addNode(head,firstPass(NULL,"addi","$23,11,$2",&ic));
-    addNode(head,firstPass(NULL,"lw","$23,-2,$2",&ic));
-    addNode(head,firstPass(NULL,"bgt","$0,$0,11",&ic));
-    addNode(head,firstPass(NULL,"stop",NULL,&ic));*/
     concatNodes(headCom,headData);
-    //printSymbolTable(symbolTable2);
     printList(headCom);
     deleteNode(headCom);
     return 0;
 }
 
-memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
-    char *lineStr;/**/
+MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
+    char *lineStr;/*A pointer to a line*/
     char opString[NUM_OF_BITS_OP];/*Operation string*/
-    lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
+    lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     const char s[2] = ",";/*A comma token*/
     char *token;/*A pointer to a token*/
     char *reg;/*A char pointer to a register*/
@@ -121,15 +99,17 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
     char *immJ;/*A pointer to an immediate value of type j.*/
-    memIm *node=(memIm *)malloc(sizeof(memIm));/*Memory allocation for memory image node.*/
-    data *newNode;/*An adress of a new node*/
+    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
+    DATA *newNode;/*An adress of a new node*/
     char *registers[3];/*An array of pointers of registers.*/
-    char *opStrPoint;
+    char *opStrPoint;/*A pointer to a Operation string*/
     opStrPoint=opString;
     char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot*/
     char *emptyPointer="00000";/*An array of bin chars for "empty" bits within the 32bits slot*/
-    char *zero="0";/*A zero string*/
-    char *one="1";
+    char *zero="0";/*A "zero" string*/
+    char *one="1";/*A "one" string*/
+    char *null="00000000";/*NULL terminator*/
+    DATA *temp;
 
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
@@ -225,7 +205,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                             registers[2]=NULL;
                             break;
                         }
-                        reg=Registers(token);
+                        reg=Registers(token);/**/
                         registers[count]=(char*) malloc(6 * sizeof(char));
                         strcpy(registers[count],reg);
                         free(reg);
@@ -280,14 +260,13 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     if(!strcmp(ptrField2,".asciz"))
     {
-        data *temp=(data*)calloc(1, sizeof(data));/*Allocate memory for a data node.*/
+        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
         node->p=temp;/*Point to the allocated memory.*/
-        char *null="00000000";
         while (*ptrField3!='\0'){
-            int asciCode=*ptrField3;
-            char *letter=ascizToBin(asciCode);
+            int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
+            char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
             strcat(temp->byte,letter);
-            newNode=(data*)calloc(1, sizeof(data));
+            newNode=(DATA*)calloc(1, sizeof(DATA));
             temp->next=newNode;
             temp=newNode;
             free(letter);
@@ -298,8 +277,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     if(!strcmp(ptrField2,".db"))
     {
-        data *temp=(data*)calloc(1, sizeof(data));
-        data *n;
+        temp=(DATA*)calloc(1, sizeof(DATA));
         node->p=temp;
         while( token != NULL ){
             char *binNum=decToBinDir(token);
@@ -308,16 +286,16 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             token = strtok(NULL, s);
             if (token==NULL)
                 break;
-            newNode=(data*)calloc(1, sizeof(data));
-            temp->next=n;
-            temp=n;
+            newNode=(DATA*)calloc(1, sizeof(DATA));
+            temp->next=newNode;
+            temp=newNode;
         }
-        n->next=NULL;
+        newNode->next=NULL;
     }
     
     if(!strcmp(ptrField2,".dw"))
     {
-        data *temp=(data*)calloc(1, sizeof(data));
+        temp=(DATA*)calloc(1, sizeof(DATA));
         node->p=temp;
         char *binNum,*binNumStart;
         while( token != NULL ){
@@ -327,7 +305,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             strncpy(temp->byte,binNum,8);
             //printf("temp->byte is:%s\n",temp->byte);
             for(int i=0;i<3;i++){
-                newNode=(data*)calloc(1, sizeof(data));
+                newNode=(DATA*)calloc(1, sizeof(DATA));
                 temp->next=newNode;
                 temp=newNode;
                 binNum-=8;
@@ -337,7 +315,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             token = strtok(NULL, s);
             if (token != NULL)
             {
-                newNode=(data*)calloc(1, sizeof(data));
+                newNode=(DATA*)calloc(1, sizeof(DATA));
                 temp->next=newNode;
                 temp=newNode;
             }
@@ -348,16 +326,16 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     if(!strcmp(ptrField2,".dh"))
     {
-        data *temp=(data*)calloc(1, sizeof(data));
+        temp=(DATA*)calloc(1, sizeof(DATA));
         node->p=temp;
-        data *head;
+        DATA *head;
         char *binNum,*binNumStart;
         while( token != NULL ){
             binNum=decToBinDirH(token);
             binNumStart=binNum;
             binNum+=8;
             strncpy(temp->byte,binNum,8);
-            newNode=(data*)calloc(1, sizeof(data));
+            newNode=(DATA*)calloc(1, sizeof(DATA));
             temp->next=newNode;
             temp=newNode;
             binNum-=8;
@@ -365,7 +343,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             token = strtok(NULL, s);
             if (token != NULL)
             {
-                newNode=(data*)calloc(1, sizeof(data));
+                newNode=(DATA*)calloc(1, sizeof(DATA));
                 temp->next=newNode;
                 temp=newNode;
             }
@@ -495,9 +473,9 @@ char *decToBinDirH(char *number)
     return str;
 }
 
-void addNode(memIm *headCom,memIm *headData, memIm *node)
+void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node)
 {
-    memIm *nodePointer;/*A pointer to a memory image node*/
+    MEMIM *nodePointer;/*A pointer to a memory image node*/
     /*Add a new node the Commands list.*/
     if (node->p==NULL){
         nodePointer=headCom;
@@ -519,8 +497,8 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
     
 }
 
-void concatNodes(memIm *headCom,memIm *headData){
-        memIm *nodePointer;/*A pointer to a memory image node*/
+void concatNodes(MEMIM *headCom,MEMIM *headData){
+        MEMIM *nodePointer;/*A pointer to a memory image node*/
         nodePointer=headCom;
         /*Concatenate commands list and directives list*/
         while(nodePointer->next!=NULL)
@@ -530,9 +508,9 @@ void concatNodes(memIm *headCom,memIm *headData){
         nodePointer->next=headData;
 }
 
-void printList (memIm *head)
+void printList (MEMIM *head)
 {
-    memIm *q;
+    MEMIM *q;
     q=head;
     char *bin;
     char mem[5];
@@ -545,7 +523,7 @@ void printList (memIm *head)
     int inCount;
     int lastNodeFlag=0;
     char hex;
-    data *temp;
+    DATA *temp;
     static int ic=100;
     while(q!=NULL)
     {
@@ -645,8 +623,8 @@ void printList (memIm *head)
 }
 
 
-void deleteNode(memIm *node){
-    memIm *temp;/*A temp node which will be deleted from the linked list*/
+void deleteNode(MEMIM *node){
+    MEMIM *temp;/*A temp node which will be deleted from the linked list*/
     temp=node;
     /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
