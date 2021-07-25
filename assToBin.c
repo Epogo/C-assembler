@@ -27,7 +27,7 @@ typedef struct memoryImage{
     char op[NUM_OF_BITS_OP];/*An operation (expressed by binary bits)*/
     DATA *p;/*A pointer to data*/
     int ic;/*Instruction counter.*/
-    int dc;
+    int dc;/*Data counter*/
     struct memoryImage *next;
 } MEMIM;
 
@@ -68,7 +68,7 @@ int main()
 {
     MEMIM *headCom,*headData;
     TABLE_NODE_T *tableHead;
-    int ic=INITIC;
+    int ic=INITIC;/*Initializing the Instruction count*/
     tableHead = symbolTable("YU",122,0,0);
     tableHead = symbolTable("ALL2",187,0,0);
     tableHead = symbolTable("ALL4",210,0,0);
@@ -100,16 +100,16 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
     char *immJ;/*A pointer to an immediate value of type j.*/
     MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
-    DATA *newNode;/*An adress of a new node*/
+    DATA *newNode;/*An adress of a new node.*/
     char *registers[3];/*An array of pointers of registers.*/
-    char *opStrPoint;/*A pointer to a Operation string*/
+    char *opStrPoint;/*A pointer to a Operation string.*/
     opStrPoint=opString;
-    char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot*/
-    char *emptyReg="00000";/*An array of bin chars for "empty register" bits within the 32bits slot*/
-    char *zero="0";/*A "zero" string*/
-    char *one="1";/*A "one" string*/
-    char *null="00000000";/*NULL terminator*/
-    DATA *temp;
+    char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot.*/
+    char *emptyReg="00000";/*An array of bin chars for "empty register" bits within the 32bits slot.*/
+    char *zero="0";/*A "zero" string.*/
+    char *one="1";/*A "one" string.*/
+    char *null="00000000";/*NULL terminator.*/
+    DATA *temp;/*A Temporary pointer.*/
 
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
@@ -124,7 +124,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     /*If the command is a copy command*/
                     if((i>4)&&(count==1))
                     {
-                        strcpy(registers[count],emptyReg);
+                        strcpy(registers[count],emptyReg);/*Set the suitable register to zero.*/
                         count++;
                         continue;
                     }
@@ -150,11 +150,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 {
                     if (k==1){
                         strcat(opStrPoint,emptyReg);/*Copy the suitable opcode to the Operation string.*/
-                        free(registers[k]);
+                        free(registers[k]);/*Free the register pointers*/
                         continue;
                     }
                     strcat(opStrPoint,registers[k]);
-                    free(registers[k]);
+                    free(registers[k]);/*Free the register pointers*/
                 }
                 strcat(opStrPoint,rComFunct[i%5]);/*Copy the suitable funct code to the Operation string.*/
             }
