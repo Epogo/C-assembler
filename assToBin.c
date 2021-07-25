@@ -195,8 +195,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     free(imm);
             }
             else{
-                    while( token != NULL ) {
-                                if (count==2){
+                while( token != NULL ) {
+                    if (count==2){
                         while (symTable!=NULL){
                             if (!strcmp(symTable->symbol,token))
                             {
@@ -207,13 +207,13 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         }    
                             registers[2]=NULL;
                             break;
-                        }
-                        reg=Registers(token);/**/
-                        registers[count]=(char*) malloc(6 * sizeof(char));
-                        strcpy(registers[count],reg);
-                        free(reg);
-                        token = strtok(NULL, s);
-                        count++;
+                    }
+                    reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+                    registers[count]=(char*) malloc(6 * sizeof(char));
+                    strcpy(registers[count],reg);
+                    free(reg);
+                    token = strtok(NULL, s);
+                    count++;
                 }
                     
                 strcpy(opStrPoint,iOpCode[i]);
@@ -268,20 +268,20 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         while (*ptrField3!='\0'){
             int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
             char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
-            strcat(temp->byte,letter);
-            newNode=(DATA*)calloc(1, sizeof(DATA));
-            temp->next=newNode;
-            temp=newNode;
-            free(letter);
-            ptrField3++;
+            strcat(temp->byte,letter);/*Copy the string to byte array within the temp node.*/
+            newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+            temp->next=newNode;/*Point to the new node.*/
+            temp=newNode;/*Set the temp node to point on the newNode.*/
+            free(letter);/*Free the allocated space for the string*/
+            ptrField3++;/*Advance to the next byte.*/
         }
-        strcat(temp->byte,null);
+        strcat(temp->byte,null);/*Concatenate the null bits to the end of the ascii linked-list.*/
     }
     
     if(!strcmp(ptrField2,".db"))
     {
-        temp=(DATA*)calloc(1, sizeof(DATA));
-        node->p=temp;
+        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+        node->p=temp;/*Point to the allocated memory.*/
         while( token != NULL ){
             char *binNum=decToBinDir(token);
             strcat(temp->byte,binNum);
