@@ -123,10 +123,12 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *immJ;/*A pointer to an immediate value of type j.*/
     memIm *node=(memIm *)malloc(sizeof(memIm));/*Memory allocation for memory image node.*/
     char *registers[3];/*An array of pointers of registers.*/
-    char *pointer;
-    pointer=opString;
+    char *opStrPoint;
+    opStrPoint=opString;
     char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot*/
     char *emptyPointer="00000";/*An array of bin chars for "empty" bits within the 32bits slot*/
+    char *zero="0";/*A zero string*/
+    char *one="1";
 
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
@@ -150,30 +152,30 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     count++;
             }
             if(i<5){
-                strcpy(pointer,rOpCode[0]);
-                pointer+=strlen(rOpCode[0]);
+                strcpy(opStrPoint,rOpCode[0]);
+                opStrPoint+=strlen(rOpCode[0]);
                 for (int j=0;j<3;j++)
                 {
-                    strcat(pointer,registers[j]);
+                    strcat(opStrPoint,registers[j]);
                     free(registers[j]);
                 }
-                strcat(pointer,rComFunct[i]);
+                strcat(opStrPoint,rComFunct[i]);
             }
             else{
-                strcpy(pointer,rOpCode[1]);
+                strcpy(opStrPoint,rOpCode[1]);
                 for (int k=2;k>=0;k--)
                 {
                     if (k==1){
-                        strcat(pointer,emptyPointer);
+                        strcat(opStrPoint,emptyPointer);
                         free(registers[k]);
                         continue;
                     }
-                    strcat(pointer,registers[k]);
+                    strcat(opStrPoint,registers[k]);
                     free(registers[k]);
                 }
-                strcat(pointer,rComFunct[i%5]);
+                strcat(opStrPoint,rComFunct[i%5]);
             }
-            strcat(pointer,notInUse);
+            strcat(opStrPoint,notInUse);
         }
     }
 
@@ -189,23 +191,23 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                             token = strtok(NULL, s);
                             continue;
                         }
-                        reg=Registers(token);
-                        registers[count]=(char*) malloc(6 * sizeof(char));
+                        reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+                        registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
                         strcpy(registers[count],reg);
                         free(reg);
                         token = strtok(NULL, s);
                         count++;
                 }
 
-                strcpy(pointer,iOpCode[i]);
+                strcpy(opStrPoint,iOpCode[i]);
                 for (int j=0;j<3;j++)
                     {
                         if (j==1)
                             continue;
-                        strcat(pointer,registers[j]);
+                        strcat(opStrPoint,registers[j]);
                         free(registers[j]);
                     }
-                    strcat(pointer,imm);
+                    strcat(opStrPoint,imm);
                     free(imm);
             }
             else{
@@ -230,13 +232,13 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         count++;
                 }
                     
-                strcpy(pointer,iOpCode[i]);
+                strcpy(opStrPoint,iOpCode[i]);
                 for (int j=0;j<2;j++)
                     {
-                        strcat(pointer,registers[j]);
+                        strcat(opStrPoint,registers[j]);
                         free(registers[j]);
                     }
-                strcat(pointer,imm);
+                strcat(opStrPoint,imm);
                 free(imm);
             }
         }    
@@ -246,7 +248,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         if(!strcmp(ptrField2,jCommands[i])){
             
             if (i<3){
-                strcpy(pointer,jOpCode[i]);
+                strcpy(opStrPoint,jOpCode[i]);
                 while (symTable!=NULL){
                     if (!strcmp(symTable->symbol,ptrField3))
                     {
@@ -255,21 +257,21 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     symTable=symTable->next;
                 }
                 if(*ptrField3!='$'){
-                        strcat(pointer,"0");
-                        strcat(pointer,immJ);
+                        strcat(opStrPoint,zero);
+                        strcat(opStrPoint,immJ);
                 }
                 else{
                         reg=Registers(ptrField3);
-                        strcat(pointer,"1");
-                        strcat(pointer,reg);
+                        strcat(opStrPoint,one);
+                        strcat(opStrPoint,reg);
                         free(reg);
                 }
             }
             else{
-                strcpy(pointer,jOpCode[i]);
+                strcpy(opStrPoint,jOpCode[i]);
                 strcpy(immStop,decToBinJ(0));
-                strcat(immStop,"0");
-                strcat(pointer,immStop);
+                strcat(immStop,zero);
+                strcat(opStrPoint,immStop);
             }
         }
 
