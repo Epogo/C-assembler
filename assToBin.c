@@ -105,7 +105,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *opStrPoint;/*A pointer to a Operation string*/
     opStrPoint=opString;
     char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot*/
-    char *emptyPointer="00000";/*An array of bin chars for "empty" bits within the 32bits slot*/
+    char *emptyReg="00000";/*An array of bin chars for "empty register" bits within the 32bits slot*/
     char *zero="0";/*A "zero" string*/
     char *one="1";/*A "one" string*/
     char *null="00000000";/*NULL terminator*/
@@ -115,51 +115,54 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
     token = strtok(lineStr, s);/*A definition of a token*/
     
-    /*Check if the command is an RCOMMAND*/
+    /*Check if the command is a RCOMMAND*/
     for(int i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
             while( token != NULL ) {
                     reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                     registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
+                    /*If the command is a copy command*/
                     if((i>4)&&(count==1))
                     {
-                        strcpy(registers[count],"00000");
+                        strcpy(registers[count],emptyReg);
                         count++;
                         continue;
                     }
                     strcpy(registers[count],reg);
                     free(reg);
-                    token = strtok(NULL, s);
+                    token = strtok(NULL, s);/*Continue to loop over the tokens until the token is null*/
                     count++;
             }
+            /*If the command is logical command*/
             if(i<5){
-                strcpy(opStrPoint,rOpCode[0]);
-                opStrPoint+=strlen(rOpCode[0]);
+                strcpy(opStrPoint,rOpCode[0]);/*Copy the suitable opcode to the Operation string.*/
+                /*Copy each binary code for each register to the suitable place.*/
                 for (int j=0;j<3;j++)
                 {
                     strcat(opStrPoint,registers[j]);
                     free(registers[j]);
                 }
-                strcat(opStrPoint,rComFunct[i]);
+                strcat(opStrPoint,rComFunct[i]);/*Copy the suitable funct code to the Operation string.*/
             }
             else{
                 strcpy(opStrPoint,rOpCode[1]);
                 for (int k=2;k>=0;k--)
                 {
                     if (k==1){
-                        strcat(opStrPoint,emptyPointer);
+                        strcat(opStrPoint,emptyReg);/*Copy the suitable opcode to the Operation string.*/
                         free(registers[k]);
                         continue;
                     }
                     strcat(opStrPoint,registers[k]);
                     free(registers[k]);
                 }
-                strcat(opStrPoint,rComFunct[i%5]);
+                strcat(opStrPoint,rComFunct[i%5]);/*Copy the suitable funct code to the Operation string.*/
             }
-            strcat(opStrPoint,notInUse);
+            strcat(opStrPoint,notInUse);/*Set the last bits in the operation string as zeros.*/
         }
     }
-
+    
+    /*Check if the command is a ICOMMAND*/
     for(int i=0;i<ICOMLEN;i++){
         if(!strcmp(ptrField2,iCommands[i])){
             if(i<5||i>8){
@@ -174,13 +177,13 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         }
                         reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                         registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
-                        strcpy(registers[count],reg);
+                        strcpy(registers[count],reg);/*Copy each reg to a place in the registers array*/
                         free(reg);
                         token = strtok(NULL, s);
                         count++;
                 }
 
-                strcpy(opStrPoint,iOpCode[i]);
+                strcpy(opStrPoint,iOpCode[i]);/*Copy the suitable opcode to the Operation string.*/
                 for (int j=0;j<3;j++)
                     {
                         if (j==1)
