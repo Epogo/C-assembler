@@ -497,6 +497,7 @@ char *decToBinDirH(char *number)
 void addNode(memIm *headCom,memIm *headData, memIm *node)
 {
     memIm *nodePointer;/*A pointer to a memory image node*/
+    /*Add a new node the Commands list.*/
     if (node->p==NULL){
         nodePointer=headCom;
         while(nodePointer->next!=NULL)
@@ -505,7 +506,7 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
         }
         nodePointer->next=node;
     }
-
+    /*Add a new node the Directives list.*/
     else{
         nodePointer=headData;
         while(nodePointer->next!=NULL)
@@ -518,13 +519,14 @@ void addNode(memIm *headCom,memIm *headData, memIm *node)
 }
 
 void concatNodes(memIm *headCom,memIm *headData){
-        memIm *q;
-        q=headCom;
-        while(q->next!=NULL)
+        memIm *nodePointer;/*A pointer to a memory image node*/
+        nodePointer=headCom;
+        /*Concatenate commands list and directives list*/
+        while(nodePointer->next!=NULL)
         {
-            q = q->next;
+            nodePointer = nodePointer->next;
         }
-        q->next=headData;
+        nodePointer->next=headData;
 }
 
 void printList (memIm *head)
@@ -643,8 +645,9 @@ void printList (memIm *head)
 
 
 void deleteNode(memIm *node){
-    memIm *temp;
+    memIm *temp;/*A temp node which will be deleted from the linked list*/
     temp=node;
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
         temp=node;
         if (temp==NULL)
@@ -666,14 +669,15 @@ void printSymbolTable(TABLE_NODE_T *symbolTable){
 
 char binToHex(char *bin)
 {
-   char hex;
-   int count=3;
-   int num=0;
-   int digit;
+   char hex;/*The hex value which will be returned as a char*/
+   int count=3;/*Intialize the counter*/
+   int num=0;/*Initialize the num*/
+   /*While the bin string is not null-continue to sum numbers*/
    for(char *i=bin;*i;i++){
         num+=(pow(2,count))*(*i - '0');
         count--;
     }
+    /*Return the appropriate hex value*/
     if(num<10){
         hex = num+48;
     }
