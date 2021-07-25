@@ -89,7 +89,7 @@ int main()
     //addNode(headCom,headData,firstPass(NULL,".db","31,-12,1"));
     //headData=firstPass(NULL,".asciz","aBc");
     addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
-    addNode(headCom,headData,memAdd("ALL2","jmp","YU",tableHead));
+    addNode(headCom,headData,memAdd("ALL2","jmp","$9",tableHead));
     addNode(headCom,headData,memAdd("ALL3","blt","$4,$5,ALL6",tableHead));
     addNode(headCom,headData,memAdd("ALL4","bne","$7,$8,ALL4",tableHead));
     addNode(headCom,headData,memAdd("YU2","add","$4,$8,$9",tableHead));
@@ -115,7 +115,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char string[NUM_OF_BITS_OP];
     str = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
     const char s[2] = ",";/*A comma token*/
-    char *token;/**/
+    char *token;/*A pointer to a token*/
     char *reg;
     int count=0;
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));
@@ -247,12 +247,10 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             
             if (i<3){
                 strcpy(pointer,jOpCode[i]);
-                
                 while (symTable!=NULL){
                     if (!strcmp(symTable->symbol,ptrField3))
                     {
                         immJ=decToBinJ(symTable->value);
-                        //printf("\n%s ",immJ);
                     }
                     symTable=symTable->next;
                 }
@@ -261,7 +259,10 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         strcat(pointer,immJ);
                 }
                 else{
-                    strcat(pointer,"1?");
+                        reg=Registers(ptrField3);
+                        strcat(pointer,"1");
+                        strcat(pointer,reg);
+                        free(reg);
                 }
             }
             else{
