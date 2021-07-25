@@ -513,8 +513,8 @@ void concatNodes(MEMIM *headCom,MEMIM *headData){
 
 void printList (MEMIM *head)
 {
-    MEMIM *q;
-    q=head;
+    MEMIM *nodePointer;
+    nodePointer=head;
     char *bin;
     char mem[5];
     char* printArr=(char *) malloc(8);
@@ -528,16 +528,16 @@ void printList (MEMIM *head)
     char hex;
     DATA *temp;
     static int ic=100;
-    while(q!=NULL)
+    while(nodePointer!=NULL)
     {
-        if (q->next==NULL)
+        if (nodePointer->next==NULL)
             lastNodeFlag=1;
         //printf("%d ",q->address);
-        if((q->p)!=NULL){
+        if((nodePointer->p)!=NULL){
             k=0;
             int bitsNum;
-            while((q->p)!=NULL){
-                bin=q->p->byte;
+            while((nodePointer->p)!=NULL){
+                bin=nodePointer->p->byte;
                 j=0;
                 for(int i=0;i<8;i++){
                     mem[j]=*bin;
@@ -556,9 +556,9 @@ void printList (MEMIM *head)
                 if (k%8==0){
                     printArr = (char *) realloc(printArr, k+8);
                 }
-                temp=q->p;
+                temp=nodePointer->p;
                 //printf("%s\n",q->p->byte);
-                q->p=q->p->next;
+                nodePointer->p=nodePointer->p->next;
                 free(temp);
             }
             //printf("k is:%d\n", k);
@@ -585,7 +585,7 @@ void printList (MEMIM *head)
         }
         else
             {
-            bin=q->op;
+            bin=nodePointer->op;
             k=0;
             for(int i=0;i<32;i++){
                 mem[j]=*bin;
@@ -620,7 +620,7 @@ void printList (MEMIM *head)
             ic+=4;
         }
            
-        q=q->next;
+        nodePointer=nodePointer->next;
     }
     free(startArr);
 }
