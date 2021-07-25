@@ -47,7 +47,6 @@ char *ascizToBin(int);
 char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
-data* reverse(data *node);
 void deleteNode(memIm*);
 void addNode(memIm *headCom,memIm *headData, memIm *node);
 void printList(memIm *head);
@@ -115,8 +114,8 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *str;
     char string[NUM_OF_BITS_OP];
     str = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));
-    const char s[2] = ",";
-    char *token;
+    const char s[2] = ",";/*A comma token*/
+    char *token;/**/
     char *reg;
     int count=0;
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));
@@ -410,11 +409,11 @@ char *Registers(char *reg)
 
 char *decToBin(int num)
 {
-    int i,j;
-    char *str=(char*)malloc(17);
+    int i;
+    char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
     for(unsigned int i=0; i<16; i++)
     {
-      unsigned int mask = 1 << (16 - 1 - i);
+      unsigned int mask = 1 << (16 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
     }
     str[16] = '\0';
@@ -424,11 +423,11 @@ char *decToBin(int num)
 
 char *decToBinJ(int num)
 {
-    int i,j;
-    char *str=(char*)malloc(26);
+    int i;
+    char *str=(char*)malloc(26);/*Allocate memory for a binary immediate representation*/
     for(unsigned int i=0; i<25; i++)
     {
-      unsigned int mask = 1 << (25 - 1 - i);
+      unsigned int mask = 1 << (25 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
     }
     str[25] = '\0';
@@ -437,26 +436,26 @@ char *decToBinJ(int num)
 
 char *ascizToBin(int num)
 {
-    int i,j;
-    char *str=(char*)malloc(9);
+    int i;
+    char *str=(char*)malloc(9);/*Allocate memory for byte representation*/
     for(unsigned int i=0; i<8; i++)
     {
-      unsigned int mask = 1 << (8 - 1 - i);
+      unsigned int mask = 1 << (8 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
     }
-    str[8] = '\0';
+    str[8] = '\0';/*Put a zero at the end of the byte string*/
     return str;
 }
 
 char *decToBinDir(char *number)
 {
     int num;
-    int i,j;
-    char *str=(char*)malloc(9);
+    int i;
+    char *str=(char*)malloc(9);/*Allocate memory for byte representation*/
     num=atoi(number);
     for(unsigned int i=0; i<8; i++)
     {
-      unsigned int mask = 1 << (8 - 1 - i);
+      unsigned int mask = 1 << (8 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
     }
     str[8] = '\0';
@@ -466,12 +465,12 @@ char *decToBinDir(char *number)
 char *decToBinDirW(char *number)
 {
     int num;
-    int i,j;
-    char *str=(char*)calloc(33,sizeof(char));
+    int i;
+    char *str=(char*)calloc(33,sizeof(char));/*Allocate memory for word representation*/
     num=atoi(number);
     for(unsigned int i=0; i<32; i++)
     {
-      unsigned int mask = 1 << (32 - 1 - i);
+      unsigned int mask = 1 << (32 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
     }
     str[32] = '\0';
@@ -481,12 +480,12 @@ char *decToBinDirW(char *number)
 char *decToBinDirH(char *number)
 {
     int num;
-    int i,j;
-    char *str=(char*)malloc(17);
+    int i;
+    char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
     num=atoi(number);
     for(unsigned int i=0; i<32; i++)
     {
-      unsigned int mask = 1 << (32 - 1 - i);
+      unsigned int mask = 1 << (32 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       if(i<16)
         continue;
       str[i-16] = (num & mask) ? '1' : '0';
@@ -497,31 +496,23 @@ char *decToBinDirH(char *number)
 
 void addNode(memIm *headCom,memIm *headData, memIm *node)
 {
-    memIm *q;
-    data *r;
+    memIm *nodePointer;/*A pointer to a memory image node*/
     if (node->p==NULL){
-        q=headCom;
-        while(q->next!=NULL)
+        nodePointer=headCom;
+        while(nodePointer->next!=NULL)
         {
-            q = q->next;
+            nodePointer = nodePointer->next;
         }
-        q->next=node;
+        nodePointer->next=node;
     }
-    /*else{
-        r=headData->p;
-        while(r->next!=NULL)
-        {
-            r = r->next;
-        }
-        r->next=node->p;
-    }*/
+
     else{
-        q=headData;
-        while(q->next!=NULL)
+        nodePointer=headData;
+        while(nodePointer->next!=NULL)
         {
-            q = q->next;
+            nodePointer = nodePointer->next;
         }
-        q->next=node;
+        nodePointer->next=node;
     }
     
 }
