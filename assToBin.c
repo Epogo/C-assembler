@@ -122,6 +122,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
     char *immJ;/*A pointer to an immediate value of type j.*/
     memIm *node=(memIm *)malloc(sizeof(memIm));/*Memory allocation for memory image node.*/
+    data *newNode;/*An adress of a new node*/
     char *registers[3];/*An array of pointers of registers.*/
     char *opStrPoint;
     opStrPoint=opString;
@@ -279,17 +280,16 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     if(!strcmp(ptrField2,".asciz"))
     {
-        data *temp=(data*)calloc(1, sizeof(data));
-        node->p=temp;
-        data *n;
+        data *temp=(data*)calloc(1, sizeof(data));/*Allocate memory for a data node.*/
+        node->p=temp;/*Point to the allocated memory.*/
         char *null="00000000";
         while (*ptrField3!='\0'){
             int asciCode=*ptrField3;
             char *letter=ascizToBin(asciCode);
             strcat(temp->byte,letter);
-            n=(data*)calloc(1, sizeof(data));
-            temp->next=n;
-            temp=n;
+            newNode=(data*)calloc(1, sizeof(data));
+            temp->next=newNode;
+            temp=newNode;
             free(letter);
             ptrField3++;
         }
@@ -308,7 +308,7 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             token = strtok(NULL, s);
             if (token==NULL)
                 break;
-            n=(data*)calloc(1, sizeof(data));
+            newNode=(data*)calloc(1, sizeof(data));
             temp->next=n;
             temp=n;
         }
@@ -319,7 +319,6 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     {
         data *temp=(data*)calloc(1, sizeof(data));
         node->p=temp;
-        data *n;
         char *binNum,*binNumStart;
         while( token != NULL ){
             binNum=decToBinDirW(token);
@@ -328,9 +327,9 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             strncpy(temp->byte,binNum,8);
             //printf("temp->byte is:%s\n",temp->byte);
             for(int i=0;i<3;i++){
-                n=(data*)calloc(1, sizeof(data));
-                temp->next=n;
-                temp=n;
+                newNode=(data*)calloc(1, sizeof(data));
+                temp->next=newNode;
+                temp=newNode;
                 binNum-=8;
                 strncpy(temp->byte,binNum,8);
                 //printf("temp->byte is:%s\n",temp->byte);
@@ -338,9 +337,9 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             token = strtok(NULL, s);
             if (token != NULL)
             {
-                n=(data*)calloc(1, sizeof(data));
-                temp->next=n;
-                temp=n;
+                newNode=(data*)calloc(1, sizeof(data));
+                temp->next=newNode;
+                temp=newNode;
             }
             free(binNumStart);
         }
@@ -351,7 +350,6 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     {
         data *temp=(data*)calloc(1, sizeof(data));
         node->p=temp;
-        data *n;
         data *head;
         char *binNum,*binNumStart;
         while( token != NULL ){
@@ -359,17 +357,17 @@ memIm *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             binNumStart=binNum;
             binNum+=8;
             strncpy(temp->byte,binNum,8);
-            n=(data*)calloc(1, sizeof(data));
-            temp->next=n;
-            temp=n;
+            newNode=(data*)calloc(1, sizeof(data));
+            temp->next=newNode;
+            temp=newNode;
             binNum-=8;
             strncpy(temp->byte,binNum,8);
             token = strtok(NULL, s);
             if (token != NULL)
             {
-                n=(data*)calloc(1, sizeof(data));
-                temp->next=n;
-                temp=n;
+                newNode=(data*)calloc(1, sizeof(data));
+                temp->next=newNode;
+                temp=newNode;
             }
             free(binNumStart);
         }
