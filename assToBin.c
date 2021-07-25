@@ -200,8 +200,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         while (symTable!=NULL){
                             if (!strcmp(symTable->symbol,token))
                             {
-                                imm=decToBin(symTable->value);
-                                //printf("\n%s ",immJ);
+                                imm=decToBin(symTable->value);/*Convert a value from the symbol table
+                                to binary representation*/
                             }
                             symTable=symTable->next;
                         }    
@@ -209,9 +209,9 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                             break;
                     }
                     reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
-                    registers[count]=(char*) malloc(6 * sizeof(char));
-                    strcpy(registers[count],reg);
-                    free(reg);
+                    registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate memory for the registers.*/
+                    strcpy(registers[count],reg);/*Copy reg value to the registers array.*/
+                    free(reg);/*Free allocated memory.*/
                     token = strtok(NULL, s);
                     count++;
                 }
@@ -240,10 +240,12 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     }
                     symTable=symTable->next;
                 }
+                /*If the second field is a label field*/
                 if(*ptrField3!='$'){
                         strcat(opStrPoint,zero);
                         strcat(opStrPoint,immJ);
                 }
+                /*If the second field is a register field*/
                 else{
                         reg=Registers(ptrField3);
                         strcat(opStrPoint,one);
@@ -283,26 +285,26 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
         node->p=temp;/*Point to the allocated memory.*/
         while( token != NULL ){
-            char *binNum=decToBinDir(token);
+            char *binNum=decToBinDir(token);/*Convert a token to binary string.*/
             strcat(temp->byte,binNum);
             free(binNum);
             token = strtok(NULL, s);
             if (token==NULL)
                 break;
-            newNode=(DATA*)calloc(1, sizeof(DATA));
-            temp->next=newNode;
-            temp=newNode;
+            newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+            temp->next=newNode;/*Point to the new node.*/
+            temp=newNode;/*Set the temp node to point on the newNode.*/
         }
         newNode->next=NULL;
     }
     
     if(!strcmp(ptrField2,".dw"))
     {
-        temp=(DATA*)calloc(1, sizeof(DATA));
-        node->p=temp;
+        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+        node->p=temp;/*Point to the allocated memory.*/
         char *binNum,*binNumStart;
         while( token != NULL ){
-            binNum=decToBinDirW(token);
+            binNum=decToBinDirW(token);/*Convert a token to binary string.*/
             binNumStart=binNum;
             binNum+=24;
             strncpy(temp->byte,binNum,8);
