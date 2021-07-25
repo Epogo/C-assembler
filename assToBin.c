@@ -362,9 +362,9 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
 char *Registers(char *reg)
 {
     int num;
-    char *temp;
+    char *temp;/*Temporary char pointer.*/
     int i,j;
-    char *str=(char*)malloc(6);
+    char *str=(char*)malloc(6);/*Allocate memory for a reg string.*/
     temp=reg;
     if (reg[0]!='$'){
         /*printf("Not a register!");
@@ -372,7 +372,7 @@ char *Registers(char *reg)
     	return NULL;
     }
     temp++;
-    num=atoi(temp);
+    num=atoi(temp);/*Convert a temp char string to a integer number.*/
     if (num>31)
     {
         printf("Error: register can be Ri, with i=0,1,...,31\n");
