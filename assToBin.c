@@ -246,26 +246,26 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     while (symTable!=NULL){
                         if (!strcmp(symTable->symbol,ptrField3))
                         {
-                            immJ=decToBinJ(symTable->value);
+                            immJ=decToBinJ(symTable->value);/*Extracting the immediate for J-type commands.*/
                         }
                         symTable=symTable->next;
                     }
                     /*If the second field is a label field*/
                     if(*ptrField3!='$'){
-                            strcat(opStrPoint,zero);
-                            strcat(opStrPoint,immJ);
+                            strcat(opStrPoint,zero);/*Concat zero to the Operation string.*/
+                            strcat(opStrPoint,immJ);/*Concat immediate to the Operation string.*/
                     }
                     /*If the second field is a register field*/
                     else{
-                            reg=Registers(ptrField3);
-                            strcat(opStrPoint,one);
-                            strcat(opStrPoint,reg);
+                            reg=Registers(ptrField3);/*Extract reg value from the function.*/
+                            strcat(opStrPoint,one);/*Concat one to the Operation string.*/
+                            strcat(opStrPoint,reg);/*Concat reg to the Operation string.*/
                             free(reg);
                     }
                 }
                 else{
-                    strcpy(opStrPoint,jOpCode[i]);
-                    strcpy(immStop,decToBinJ(0));
+                    strcpy(opStrPoint,jOpCode[i]);/*Copy the immediate for the suitable J-COMMAND*/
+                    strcpy(immStop,decToBinJ(0));/*Copy the immediate 0 to repr*/
                     strcat(immStop,zero);
                     strcat(opStrPoint,immStop);
                 }
