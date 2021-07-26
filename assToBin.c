@@ -89,35 +89,38 @@ int main()
 }
 
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
+    int count=0;/*A counter*/
+    int comFlag=0;/*If a given command or direcrive has been found.*/
     char *lineStr;/*A pointer to a line*/
-    char opString[NUM_OF_BITS_OP];/*Operation string*/
-    lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     const char s[2] = ",";/*A comma token*/
     char *token;/*A pointer to a token*/
     char *reg;/*A char pointer to a register*/
-    int count=0;/*A counter*/
+    char opString[NUM_OF_BITS_OP];/*Operation string*/
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
     char *immJ;/*A pointer to an immediate value of type j.*/
-    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
-    DATA *newNode;/*An adress of a new node.*/
     char *registers[3];/*An array of pointers of registers.*/
     char *opStrPoint;/*A pointer to a Operation string.*/
-    opStrPoint=opString;
+    char *binNum,*binNumStart;/*Binary number pointer& A pointer to the the first byte.*/
     char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot.*/
     char *emptyReg="00000";/*An array of bin chars for "empty register" bits within the 32bits slot.*/
     char *zero="0";/*A "zero" string.*/
     char *one="1";/*A "one" string.*/
     char *null="00000000";/*NULL terminator.*/
+    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *temp;/*A Temporary pointer.*/
-
+    DATA *newNode;/*An adress of a new node.*/
+    lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
+    opStrPoint=opString;
+    
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
     token = strtok(lineStr, s);/*A definition of a token*/
     
-    /*Check if the command is a RCOMMAND*/
+    /*Check if the command is a R-COMMAND*/
     for(int i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
+            comFlag=1;
             while( token != NULL ) {
                     reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                     registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
@@ -159,208 +162,219 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 strcat(opStrPoint,rComFunct[i%5]);/*Copy the suitable funct code to the Operation string.*/
             }
             strcat(opStrPoint,notInUse);/*Set the last bits in the operation string as zeros.*/
+            break;
         }
     }
     
-    /*Check if the command is a ICOMMAND*/
-    for(int i=0;i<ICOMLEN;i++){
-        if(!strcmp(ptrField2,iCommands[i])){
-            if(i<5||i>8){
-                while( token != NULL ) {
-                        if (count==1)
-                        {
-                            registers[count]=NULL;
-                            strcpy(imm,decToBin(atoi(token)));
-                            count++;
+    /*Check if the command is a I-COMMAND*/
+    if(!comFlag){
+        for(int i=0;i<ICOMLEN;i++){
+            if(!strcmp(ptrField2,iCommands[i])){
+                if(i<5||i>8){
+                    while( token != NULL ) {
+                            if (count==1)
+                            {
+                                registers[count]=NULL;
+                                strcpy(imm,decToBin(atoi(token)));
+                                count++;
+                                token = strtok(NULL, s);
+                                continue;
+                            }
+                            reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+                            registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
+                            strcpy(registers[count],reg);/*Copy each reg to a place in the registers array*/
+                            free(reg);
                             token = strtok(NULL, s);
-                            continue;
+                            count++;
+                    }
+    
+                    strcpy(opStrPoint,iOpCode[i]);/*Copy the suitable opcode to the Operation string.*/
+                    for (int j=0;j<3;j++)
+                        {
+                            if (j==1)
+                                continue;
+                            strcat(opStrPoint,registers[j]);
+                            free(registers[j]);
+                        }
+                        strcat(opStrPoint,imm);
+                        free(imm);
+                }
+                else{
+                    while( token != NULL ) {
+                        if (count==2){
+                            while (symTable!=NULL){
+                                if (!strcmp(symTable->symbol,token))
+                                {
+                                    imm=decToBin(symTable->value);/*Convert a value from the symbol table
+                                    to binary representation*/
+                                }
+                                symTable=symTable->next;
+                            }    
+                                registers[2]=NULL;
+                                break;
                         }
                         reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
-                        registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
-                        strcpy(registers[count],reg);/*Copy each reg to a place in the registers array*/
-                        free(reg);
+                        registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate memory for the registers.*/
+                        strcpy(registers[count],reg);/*Copy reg value to the registers array.*/
+                        free(reg);/*Free allocated memory.*/
                         token = strtok(NULL, s);
                         count++;
-                }
-
-                strcpy(opStrPoint,iOpCode[i]);/*Copy the suitable opcode to the Operation string.*/
-                for (int j=0;j<3;j++)
-                    {
-                        if (j==1)
-                            continue;
-                        strcat(opStrPoint,registers[j]);
-                        free(registers[j]);
                     }
+                        
+                    strcpy(opStrPoint,iOpCode[i]);
+                    for (int j=0;j<2;j++)
+                        {
+                            strcat(opStrPoint,registers[j]);
+                            free(registers[j]);
+                        }
                     strcat(opStrPoint,imm);
                     free(imm);
-            }
-            else{
-                while( token != NULL ) {
-                    if (count==2){
-                        while (symTable!=NULL){
-                            if (!strcmp(symTable->symbol,token))
-                            {
-                                imm=decToBin(symTable->value);/*Convert a value from the symbol table
-                                to binary representation*/
-                            }
-                            symTable=symTable->next;
-                        }    
-                            registers[2]=NULL;
-                            break;
-                    }
-                    reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
-                    registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate memory for the registers.*/
-                    strcpy(registers[count],reg);/*Copy reg value to the registers array.*/
-                    free(reg);/*Free allocated memory.*/
-                    token = strtok(NULL, s);
-                    count++;
                 }
-                    
-                strcpy(opStrPoint,iOpCode[i]);
-                for (int j=0;j<2;j++)
-                    {
-                        strcat(opStrPoint,registers[j]);
-                        free(registers[j]);
-                    }
-                strcat(opStrPoint,imm);
-                free(imm);
-            }
-        }    
+            }    
+        }
     }
     
-    for(int i=0;i<JCOMLEN;i++){
-        if(!strcmp(ptrField2,jCommands[i])){
-            
-            if (i<3){
-                strcpy(opStrPoint,jOpCode[i]);
-                while (symTable!=NULL){
-                    if (!strcmp(symTable->symbol,ptrField3))
-                    {
-                        immJ=decToBinJ(symTable->value);
+        /*Check if the command is a J-COMMAND*/
+    if(!comFlag){
+        for(int i=0;i<JCOMLEN;i++){
+            if(!strcmp(ptrField2,jCommands[i])){
+                
+                if (i<3){
+                    strcpy(opStrPoint,jOpCode[i]);
+                    while (symTable!=NULL){
+                        if (!strcmp(symTable->symbol,ptrField3))
+                        {
+                            immJ=decToBinJ(symTable->value);
+                        }
+                        symTable=symTable->next;
                     }
-                    symTable=symTable->next;
+                    /*If the second field is a label field*/
+                    if(*ptrField3!='$'){
+                            strcat(opStrPoint,zero);
+                            strcat(opStrPoint,immJ);
+                    }
+                    /*If the second field is a register field*/
+                    else{
+                            reg=Registers(ptrField3);
+                            strcat(opStrPoint,one);
+                            strcat(opStrPoint,reg);
+                            free(reg);
+                    }
                 }
-                /*If the second field is a label field*/
-                if(*ptrField3!='$'){
-                        strcat(opStrPoint,zero);
-                        strcat(opStrPoint,immJ);
-                }
-                /*If the second field is a register field*/
                 else{
-                        reg=Registers(ptrField3);
-                        strcat(opStrPoint,one);
-                        strcat(opStrPoint,reg);
-                        free(reg);
+                    strcpy(opStrPoint,jOpCode[i]);
+                    strcpy(immStop,decToBinJ(0));
+                    strcat(immStop,zero);
+                    strcat(opStrPoint,immStop);
                 }
             }
-            else{
-                strcpy(opStrPoint,jOpCode[i]);
-                strcpy(immStop,decToBinJ(0));
-                strcat(immStop,zero);
-                strcat(opStrPoint,immStop);
+    
+        }
+    }
+    if(!comFlag){
+        if(!strcmp(ptrField2,".asciz"))
+        {
+            temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+            node->p=temp;/*Point to the allocated memory.*/
+            while (*ptrField3!='\0'){
+                int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
+                char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
+                strcat(temp->byte,letter);/*Copy the string to byte array within the temp node.*/
+                newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+                temp->next=newNode;/*Point to the new node.*/
+                temp=newNode;/*Set the temp node to point on the newNode.*/
+                free(letter);/*Free the allocated space for the string*/
+                ptrField3++;/*Advance to the next byte.*/
             }
+            strcat(temp->byte,null);/*Concatenate the null bits to the end of the ascii linked-list.*/
         }
-
     }
     
-    if(!strcmp(ptrField2,".asciz"))
-    {
-        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
-        node->p=temp;/*Point to the allocated memory.*/
-        while (*ptrField3!='\0'){
-            int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
-            char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
-            strcat(temp->byte,letter);/*Copy the string to byte array within the temp node.*/
-            newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
-            temp->next=newNode;/*Point to the new node.*/
-            temp=newNode;/*Set the temp node to point on the newNode.*/
-            free(letter);/*Free the allocated space for the string*/
-            ptrField3++;/*Advance to the next byte.*/
+    if(!comFlag){
+        if(!strcmp(ptrField2,".db"))
+        {
+            temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+            node->p=temp;/*Point to the allocated memory.*/
+            while( token != NULL ){
+                binNum=ascizToBin(atoi(token));/*Convert a token to binary string.*/
+                strcat(temp->byte,binNum);
+                free(binNum);
+                token = strtok(NULL, s);
+                if (token==NULL)
+                    break;
+                newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+                temp->next=newNode;/*Point to the new node.*/
+                temp=newNode;/*Set the temp node to point on the newNode.*/
+            }
+            newNode->next=NULL;
         }
-        strcat(temp->byte,null);/*Concatenate the null bits to the end of the ascii linked-list.*/
     }
     
-    if(!strcmp(ptrField2,".db"))
-    {
-        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
-        node->p=temp;/*Point to the allocated memory.*/
-        while( token != NULL ){
-            char *binNum=ascizToBin(atoi(token));/*Convert a token to binary string.*/
-            strcat(temp->byte,binNum);
-            free(binNum);
-            token = strtok(NULL, s);
-            if (token==NULL)
-                break;
-            newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
-            temp->next=newNode;/*Point to the new node.*/
-            temp=newNode;/*Set the temp node to point on the newNode.*/
+    if(!comFlag){
+        if(!strcmp(ptrField2,".dw"))
+        {
+            temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+            node->p=temp;/*Point to the allocated memory.*/
+            while( token != NULL ){
+                binNum=decToBinDirW(token);/*Convert a token to a binary string.*/
+                binNumStart=binNum;
+                binNum+=24;/*Advance to the last byte in the word*/
+                strncpy(temp->byte,binNum,8);
+                //printf("temp->byte is:%s\n",temp->byte);
+                for(int i=0;i<3;i++){
+                    newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+                    temp->next=newNode;/*Point to the new node.*/
+                    temp=newNode;/*Set the temp node to point on the newNode.*/
+                    binNum-=8;/*Go the the next byte.*/
+                    strncpy(temp->byte,binNum,8);
+                    //printf("temp->byte is:%s\n",temp->byte);
+                }
+                token = strtok(NULL, s);
+                if (token != NULL)
+                {
+                    newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+                    temp->next=newNode;/*Point to the new node.*/
+                    temp=newNode;/*Set the temp node to point on the newNode.*/
+                }
+                free(binNumStart);
+            }
+    
         }
-        newNode->next=NULL;
     }
     
-    if(!strcmp(ptrField2,".dw"))
-    {
-        temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
-        node->p=temp;/*Point to the allocated memory.*/
-        char *binNum,*binNumStart;
-        while( token != NULL ){
-            binNum=decToBinDirW(token);/*Convert a token to binary string.*/
-            binNumStart=binNum;
-            binNum+=24;
-            strncpy(temp->byte,binNum,8);
-            //printf("temp->byte is:%s\n",temp->byte);
-            for(int i=0;i<3;i++){
-                newNode=(DATA*)calloc(1, sizeof(DATA));
+    if(!comFlag){
+        if(!strcmp(ptrField2,".dh"))
+        {
+            temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
+            node->p=temp;/*Point to the allocated memory.*/
+            
+            while( token != NULL ){
+                binNum=decToBinDirH(token);/*Convert a token to a binary string.*/
+                binNumStart=binNum;
+                binNum+=8;
+                strncpy(temp->byte,binNum,8);
+                newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
                 temp->next=newNode;
                 temp=newNode;
                 binNum-=8;
                 strncpy(temp->byte,binNum,8);
-                //printf("temp->byte is:%s\n",temp->byte);
+                token = strtok(NULL, s);
+                if (token != NULL)
+                {
+                    newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
+                    temp->next=newNode;/*Point to the new node.*/
+                    temp=newNode;/*Set the temp node to point on the newNode.*/
+                }
+                free(binNumStart);
             }
-            token = strtok(NULL, s);
-            if (token != NULL)
-            {
-                newNode=(DATA*)calloc(1, sizeof(DATA));
-                temp->next=newNode;
-                temp=newNode;
-            }
-            free(binNumStart);
+            
         }
-
     }
-    
-    if(!strcmp(ptrField2,".dh"))
-    {
-        temp=(DATA*)calloc(1, sizeof(DATA));
-        node->p=temp;
-        DATA *head;
-        char *binNum,*binNumStart;
-        while( token != NULL ){
-            binNum=decToBinDirH(token);
-            binNumStart=binNum;
-            binNum+=8;
-            strncpy(temp->byte,binNum,8);
-            newNode=(DATA*)calloc(1, sizeof(DATA));
-            temp->next=newNode;
-            temp=newNode;
-            binNum-=8;
-            strncpy(temp->byte,binNum,8);
-            token = strtok(NULL, s);
-            if (token != NULL)
-            {
-                newNode=(DATA*)calloc(1, sizeof(DATA));
-                temp->next=newNode;
-                temp=newNode;
-            }
-            free(binNumStart);
-        }
-        
-    }
-    strcpy(node->op,opString);
-    return node;
-    free(lineStr);
-    count=0;
+    strcpy(node->op,opString);/*Copy the opString to the operation field in the node's structure*/
+    return node;/*Return the updated node.*/
+    free(lineStr);/*Free the line string*/
 }
+
 char *Registers(char *reg)
 {
     int num;
@@ -489,7 +503,7 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node)
 
 void concatNodes(MEMIM *headCom,MEMIM *headData){
         MEMIM *nodePointer;/*A pointer to a memory image node*/
-        nodePointer=headCom;
+        nodePointer=headCom;/*Point to the head command.*/
         /*Concatenate commands list and directives list*/
         while(nodePointer->next!=NULL)
         {
