@@ -516,29 +516,29 @@ void concatNodes(MEMIM *headCom,MEMIM *headData){
 
 void printList (MEMIM *head)
 {
-    MEMIM *nodePointer;
-    nodePointer=head;
-    char *bin;
-    char mem[5];
-    char* printArr=(char *) malloc(8);
-    char *startArr;
+    int j=0;/*A counter index.*/
+    int k=0;/*A counter index.*/
+    int count=0;/*A counter index.*/
+    int inCount;/*Inside counter.*/
+    int lastNodeFlag=0;/*A flag which signs.*/
+    int bitsNum;/*An integer which represents a number.*/
+    static int ic=100;/*Instruction counter.*/
+    char *bin;/*Binary number pointer.*/
+    char *startArr;/*Stores the first array.*/
+    char mem[5];/*A temp memory which is used to store regs.*/
+    char* printArr;/*The array which will be printed (represented with hexa chars).*/
+    char hex;/*Hex char*/
+    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
     startArr=printArr;
-    int j=0;
-    int k=0;
-    int count=0;
-    int inCount;
-    int lastNodeFlag=0;
-    char hex;
-    DATA *temp;
-    static int ic=100;
+    MEMIM *nodePointer;/*A pointer to a memory image node.*/
+    DATA *temp;/*temporary data node.*/
+    nodePointer=head;
     while(nodePointer!=NULL)
     {
         if (nodePointer->next==NULL)
-            lastNodeFlag=1;
-        //printf("%d ",q->address);
+            lastNodeFlag=1;/*Set flag to 1 if the current node is the last node.*/
         if((nodePointer->p)!=NULL){
             k=0;
-            int bitsNum;
             while((nodePointer->p)!=NULL){
                 bin=nodePointer->p->byte;
                 j=0;
@@ -549,7 +549,6 @@ void printList (MEMIM *head)
                         hex=binToHex(mem);
                         j=0;
                         printArr[k++]=hex;
-                        //printf("hex is:%c, k is:%d\n", hex, k);
                         bin++;
                         continue;
                     }
@@ -560,11 +559,9 @@ void printList (MEMIM *head)
                     printArr = (char *) realloc(printArr, k+8);
                 }
                 temp=nodePointer->p;
-                //printf("%s\n",q->p->byte);
                 nodePointer->p=nodePointer->p->next;
                 free(temp);
             }
-            //printf("k is:%d\n", k);
             inCount=0;
             if (count==0)
                 printf("%d ",ic);
@@ -573,10 +570,8 @@ void printList (MEMIM *head)
                 printf("%c ",printArr[i+1]);
                 inCount+=2;
                 count+=2;
-                //printf(" count: %d k is:%d ",count,k);
                 if ((count%8==0)){
                     printf("\n");
-                    //printf(" count: %d k is:%d ",count,k);
                     ic+=4;
                     if ((lastNodeFlag==1)&&(inCount==k))
                         break;
@@ -594,7 +589,6 @@ void printList (MEMIM *head)
                 mem[j]=*bin;
                 if((i+1)%4==0){
                 mem[4]='\0';
-                //printf("%s ",mem);
                 hex=binToHex(mem);
                 printArr[k]=hex;
                 j=0;
@@ -617,12 +611,10 @@ void printList (MEMIM *head)
                     printf("%d ",ic);
                 }
                 k-=2;
-
             }
             printf("\n");
             ic+=4;
         }
-           
         nodePointer=nodePointer->next;
     }
     free(startArr);
