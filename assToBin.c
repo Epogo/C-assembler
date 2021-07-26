@@ -170,6 +170,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     if(!comFlag){
         for(int i=0;i<ICOMLEN;i++){
             if(!strcmp(ptrField2,iCommands[i])){
+                comFlag=1;
                 if(i<5||i>8){
                     while( token != NULL ) {
                             if (count==1)
@@ -239,7 +240,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     if(!comFlag){
         for(int i=0;i<JCOMLEN;i++){
             if(!strcmp(ptrField2,jCommands[i])){
-                
+                comFlag=1;
                 if (i<3){
                     strcpy(opStrPoint,jOpCode[i]);
                     while (symTable!=NULL){
@@ -276,6 +277,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     if(!comFlag){
         if(!strcmp(ptrField2,".asciz"))
         {
+            comFlag=1;
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while (*ptrField3!='\0'){
@@ -295,6 +297,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     if(!comFlag){
         if(!strcmp(ptrField2,".db"))
         {
+            comFlag=1;
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
@@ -315,6 +318,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     if(!comFlag){
         if(!strcmp(ptrField2,".dw"))
         {
+            comFlag=1;
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
