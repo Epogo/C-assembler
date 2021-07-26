@@ -44,7 +44,6 @@ char *Registers(char*);
 char *decToBin(int);
 char *decToBinJ(int);
 char *ascizToBin(int);
-char *decToBinDir(char*);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
 void deleteNode(MEMIM*);
@@ -76,6 +75,7 @@ int main()
     tableHead = symbolTable("ALL6",214,0,0);
     headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
     headData=memAdd(NULL,".asciz","a",tableHead);
+    addNode(headCom,headData,memAdd("YU",".db","2,3",tableHead));
     addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
     addNode(headCom,headData,memAdd("ALL2","jmp","$9",tableHead));
     addNode(headCom,headData,memAdd("ALL3","blt","$4,$5,ALL6",tableHead));
@@ -285,7 +285,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
         temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
         node->p=temp;/*Point to the allocated memory.*/
         while( token != NULL ){
-            char *binNum=decToBinDir(token);/*Convert a token to binary string.*/
+            char *binNum=ascizToBin(atoi(token));/*Convert a token to binary string.*/
             strcat(temp->byte,binNum);
             free(binNum);
             token = strtok(NULL, s);
@@ -428,21 +428,6 @@ char *ascizToBin(int num)
       str[i] = (num & mask) ? '1' : '0';
     }
     str[8] = '\0';/*Put a zero at the end of the byte string*/
-    return str;
-}
-
-char *decToBinDir(char *number)
-{
-    int num;
-    int i;
-    char *str=(char*)malloc(9);/*Allocate memory for byte representation*/
-    num=atoi(number);
-    for(unsigned int i=0; i<8; i++)
-    {
-      unsigned int mask = 1 << (8 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
-      str[i] = (num & mask) ? '1' : '0';
-    }
-    str[8] = '\0';
     return str;
 }
 
