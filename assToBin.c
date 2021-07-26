@@ -230,6 +230,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     strcat(opStrPoint,imm);
                     free(imm);
                 }
+                break;
             }    
         }
     }
@@ -267,6 +268,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     strcat(immStop,zero);
                     strcat(opStrPoint,immStop);
                 }
+                break;
             }
     
         }
