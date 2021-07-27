@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
 #include <math.h>
 #define NUMBIT 16
 #define RCOMLEN 8
