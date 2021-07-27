@@ -90,6 +90,7 @@ int main()
 
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
     int count=0;/*A counter*/
+    int i;
     int comFlag=0;/*If a given command or direcrive has been found.*/
     char *lineStr;/*A pointer to a line*/
     const char s[2] = ",";/*A comma token*/
@@ -118,7 +119,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     token = strtok(lineStr, s);/*A definition of a token*/
     
     /*Check if the command is a R-COMMAND*/
-    for(int i=0;i<RCOMLEN;i++){
+    for(i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
             comFlag=1;
             while( token != NULL ) {
@@ -168,7 +169,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
     /*Check if the command is a I-COMMAND*/
     if(!comFlag){
-        for(int i=0;i<ICOMLEN;i++){
+        for(i=0;i<ICOMLEN;i++){
             if(!strcmp(ptrField2,iCommands[i])){
                 comFlag=1;
                 if(i<5||i>8){
@@ -238,7 +239,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     
         /*Check if the command is a J-COMMAND*/
     if(!comFlag){
-        for(int i=0;i<JCOMLEN;i++){
+        for(i=0;i<JCOMLEN;i++){
             if(!strcmp(ptrField2,jCommands[i])){
                 comFlag=1;
                 if (i<3){
@@ -326,14 +327,12 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 binNumStart=binNum;
                 binNum+=24;/*Advance to the last byte in the word*/
                 strncpy(temp->byte,binNum,8);
-                //printf("temp->byte is:%s\n",temp->byte);
-                for(int i=0;i<3;i++){
+                for(i=0;i<3;i++){
                     newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
                     temp->next=newNode;/*Point to the new node.*/
                     temp=newNode;/*Set the temp node to point on the newNode.*/
                     binNum-=8;/*Go the the next byte.*/
                     strncpy(temp->byte,binNum,8);
-                    //printf("temp->byte is:%s\n",temp->byte);
                 }
                 token = strtok(NULL, s);
                 if (token != NULL)
@@ -415,7 +414,7 @@ char *decToBin(int num)
 {
     int i;
     char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
-    for(unsigned int i=0; i<16; i++)
+    for(i=0; i<16; i++)
     {
       unsigned int mask = 1 << (16 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
@@ -429,7 +428,7 @@ char *decToBinJ(int num)
 {
     int i;
     char *str=(char*)malloc(26);/*Allocate memory for a binary immediate representation*/
-    for(unsigned int i=0; i<25; i++)
+    for(i=0; i<25; i++)
     {
       unsigned int mask = 1 << (25 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
@@ -442,7 +441,7 @@ char *ascizToBin(int num)
 {
     int i;
     char *str=(char*)malloc(9);/*Allocate memory for byte representation*/
-    for(unsigned int i=0; i<8; i++)
+    for(i=0; i<8; i++)
     {
       unsigned int mask = 1 << (8 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
@@ -457,7 +456,7 @@ char *decToBinDirW(char *number)
     int i;
     char *str=(char*)calloc(33,sizeof(char));/*Allocate memory for word representation*/
     num=atoi(number);
-    for(unsigned int i=0; i<32; i++)
+    for(i=0; i<32; i++)
     {
       unsigned int mask = 1 << (32 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       str[i] = (num & mask) ? '1' : '0';
@@ -472,7 +471,7 @@ char *decToBinDirH(char *number)
     int i;
     char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
     num=atoi(number);
-    for(unsigned int i=0; i<32; i++)
+    for(unsigned i=0; i<32; i++)
     {
       unsigned int mask = 1 << (32 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       if(i<16)
@@ -520,6 +519,7 @@ void concatNodes(MEMIM *headCom,MEMIM *headData){
 
 void printList (MEMIM *head)
 {
+    int i=0;
     int j=0;/*A counter index.*/
     int k=0;/*A counter index.*/
     int count=0;/*A counter index.*/
@@ -546,7 +546,7 @@ void printList (MEMIM *head)
             while((nodePointer->p)!=NULL){
                 bin=nodePointer->p->byte;
                 j=0;
-                for(int i=0;i<8;i++){
+                for(i=0;i<8;i++){
                     mem[j]=*bin;
                     if((i+1)%4==0){
                         mem[4]='\0';
@@ -569,7 +569,7 @@ void printList (MEMIM *head)
             inCount=0;
             if (count==0)
                 printf("%d ",ic);
-            for(int i=0;i<k;i+=2){
+            for(i=0;i<k;i+=2){
                 printf("%c",printArr[i]);
                 printf("%c ",printArr[i+1]);
                 inCount+=2;
@@ -589,7 +589,7 @@ void printList (MEMIM *head)
             {
             bin=nodePointer->op;
             k=0;
-            for(int i=0;i<32;i++){
+            for(i=0;i<32;i++){
                 mem[j]=*bin;
                 if((i+1)%4==0){
                 mem[4]='\0';
