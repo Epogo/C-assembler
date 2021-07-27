@@ -31,13 +31,6 @@ typedef struct memoryImage{
     struct memoryImage *next;
 } MEMIM;
 
-struct tableNode{
-	char symbol[SYMBOL_NUM_OF_CHARS];
-	int value;
-	int attribute[2];
-	struct tableNode* next;
-};
-typedef struct tableNode TABLE_NODE_T;
 
 MEMIM *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
@@ -51,7 +44,7 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node);
 void printList(MEMIM *head);
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
-TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
+/*TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);*/
 void printSymbolTable(TABLE_NODE_T *symbolTable);
 
 char *rCommands[]={"add","sub","and","or","nor","move","mvhi","mvlo"};/*R commands*/
@@ -62,12 +55,12 @@ char *rComFunct[]={"00001","00010","00011","00100","00101"};/*A list of functs f
 char *rOpCode[]={"000000","000001"};/*A list of opcodes for r commands*/
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};/*A list of opcodes for i commands*/
 char *jOpCode[]={"011110","011111","100000","111111"};/*A list of opcodes for j commands*/
-
+/*
 int main()
 {
     MEMIM *headCom,*headData;
     TABLE_NODE_T *tableHead;
-    int ic=INITIC;/*Initializing the Instruction count*/
+    int ic=INITIC;
     tableHead = symbolTable("YU",122,0,0);
     tableHead = symbolTable("ALL2",187,0,0);
     tableHead = symbolTable("ALL4",210,0,0);
@@ -86,7 +79,7 @@ int main()
     printList(headCom);
     deleteNode(headCom);
     return 0;
-}
+}*/
 
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
     int count=0;/*A counter*/
@@ -668,41 +661,3 @@ char binToHex(char *bin)
     return hex;
 }
 
-TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2){
-	/*printf("\n%s\n",symbol);*/
-
-	TABLE_NODE_T *ptrTableNode; /*initialize pointer to TABLE_NODE_T, variable ptrTableNode*/
-	TABLE_NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type TABLE_NODE_T*/
-	static TABLE_NODE_T *current;
-	static TABLE_NODE_T *head;
-	static int firstSymbolFlag = 1;
-	
-	tmpPtr = (TABLE_NODE_T*)calloc(1, sizeof(TABLE_NODE_T));
-	if(!tmpPtr)
-	{
-		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
-		exit(0);
-	}
-	ptrTableNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
-
-	if(firstSymbolFlag == 0){
-		current->next = ptrTableNode;
-	}
-
-	if(firstSymbolFlag == 1){
-		head = ptrTableNode;
-	}
-
-	strcpy(ptrTableNode->symbol,symbol);
-	ptrTableNode->value = value;
-	ptrTableNode->attribute[0] = attribute1;
-	ptrTableNode->attribute[1] = attribute2;
-	ptrTableNode->next = NULL;
-
-	current = ptrTableNode;
-	
-	firstSymbolFlag = 0;
-
-	return head;
-
-}
