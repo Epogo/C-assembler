@@ -412,7 +412,7 @@ char *Registers(char *reg)
 
 char *decToBin(int num)
 {
-    int i;
+    unsigned int i;
     char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
     for(i=0; i<16; i++)
     {
@@ -426,7 +426,7 @@ char *decToBin(int num)
 
 char *decToBinJ(int num)
 {
-    int i;
+    unsigned int i;
     char *str=(char*)malloc(26);/*Allocate memory for a binary immediate representation*/
     for(i=0; i<25; i++)
     {
@@ -439,7 +439,7 @@ char *decToBinJ(int num)
 
 char *ascizToBin(int num)
 {
-    int i;
+    unsigned int i;
     char *str=(char*)malloc(9);/*Allocate memory for byte representation*/
     for(i=0; i<8; i++)
     {
@@ -453,7 +453,7 @@ char *ascizToBin(int num)
 char *decToBinDirW(char *number)
 {
     int num;
-    int i;
+    unsigned int i;
     char *str=(char*)calloc(33,sizeof(char));/*Allocate memory for word representation*/
     num=atoi(number);
     for(i=0; i<32; i++)
@@ -468,10 +468,10 @@ char *decToBinDirW(char *number)
 char *decToBinDirH(char *number)
 {
     int num;
-    int i;
+    unsigned int i;
     char *str=(char*)malloc(17);/*Allocate memory for a binary immediate representation*/
     num=atoi(number);
-    for(unsigned i=0; i<32; i++)
+    for(i=0; i<32; i++)
     {
       unsigned int mask = 1 << (32 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
       if(i<16)
@@ -650,11 +650,12 @@ void printSymbolTable(TABLE_NODE_T *symbolTable){
 
 char binToHex(char *bin)
 {
+   char *i;
    char hex;/*The hex value which will be returned as a char*/
    int count=3;/*Intialize the counter*/
    int num=0;/*Initialize the num*/
    /*While the bin string is not null-continue to sum numbers*/
-   for(char *i=bin;*i;i++){
+   for(i=bin;*i;i++){
         num+=(pow(2,count))*(*i - '0');
         count--;
     }
