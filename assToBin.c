@@ -90,7 +90,7 @@ int main()
 
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
     int count=0;/*A counter*/
-    int i;
+    int i,j,k;
     int comFlag=0;/*If a given command or direcrive has been found.*/
     char *lineStr;/*A pointer to a line*/
     const char s[2] = ",";/*A comma token*/
@@ -141,7 +141,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             if(i<5){
                 strcpy(opStrPoint,rOpCode[0]);/*Copy the suitable opcode to the Operation string.*/
                 /*Copy each binary code for each register to the suitable place.*/
-                for (int j=0;j<3;j++)
+                for (j=0;j<3;j++)
                 {
                     strcat(opStrPoint,registers[j]);
                     free(registers[j]);
@@ -150,7 +150,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             }
             else{
                 strcpy(opStrPoint,rOpCode[1]);
-                for (int k=2;k>=0;k--)
+                for (k=2;k>=0;k--)
                 {
                     if (k==1){
                         strcat(opStrPoint,emptyReg);/*Copy the suitable opcode to the Operation string.*/
@@ -191,7 +191,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     }
     
                     strcpy(opStrPoint,iOpCode[i]);/*Copy the suitable opcode to the Operation string.*/
-                    for (int j=0;j<3;j++)
+                    for (j=0;j<3;j++)
                         {
                             if (j==1)
                                 continue;
@@ -224,7 +224,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     }
                         
                     strcpy(opStrPoint,iOpCode[i]);
-                    for (int j=0;j<2;j++)
+                    for (j=0;j<2;j++)
                         {
                             strcat(opStrPoint,registers[j]);
                             free(registers[j]);
