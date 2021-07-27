@@ -1,5 +1,5 @@
-main: checkDirectives.o checkCommands.o secondPass.o symbolTable.o firstPass.o manageContents.o handleInput.o readFile.o main.o
-	gcc -Wall -ansi -pedantic main.o readFile.o handleInput.o manageContents.o firstPass.o symbolTable.o secondPass.o checkCommands.o checkDirectives.o -o main
+main: assToBin.o checkDirectives.o checkCommands.o secondPass.o symbolTable.o firstPass.o manageContents.o handleInput.o readFile.o main.o
+	gcc -Wall -ansi -pedantic main.o readFile.o handleInput.o manageContents.o firstPass.o symbolTable.o secondPass.o checkCommands.o checkDirectives.o assToBin.o -o main -lm
 main.o: main.c main.h
 	gcc -c -Wall -ansi -pedantic main.c -o main.o
 readFile.o: readFile.c main.h
@@ -18,3 +18,5 @@ checkCommands.o: checkCommands.c main.h
 	gcc -c -Wall -ansi -pedantic checkCommands.c -o checkCommands.o
 checkDirectives.o: checkDirectives.c main.h
 	gcc -c -Wall -ansi -pedantic checkDirectives.c -o checkDirectives.o
+assToBin.o: assToBin.c main.h
+	gcc -c -Wall -ansi -pedantic assToBin.c -o assToBin.o -lm

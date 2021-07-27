@@ -4,7 +4,7 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 /*static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};*/
 
-enum Attributes {EMPTY,CODE,DATA,ENTRY,EXTERNAL};
+enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected){
 	static int IC,DC,errorFlag;
@@ -14,9 +14,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	TABLE_NODE_T* tableTmp;
 	/*enum Attributes Attribute;*/
 	static int step = 1;
+	static MEMIM* headCom;
+	static MEMIM* headData;
+	static int firstDataFlag = FLAGOFF;
+	static int firstComFlag = FLAGOFF;
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
+	
 	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
 
 	
@@ -67,12 +72,23 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 7:
 				if(labelFlag == FLAGON){
-					tableHead = symbolTable(ptrField1,DC,DATA,EMPTY);
+					tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY);
 				}
 				step = 8;
 				break;
 			case 8:
 				/*Add to "Tmunat Hazikaron"*/
+				if(firstDataFlag == FLAGOFF){
+					headData = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
+					firstDataFlag = FLAGON;
+				}
+				else{
+					if(firstComFlag == FLAGOFF){
+						headCom = NULL;
+					}
+					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
+				}
+				/*headData = memAdd(ptrField1,ptrField2,ptrField3,tableHead);*/
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
@@ -121,6 +137,20 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 15;
 				break;
 			case 15:
+				/*Add to "Tmunat Hazikaron"*/
+				if(firstComFlag == FLAGOFF){
+					printf("Entered \n");
+					headCom = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
+					firstComFlag = FLAGON;
+					/*printf("My headCom: |%s| |%s| |%s|\n",ptrField1,ptrField2,ptrField3);*/
+				}
+				else{
+					if(firstDataFlag == FLAGOFF){
+						headData = NULL;
+					}
+					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
+				}
+
 				step = 16;
 				break;
 			case 16:
@@ -129,6 +159,19 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				endWhileFlag = FLAGON;
 				break;
 			case 17:
+				/*if(firstDataFlag == FLAGOFF){
+					headData = NULL;
+				}
+				if(firstComFlag == FLAGOFF){
+					headCom = NULL;
+				}*/
+				/*concatNodes(headCom,headData);*/
+				/*printList(headCom);*/
+				/*printList(memAdd(NULL,".asciz","pizdietz",NULL));*/
+				/*printf("\nCheck: %s \n",headData->symbol);*/
+				concatNodes(headCom,headData);
+				printList(headCom);
+				exit(0);
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
 				}
@@ -146,13 +189,13 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				while(1){
 					/*printf("\nSymbol: %s, Value: %d, Attribute 1: %d\n",tableTmp->symbol,tableTmp->value,tableTmp->attribute[0]);*/
 					if(tableTmp->next == NULL){
-						if(tableTmp->attribute[0] == DATA){
+						if(tableTmp->attribute[0] == MYDATA){
 							tableTmp->value = tableTmp->value + ICF;
 						}
 						break;
 					}
 					else{
-						if(tableTmp->attribute[0] == DATA){
+						if(tableTmp->attribute[0] == MYDATA){
 							tableTmp->value = tableTmp->value + ICF;
 						}
 						tableTmp = tableTmp->next;

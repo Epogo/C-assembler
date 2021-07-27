@@ -1,6 +1,6 @@
 #include "main.h"
 
-enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,DATA,CODE};
+enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,MYDATA,CODE};
 
 /*static enum status state;*/
 
@@ -106,7 +106,7 @@ void manageContents(NODE_T *ptrNode){
 					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected);*/
 				}
 			}
-			if(state == DATA){
+			if(state == MYDATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
@@ -186,7 +186,7 @@ void manageContents(NODE_T *ptrNode){
 				index++;
 				continue;
 			}
-			else if(state == DATA){
+			else if(state == MYDATA){
 				ptrData[dataIndex] = current->inputChar[index];
 				dataIndex++;
 				index++;
@@ -257,7 +257,7 @@ void manageContents(NODE_T *ptrNode){
 				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
 				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected);
 			} 
-			if(state == DATA){
+			if(state == MYDATA){
 				ptrData[dataIndex] = '\0';
 				if(labelFlag == FLAGON){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
@@ -393,7 +393,7 @@ void manageContents(NODE_T *ptrNode){
 			case POSTDIRECTIVE:
 				ptrData = calloc(MAXLINELEN,sizeof(char));
 				dataIndex = 0;
-				state = DATA;
+				state = MYDATA;
 				break;
 			case POSTLABEL:
 				ptrCommandDirective = calloc(MAXLINELEN,sizeof(char));
@@ -421,7 +421,7 @@ void manageContents(NODE_T *ptrNode){
 				CommandDirectiveIndex++;
 				index++;
 				break;
-			case DATA:
+			case MYDATA:
 				ptrData[dataIndex] = current->inputChar[index];
 				dataIndex++;
 				index++;

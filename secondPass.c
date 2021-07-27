@@ -2,7 +2,7 @@
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
-enum Attributes {EMPTY,CODE,DATA,ENTRY,EXTERNAL};
+enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF){
 
