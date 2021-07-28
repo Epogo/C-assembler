@@ -1,4 +1,4 @@
-#include "main.h"
+#include "assembler.h"
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
@@ -6,7 +6,7 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected){
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename){
 	static int IC,DC,errorFlag;
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
 	static TABLE_NODE_T* tableHead;
@@ -22,7 +22,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	
-	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
+	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
 
 	
 
@@ -78,7 +78,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 8:
 				/*Add to "Tmunat Hazikaron"*/
-				if(firstDataFlag == FLAGOFF){
+				/*if(firstDataFlag == FLAGOFF){
 					headData = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
 					firstDataFlag = FLAGON;
 				}
@@ -87,8 +87,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						headCom = NULL;
 					}
 					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
-				}
-				/*headData = memAdd(ptrField1,ptrField2,ptrField3,tableHead);*/
+				}*/
+
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
@@ -138,18 +138,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 15:
 				/*Add to "Tmunat Hazikaron"*/
-				if(firstComFlag == FLAGOFF){
+				/*if(firstComFlag == FLAGOFF){
 					printf("Entered \n");
 					headCom = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
 					firstComFlag = FLAGON;
-					/*printf("My headCom: |%s| |%s| |%s|\n",ptrField1,ptrField2,ptrField3);*/
 				}
 				else{
 					if(firstDataFlag == FLAGOFF){
 						headData = NULL;
 					}
 					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
-				}
+				}*/
 
 				step = 16;
 				break;
@@ -169,11 +168,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				/*printList(headCom);*/
 				/*printList(memAdd(NULL,".asciz","pizdietz",NULL));*/
 				/*printf("\nCheck: %s \n",headData->symbol);*/
-				concatNodes(headCom,headData);
+				/*concatNodes(headCom,headData);
 				printList(headCom);
-				exit(0);
+				exit(0);*/
+
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
+					freeLines(linesHead);
+					freeTable(tableHead);
 				}
 				else{
 					step = 18;
@@ -209,7 +211,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-				secondPass(linesHead,tableHead,ICF,DCF);
+				secondPass(linesHead,tableHead,ICF,DCF,filename);
+				freeLines(linesHead);
+				freeTable(tableHead);
 				break;
 	
 				
@@ -262,3 +266,30 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 
 }
 
+void freeLines(LINE_FIELDS_T* linesPtr){
+    LINE_FIELDS_T *temp;/*A temp node which will be deleted from the linked list*/
+
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    while(1){
+        temp=linesPtr;
+        if (temp==NULL){
+            break;
+	}
+        free(temp);
+        linesPtr=linesPtr->next;
+    }
+}
+
+void freeTable(TABLE_NODE_T* tablePtr){
+    TABLE_NODE_T *temp;/*A temp node which will be deleted from the linked list*/
+
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    while(1){
+        temp=tablePtr;
+        if (temp==NULL){
+            break;
+	}
+        free(temp);
+        tablePtr=tablePtr->next;
+    }
+}

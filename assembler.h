@@ -72,13 +72,13 @@ struct lineFields{
 typedef struct lineFields LINE_FIELDS_T;
 
 void readFile(int argc, char** argv);
-void handleFileContents(FILE *fd);
+void handleFileContents(FILE *fd, char *filename);
 void storeLines(NODE_T *ptrNode, FILE *fd);
-void manageContents(NODE_T *ptrNode);
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected);
+void manageContents(NODE_T *ptrNode, char *filename);
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
-void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF);
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename);
 void errorMsg(int error,int lineNumber,char *fieldName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
 int checkExtraneousChars(NODE_T **current,int *index);
@@ -90,6 +90,11 @@ char* checkCommandI2(char *ptrCode,int lineNumber);
 char* checkCommandjump(char *ptrCode,int lineNumber);
 char* checkCommandlaOrcall(char *ptrCode,int lineNumber);
 char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
+void freeNodes(NODE_T *ptrNode);
+void freeLines(LINE_FIELDS_T* linesPtr);
+void freeTable(TABLE_NODE_T* tablePtr);
+void createOutputFiles(TABLE_NODE_T* tableHead, char *filename);
+
 MEMIM *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
 char *decToBin(int);
@@ -103,6 +108,7 @@ void printList(MEMIM *head);
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
+
 
 
 

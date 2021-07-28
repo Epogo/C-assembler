@@ -1,4 +1,4 @@
-#include "main.h"
+#include "assembler.h"
 
 
 char* checkData(char *ptrData,char *ptrDirective,int lineNumber){

@@ -1,4 +1,4 @@
-#include "main.h"
+#include "assembler.h"
 
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2){
 	/*printf("\n%s\n",symbol);*/
@@ -21,7 +21,6 @@ TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2){
 	if(firstSymbolFlag == 0){
 		current->next = ptrTableNode;
 	}
-
 
 	if(firstSymbolFlag == 1){
 		head = ptrTableNode;

@@ -1,12 +1,7 @@
-#include "main.h"
+#include "assembler.h"
 
 
-/*static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
-
-static char *directives[]={".db",".dw", ".dh", ".asciz", ".entry", ".extern"};*/
-
-
-void handleFileContents(FILE *fd){
+void handleFileContents(FILE *fd, char *filename){
 	NODE_T *ptrNode; /*initialize pointer to NODE_T, variable ptr_node*/
 	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
 
@@ -20,8 +15,9 @@ void handleFileContents(FILE *fd){
 
 	storeLines(ptrNode, fd);
 
-	manageContents(ptrNode);
-	
+	manageContents(ptrNode,filename);
+
+	freeNodes(ptrNode);
 }
 
 
@@ -52,6 +48,7 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 				tmpPtr = (NODE_T*)calloc(1, sizeof(NODE_T)); /*uses temporary pointer in case of error to dynamically allocate memory for an additional element to add to the linked list*/
 				if(!tmpPtr)
 				{
+					printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
 					exit(0);
 				}
 				ptrNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
@@ -67,4 +64,18 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 	}
 	ptrNode = head; /*set ptrNode equal to head to point to the first element of the list*/
 		
+}
+
+void freeNodes(NODE_T *ptrNode){
+    NODE_T *temp;/*A temp node which will be deleted from the linked list*/
+
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    while(1){
+        temp=ptrNode;
+        if (temp==NULL){
+            break;
+	}
+        free(temp);
+        ptrNode=ptrNode->next;
+    }
 }

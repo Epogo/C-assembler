@@ -1,4 +1,4 @@
-#include "main.h"
+#include "assembler.h"
 
 
 static char *Rcommands1[]={"add","sub", "and", "or", "nor"};
