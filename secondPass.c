@@ -4,7 +4,7 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
-void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename){
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead){
 
 	LINE_FIELDS_T* currentLine;
 	TABLE_NODE_T* tableTmp;
@@ -94,6 +94,10 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				}
 				break;
 			case 7:
+				if(lastLineFlag == FLAGON){
+					symbolAdd(memImHead,tableHead);
+				}
+				
 				step = 8;
 				break;
 			case 8:
@@ -109,6 +113,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				step = 10;
 				break;
 			case 10:
+				printList(memImHead);
 				createOutputFiles(tableHead,filename);
 				endWhileFlag = FLAGON;
 				break;

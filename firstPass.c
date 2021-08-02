@@ -16,6 +16,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int step = 1;
 	static MEMIM* headCom;
 	static MEMIM* headData;
+	MEMIM* memImHead;
+	MEMIM* node;
 	static int firstDataFlag = FLAGOFF;
 	static int firstComFlag = FLAGOFF;
 	errorFlag = FLAGOFF;
@@ -78,17 +80,20 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 8:
 				/*Add to "Tmunat Hazikaron"*/
-				/*if(firstDataFlag == FLAGOFF){
-					headData = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
+				if(firstDataFlag == FLAGOFF){
+					headData = memAdd(ptrField1,ptrField2,ptrField3);
+					node = headData;
 					firstDataFlag = FLAGON;
 				}
 				else{
-					if(firstComFlag == FLAGOFF){
+					/*if(firstComFlag == FLAGOFF){
 						headCom = NULL;
-					}
-					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
-				}*/
+					}*/
+					node = memAdd(ptrField1,ptrField2,ptrField3);
+					addNode(headCom,headData,node);
+				}
 
+				DC = DC + node->localDc;
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
@@ -138,17 +143,16 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 15:
 				/*Add to "Tmunat Hazikaron"*/
-				/*if(firstComFlag == FLAGOFF){
-					printf("Entered \n");
-					headCom = memAdd(ptrField1,ptrField2,ptrField3,tableHead);
+				if(firstComFlag == FLAGOFF){
+					headCom = memAdd(ptrField1,ptrField2,ptrField3);
 					firstComFlag = FLAGON;
 				}
 				else{
-					if(firstDataFlag == FLAGOFF){
+					/*if(firstDataFlag == FLAGOFF){
 						headData = NULL;
-					}
-					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3,tableHead));
-				}*/
+					}*/
+					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
+				}
 
 				step = 16;
 				break;
@@ -171,6 +175,20 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				/*concatNodes(headCom,headData);
 				printList(headCom);
 				exit(0);*/
+				
+				if(headCom != NULL){
+					memImHead = headCom;
+					concatNodes(headCom,headData);
+				}
+				else if(headData != NULL){
+					memImHead = headData;
+				}
+				else{
+					memImHead = NULL;
+				}
+		
+				/*printList(memImHead);*/
+
 
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
@@ -211,7 +229,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-				secondPass(linesHead,tableHead,ICF,DCF,filename);
+				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
 				freeLines(linesHead);
 				freeTable(tableHead);
 				break;

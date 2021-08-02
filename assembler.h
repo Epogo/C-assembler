@@ -35,17 +35,17 @@ typedef struct data{
     struct data *next;
 }DATA;
 
-/*Maybe a union should be added*/
+
 typedef struct memoryImage{
     char symbol[SYMBOL_NUM_OF_CHARS];/*The symbol of a node*/
     char op[NUM_OF_BITS_OP];/*An operation (expressed by binary bits)*/
     DATA *p;/*A pointer to data*/
-    int ic;/*Instruction counter.*/
-    int dc;/*Data counter*/
+    int localDc;/*Data counter*/
+    int dc;
+    int ic;
+    int missLabelFlag;
     struct memoryImage *next;
 } MEMIM;
-
-
 
 struct node {
 	int lineNumber;
@@ -78,7 +78,7 @@ void manageContents(NODE_T *ptrNode, char *filename);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
-void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename);
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead);
 void errorMsg(int error,int lineNumber,char *fieldName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
 int checkExtraneousChars(NODE_T **current,int *index);
@@ -95,7 +95,7 @@ void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
 void createOutputFiles(TABLE_NODE_T* tableHead, char *filename);
 
-MEMIM *memAdd(char*,char*,char*,TABLE_NODE_T*);
+MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);
 char *decToBin(int);
 char *decToBinJ(int);
@@ -108,7 +108,7 @@ void printList(MEMIM *head);
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
-
+void symbolAdd(MEMIM*,TABLE_NODE_T*);
 
 
 

@@ -54,10 +54,11 @@ int main()
     return 0;
 }*/
 
-MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symTable){
+MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     int count=0;/*A counter*/
-    int i,j,k;
     int comFlag=0;/*If a given command or direcrive has been found.*/
+    int dataCounter=0;
+    int i,j,k;
     char *lineStr;/*A pointer to a line*/
     const char s[2] = ",";/*A comma token*/
     char *token;/*A pointer to a token*/
@@ -79,7 +80,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
     DATA *newNode;/*An adress of a new node.*/
     lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     opStrPoint=opString;
-
+    
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
     token = strtok(lineStr, s);/*A definition of a token*/
@@ -99,7 +100,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                         continue;
                     }
                     strcpy(registers[count],reg);
-                    /*free(reg);*/
+                    free(reg);
                     token = strtok(NULL, s);/*Continue to loop over the tokens until the token is null*/
                     count++;
             }
@@ -110,7 +111,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 for (j=0;j<3;j++)
                 {
                     strcat(opStrPoint,registers[j]);
-                    /*free(registers[j]);*/
+                    free(registers[j]);
                 }
                 strcat(opStrPoint,rComFunct[i]);/*Copy the suitable funct code to the Operation string.*/
             }
@@ -120,11 +121,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 {
                     if (k==1){
                         strcat(opStrPoint,emptyReg);/*Copy the suitable opcode to the Operation string.*/
-                        /*free(registers[k]);*//*Free the register pointers*/
+                        free(registers[k]);/*Free the register pointers*/
                         continue;
                     }
                     strcat(opStrPoint,registers[k]);
-                    /*free(registers[k]);*//*Free the register pointers*/
+                    free(registers[k]);/*Free the register pointers*/
                 }
                 strcat(opStrPoint,rComFunct[i%5]);/*Copy the suitable funct code to the Operation string.*/
             }
@@ -151,7 +152,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                             reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                             registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
                             strcpy(registers[count],reg);/*Copy each reg to a place in the registers array*/
-                            /*free(reg);*/
+                            free(reg);
                             token = strtok(NULL, s);
                             count++;
                     }
@@ -162,29 +163,23 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                             if (j==1)
                                 continue;
                             strcat(opStrPoint,registers[j]);
-                            /*free(registers[j]);*/
+                            free(registers[j]);
                         }
                         strcat(opStrPoint,imm);
-                        /*free(imm);*/
+                        free(imm);
                 }
                 else{
                     while( token != NULL ) {
                         if (count==2){
-                            while (symTable!=NULL){
-                                if (!strcmp(symTable->symbol,token))
-                                {
-                                    imm=decToBin(symTable->value);/*Convert a value from the symbol table
-                                    to binary representation*/
-                                }
-                                symTable=symTable->next;
-                            }    
+                                node->missLabelFlag=2;
+                                strcpy(node->symbol,token);
                                 registers[2]=NULL;
                                 break;
                         }
                         reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                         registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate memory for the registers.*/
                         strcpy(registers[count],reg);/*Copy reg value to the registers array.*/
-                        /*free(reg);*//*Free allocated memory.*/
+                        free(reg);/*Free allocated memory.*/
                         token = strtok(NULL, s);
                         count++;
                     }
@@ -193,10 +188,10 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     for (j=0;j<2;j++)
                         {
                             strcat(opStrPoint,registers[j]);
-                            /*free(registers[j]);*/
+                            free(registers[j]);
                         }
                     strcat(opStrPoint,imm);
-                    /*free(imm);*/
+                    free(imm);
                 }
                 break;
             }    
@@ -210,24 +205,17 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 comFlag=1;
                 if (i<3){
                     strcpy(opStrPoint,jOpCode[i]);
-                    while (symTable!=NULL){
-                        if (!strcmp(symTable->symbol,ptrField3))
-                        {
-                            immJ=decToBinJ(symTable->value);/*Extracting the immediate for J-type commands.*/
-                        }
-                        symTable=symTable->next;
-                    }
                     /*If the second field is a label field*/
                     if(*ptrField3!='$'){
-                            strcat(opStrPoint,zero);/*Concat zero to the Operation string.*/
-                            strcat(opStrPoint,immJ);/*Concat immediate to the Operation string.*/
+                        node->missLabelFlag=1;
+                        strcpy(node->symbol,ptrField3);
                     }
                     /*If the second field is a register field*/
                     else{
-                            reg=Registers(ptrField3);/*Extract reg value from the function.*/
-                            strcat(opStrPoint,one);/*Concat one to the Operation string.*/
-                            strcat(opStrPoint,reg);/*Concat reg to the Operation string.*/
-                            /*free(reg);*/
+                        reg=Registers(ptrField3);/*Extract reg value from the function.*/
+                        strcat(opStrPoint,one);/*Concat one to the Operation string.*/
+                        strcat(opStrPoint,reg);/*Concat reg to the Operation string.*/
+                        free(reg);
                     }
                 }
                 else{
@@ -248,16 +236,19 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while (*ptrField3!='\0'){
+                dataCounter+=1;
                 int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
                 char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
                 strcat(temp->byte,letter);/*Copy the string to byte array within the temp node.*/
                 newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
                 temp->next=newNode;/*Point to the new node.*/
                 temp=newNode;/*Set the temp node to point on the newNode.*/
-                /*free(letter);*//*Free the allocated space for the string*/
+                free(letter);/*Free the allocated space for the string*/
                 ptrField3++;/*Advance to the next byte.*/
             }
             strcat(temp->byte,null);/*Concatenate the null bits to the end of the ascii linked-list.*/
+            dataCounter+=1;
+            node->localDc=dataCounter;
         }
     }
     
@@ -268,9 +259,10 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
+                dataCounter+=1;
                 binNum=ascizToBin(atoi(token));/*Convert a token to binary string.*/
                 strcat(temp->byte,binNum);
-                /*free(binNum);*/
+                free(binNum);
                 token = strtok(NULL, s);
                 if (token==NULL)
                     break;
@@ -278,6 +270,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                 temp->next=newNode;/*Point to the new node.*/
                 temp=newNode;/*Set the temp node to point on the newNode.*/
             }
+            node->localDc=dataCounter;
             newNode->next=NULL;
         }
     }
@@ -289,16 +282,19 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
+                dataCounter+=4;
                 binNum=decToBinDirW(token);/*Convert a token to a binary string.*/
                 binNumStart=binNum;
                 binNum+=24;/*Advance to the last byte in the word*/
                 strncpy(temp->byte,binNum,8);
+
                 for(i=0;i<3;i++){
                     newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
                     temp->next=newNode;/*Point to the new node.*/
                     temp=newNode;/*Set the temp node to point on the newNode.*/
                     binNum-=8;/*Go the the next byte.*/
                     strncpy(temp->byte,binNum,8);
+
                 }
                 token = strtok(NULL, s);
                 if (token != NULL)
@@ -307,9 +303,9 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     temp->next=newNode;/*Point to the new node.*/
                     temp=newNode;/*Set the temp node to point on the newNode.*/
                 }
-                /*free(binNumStart);*/
+                free(binNumStart);
             }
-    
+            node->localDc=dataCounter;
         }
     }
     
@@ -320,6 +316,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
             node->p=temp;/*Point to the allocated memory.*/
             
             while( token != NULL ){
+                dataCounter+=2;
                 binNum=decToBinDirH(token);/*Convert a token to a binary string.*/
                 binNumStart=binNum;
                 binNum+=8;
@@ -336,15 +333,16 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3,TABLE_NODE_T *symT
                     temp->next=newNode;/*Point to the new node.*/
                     temp=newNode;/*Set the temp node to point on the newNode.*/
                 }
-                /*free(binNumStart);*/
+                free(binNumStart);
             }
-            
+            node->localDc=dataCounter;
         }
     }
     strcpy(node->op,opString);/*Copy the opString to the operation field in the node's structure*/
     return node;/*Return the updated node.*/
-    /*free(lineStr);*//*Free the line string*/
+    free(lineStr);/*Free the line string*/
 }
+
 
 char *Registers(char *reg)
 {
@@ -452,25 +450,44 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node)
 {
     MEMIM *nodePointer;/*A pointer to a memory image node*/
     /*Add a new node the Commands list.*/
+    int headDc;
+    int prevDc;
+    static int ic=100;
+    static int firstDataNodeAddflag=0;
+    static int firstComNodeAddflag=0;
     if (node->p==NULL){
         nodePointer=headCom;
+        if (firstComNodeAddflag==0){
+            nodePointer->ic=ic;
+            firstComNodeAddflag=1;
+        }
         while(nodePointer->next!=NULL)
         {
             nodePointer = nodePointer->next;
         }
         nodePointer->next=node;
+        ic+=4;
+        node->ic=ic;
     }
     /*Add a new node the Directives list.*/
     else{
         nodePointer=headData;
+        headDc=headData->localDc;
         while(nodePointer->next!=NULL)
         {
             nodePointer = nodePointer->next;
         }
+        prevDc=nodePointer->dc;
         nodePointer->next=node;
+        if (firstDataNodeAddflag==0){
+            node->dc=prevDc+node->localDc+headDc;
+            firstDataNodeAddflag=1;
+        }
+        else
+            node->dc=prevDc+node->localDc;
     }
-    
 }
+
 
 void concatNodes(MEMIM *headCom,MEMIM *headData){
         MEMIM *nodePointer;/*A pointer to a memory image node*/
@@ -607,7 +624,7 @@ void deleteNode(MEMIM *node){
 void printSymbolTable(TABLE_NODE_T *symbolTable){
         TABLE_NODE_T *q;
         q=symbolTable;
-        while(q->next!=NULL)
+        while(q!=NULL)
         {
             printf("%s\n",q->symbol);
             q = q->next;
@@ -633,4 +650,60 @@ char binToHex(char *bin)
         hex = num+55;
     return hex;
 }
+
+void symbolAdd(MEMIM *head,TABLE_NODE_T* table){
+    char *immJ;
+    char *imm;
+    char *zero="0";
+    MEMIM *currentMem;
+    TABLE_NODE_T *currentTable;
+    currentMem = head;
+    currentTable = table;
+    while(currentMem!=NULL){
+        if(currentMem->missLabelFlag==1){
+            while(currentTable!=NULL){
+                if(!strcmp(currentMem->symbol,currentTable->symbol)){
+                    immJ=decToBinJ(currentTable->value);
+                    strcat(currentMem->op,zero);
+                    strcat(currentMem->op,immJ);
+                    free(immJ);
+                    break;
+                }
+		if(currentTable->next!=NULL){
+                    currentTable=currentTable->next;  
+		}
+		else{
+		    break;
+		}
+            }
+            
+        }
+        else if(currentMem->missLabelFlag==2){
+            while(currentTable!=NULL){
+                if(!strcmp(currentMem->symbol,currentTable->symbol)){
+                    imm=decToBin((currentTable->value)-(currentMem->ic));
+                    strcat(currentMem->op,imm);
+                    free(imm);
+                    break;
+                }
+		if(currentTable->next!=NULL){
+                    currentTable=currentTable->next;  
+		} 
+		else{
+		    break;
+		}
+            }
+            
+        }
+	if(currentMem->next!=NULL){
+            currentMem=currentMem->next; 
+	    currentTable = table; 
+	}
+	else{
+	    break;
+	}
+	
+    }
+}
+
 
