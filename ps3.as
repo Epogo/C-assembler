@@ -22,4 +22,4 @@ LIST: 	.db 	6,-9
  	.dh 	27056
 K: 	.dw 	31,-12
 END: 	stop	   
-.entry 	K 
+.entry 	K

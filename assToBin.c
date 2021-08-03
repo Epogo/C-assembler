@@ -4,7 +4,7 @@
 #include "assembler.h"
 #include <math.h>
 
-
+enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
 /*MEMIM *memAdd(char*,char*,char*,TABLE_NODE_T*);
 char *Registers(char*);
@@ -73,7 +73,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *notInUse="000000";/*An array of bin chars for "not in use" bits within the 32bits slot.*/
     char *emptyReg="00000";/*An array of bin chars for "empty register" bits within the 32bits slot.*/
     char *zero="0";/*A "zero" string.*/
-    char *one="1";/*A "one" string.*/
+    char *one="100000000000000000000";/*In case of J command with reg.*/
     char *null="00000000";/*NULL terminator.*/
     MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *temp;/*A Temporary pointer.*/
@@ -96,9 +96,10 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                     if((i>4)&&(count==1))
                     {
                         strcpy(registers[count],emptyReg);/*Set the suitable register to zero.*/
+
                         count++;
                         continue;
-                    }
+                    };
                     strcpy(registers[count],reg);
                     free(reg);
                     token = strtok(NULL, s);/*Continue to loop over the tokens until the token is null*/
@@ -117,13 +118,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             }
             else{
                 strcpy(opStrPoint,rOpCode[1]);
-                for (k=2;k>=0;k--)
+                for (k=0;k<=2;k++)
                 {
-                    if (k==1){
-                        strcat(opStrPoint,emptyReg);/*Copy the suitable opcode to the Operation string.*/
-                        free(registers[k]);/*Free the register pointers*/
-                        continue;
-                    }
                     strcat(opStrPoint,registers[k]);
                     free(registers[k]);/*Free the register pointers*/
                 }
@@ -342,7 +338,6 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     return node;/*Return the updated node.*/
     free(lineStr);/*Free the line string*/
 }
-
 
 char *Registers(char *reg)
 {
@@ -704,6 +699,195 @@ void symbolAdd(MEMIM *head,TABLE_NODE_T* table){
 	}
 	
     }
+}
+
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber){
+    char *immJ;
+    char *imm;
+    char *zero="0";
+    static MEMIM *currentMem;
+    TABLE_NODE_T *currentTable;
+    static int firstEntry = FLAGON;
+    SYMBOL_ADD_STRUCT_T *tmpPtr;
+    SYMBOL_ADD_STRUCT_T *structPtr;
+
+    tmpPtr = (SYMBOL_ADD_STRUCT_T*)calloc(1, sizeof(SYMBOL_ADD_STRUCT_T));
+    if(!tmpPtr)
+    {
+	    printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
+	    exit(0);
+    }
+    structPtr = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
+
+    structPtr->externalFlag = FLAGOFF;
+    structPtr->errorFlag = FLAGOFF;
+
+    if(firstEntry == FLAGON){
+    	currentMem = head;
+	firstEntry = FLAGOFF;
+    }
+    currentTable = table;
+    if(currentMem!=NULL){
+        if(currentMem->missLabelFlag==1){
+            while(currentTable!=NULL){
+                if(!strcmp(currentMem->symbol,currentTable->symbol)){
+		    if(currentTable->attribute[0] == EXTERNAL){
+			/*printf("Detected in dis bish!: %u, %s\n", currentMem->ic,currentMem->symbol);*/
+			structPtr->address = currentMem->ic;
+			strcpy(structPtr->label,currentMem->symbol);
+			structPtr->externalFlag = FLAGON;
+			
+		    }
+                    immJ=decToBinJ(currentTable->value);
+                    strcat(currentMem->op,zero);
+                    strcat(currentMem->op,immJ);
+                    free(immJ);
+                    break;
+                }
+		if(currentTable->next!=NULL){
+                    currentTable=currentTable->next;  
+		}
+		else{
+		    break;
+		}
+            }
+            
+        }
+        else if(currentMem->missLabelFlag==2){
+            while(currentTable!=NULL){
+                if(!strcmp(currentMem->symbol,currentTable->symbol)){
+                    imm=decToBin((currentTable->value)-(currentMem->ic));
+                    strcat(currentMem->op,imm);
+                    free(imm);
+                    break;
+                }
+		if(currentTable->next!=NULL){
+                    currentTable=currentTable->next;  
+		} 
+		else{
+		    break;
+		}
+            }
+            
+        }
+	if(currentMem->next!=NULL){
+            currentMem=currentMem->next; 
+	    currentTable = table; 
+	}
+	/*else{
+	    break;
+	}
+	*/
+    }
+    return structPtr;
+}
+
+
+void printListToFile (MEMIM *head,FILE *fptrObject)
+{
+    int i=0;
+    int j=0;/*A counter index.*/
+    int k=0;/*A counter index.*/
+    int count=0;/*A counter index.*/
+    int inCount;/*Inside counter.*/
+    int lastNodeFlag=0;/*A flag which signs.*/
+    int bitsNum;/*An integer which represents a number.*/
+    static int ic=100;/*Instruction counter.*/
+    char *bin;/*Binary number pointer.*/
+    char *startArr;/*Stores the first array.*/
+    char mem[5];/*A temp memory which is used to store regs.*/
+    char* printArr;/*The array which will be printed (represented with hexa chars).*/
+    char hex;/*Hex char*/
+    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
+    startArr=printArr;
+    MEMIM *nodePointer;/*A pointer to a memory image node.*/
+    DATA *temp;/*temporary data node.*/
+    nodePointer=head;
+    while(nodePointer!=NULL)
+    {
+        if (nodePointer->next==NULL)
+            lastNodeFlag=1;/*Set flag to 1 if the current node is the last node.*/
+        if((nodePointer->p)!=NULL){
+            k=0;
+            while((nodePointer->p)!=NULL){
+                bin=nodePointer->p->byte;
+                j=0;
+                for(i=0;i<8;i++){
+                    mem[j]=*bin;
+                    if((i+1)%4==0){
+                        mem[4]='\0';
+                        hex=binToHex(mem);
+                        j=0;
+                        printArr[k++]=hex;
+                        bin++;
+                        continue;
+                    }
+                    j++;
+                    bin++;
+                }
+                if (k%8==0){
+                    printArr = (char *) realloc(printArr, k+8);
+                }
+                temp=nodePointer->p;
+                nodePointer->p=nodePointer->p->next;
+                free(temp);
+            }
+            inCount=0;
+            if (count==0)
+                fprintf(fptrObject,"0%d ",ic);
+            for(i=0;i<k;i+=2){
+                fprintf(fptrObject,"%c",printArr[i]);
+                fprintf(fptrObject,"%c ",printArr[i+1]);
+                inCount+=2;
+                count+=2;
+                if ((count%8==0)){
+                    fprintf(fptrObject,"\n");
+                    ic+=4;
+                    if ((lastNodeFlag==1)&&(inCount==k))
+                        break;
+                    fprintf(fptrObject,"0%d ",ic);
+                    
+                }
+                   
+            }
+        }
+        else
+            {
+            bin=nodePointer->op;
+            k=0;
+            for(i=0;i<32;i++){
+                mem[j]=*bin;
+                if((i+1)%4==0){
+                mem[4]='\0';
+                hex=binToHex(mem);
+                printArr[k]=hex;
+                j=0;
+                bin++;
+                k++;
+                continue;
+                }
+                j++;
+                bin++;
+               
+            }
+            int count=0;
+            fprintf(fptrObject,"0%d ",ic);
+            for(k=7;k>0;){
+                count++;
+                fprintf(fptrObject,"%c",printArr[k-1]);
+                fprintf(fptrObject,"%c ",printArr[k]);
+                if (count%8==0){
+                    fprintf(fptrObject,"\n");
+                    fprintf(fptrObject,"0%d ",ic);
+                }
+                k-=2;
+            }
+            fprintf(fptrObject,"\n");
+            ic+=4;
+        }
+        nodePointer=nodePointer->next;
+    }
+    /*free(startArr);*/
 }
 
 

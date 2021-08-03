@@ -6,8 +6,8 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename){
-	static int IC,DC,errorFlag;
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename,int lineNumber){
+	static int IC,DC;
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
 	static TABLE_NODE_T* tableHead;
 	static LINE_FIELDS_T* linesHead;
@@ -20,7 +20,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	MEMIM* node;
 	static int firstDataFlag = FLAGOFF;
 	static int firstComFlag = FLAGOFF;
-	errorFlag = FLAGOFF;
+	static int errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	
@@ -43,7 +43,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						break;
 					}
 				}
-				linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag);
+				linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber);
 				if(labelFlag == LASTLINE){
 					step = 17;
 				}
@@ -162,40 +162,22 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				endWhileFlag = FLAGON;
 				break;
 			case 17:
-				/*if(firstDataFlag == FLAGOFF){
-					headData = NULL;
-				}
-				if(firstComFlag == FLAGOFF){
-					headCom = NULL;
-				}*/
-				/*concatNodes(headCom,headData);*/
-				/*printList(headCom);*/
-				/*printList(memAdd(NULL,".asciz","pizdietz",NULL));*/
-				/*printf("\nCheck: %s \n",headData->symbol);*/
-				/*concatNodes(headCom,headData);
-				printList(headCom);
-				exit(0);*/
-				
-				if(headCom != NULL){
-					memImHead = headCom;
-					concatNodes(headCom,headData);
-				}
-				else if(headData != NULL){
-					memImHead = headData;
-				}
-				else{
-					memImHead = NULL;
-				}
-		
-				/*printList(memImHead);*/
-
-
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
-					freeLines(linesHead);
+					/*freeLines(linesHead);*/
 					freeTable(tableHead);
 				}
 				else{
+					if(headCom != NULL){
+						memImHead = headCom;
+						concatNodes(headCom,headData);
+					}
+					else if(headData != NULL){
+						memImHead = headData;
+					}
+					else{
+						memImHead = NULL;
+					}
 					step = 18;
 				}
 				break;
@@ -229,9 +211,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
+			
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
-				freeLines(linesHead);
+				/*printTable(linesHead);*/
+				/*freeLines(linesHead);*/
 				freeTable(tableHead);
+
 				break;
 	
 				
@@ -245,9 +230,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 }
 
 
-LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag){
-	LINE_FIELDS_T *ptrLineFields; /*initialize pointer to TABLE_NODE_T, variable ptrTableNode*/
-	LINE_FIELDS_T *tmpPtr; /*initialize pointer to tmpPtr of type TABLE_NODE_T*/
+LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber){
+	LINE_FIELDS_T *ptrLineFields;
+	LINE_FIELDS_T *tmpPtr;
 	static LINE_FIELDS_T *current;
 	static LINE_FIELDS_T *head;
 	static int firstSymbolFlag = 1;
@@ -274,8 +259,8 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 	strcpy(ptrLineFields->comOrDir,ptrField2);
 	strcpy(ptrLineFields->values,ptrField3);
 	ptrLineFields->labelFlag = labelFlag;
+	ptrLineFields->lineNumber = lineNumber;
 	ptrLineFields->next = NULL;
-
 	current = ptrLineFields;
 	
 	firstSymbolFlag = 0;

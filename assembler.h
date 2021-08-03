@@ -6,7 +6,7 @@
 #define ERROR 1
 #define NOERROR 0
 #define MAXLABELLEN 32 /*maximum length of label of 31 + 1 for \0*/
-#define MAXDATACODELEN 7 /* maximum length of data or code command (.asciz is 6 chars + 1 for \0)*/
+#define MAXDATACODELEN 8 /* maximum length of data or code command (.extern is 7 chars + 1 for \0)*/
 #define FLAGOFF 0
 #define FLAGON 1
 #define NUMDIRECTIVES 4
@@ -67,17 +67,27 @@ struct lineFields{
 	char comOrDir[MAXDATACODELEN];
 	char values[MAXLINELEN];
 	int labelFlag;
+	int lineNumber;
 	struct lineFields* next;
 };
 typedef struct lineFields LINE_FIELDS_T;
+
+struct symbolAddStruct{
+	char label[MAXLABELLEN];
+	int address;
+	int externalFlag;
+	int errorFlag;
+	struct symbolAddStruct* next;
+};
+typedef struct symbolAddStruct SYMBOL_ADD_STRUCT_T;
 
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd, char *filename);
 void storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode, char *filename);
-void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename);
+void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename,int lineNumber);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
-LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag);
+LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber);
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead);
 void errorMsg(int error,int lineNumber,char *fieldName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
@@ -93,7 +103,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
 void freeNodes(NODE_T *ptrNode);
 void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
-void createOutputFiles(TABLE_NODE_T* tableHead, char *filename);
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF);
 
 MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);
@@ -109,7 +119,8 @@ char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
 void symbolAdd(MEMIM*,TABLE_NODE_T*);
-
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber);
+void printListToFile(MEMIM *head,FILE *fptrObject);
 
 
 

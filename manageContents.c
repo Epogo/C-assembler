@@ -39,7 +39,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 			if(state == FIRSTWORD){
 				errorMsg(22,current->lineNumber,NULL);
 				errorDetected = FLAGON;
-				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 				state = newLine(&errorDetected,&current,&labelFlag,&index);
 				continue;
 			}
@@ -48,14 +48,14 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(state == -1){
 					errorMsg(21,current->lineNumber,ptrFirstWord);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
 				else{
 					errorMsg(22,current->lineNumber,NULL);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -64,19 +64,19 @@ void manageContents(NODE_T *ptrNode, char *filename){
 			if(state == COMMANDORDIRECTIVE){
 				ptrCommandDirective[CommandDirectiveIndex] = '\0';
 				if(!strcmp("stop", ptrCommandDirective)){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					/*free(ptrFirstWord);*/
 					free(ptrCommandDirective);
 				}
 				else if(state != -1){
 					errorMsg(22,current->lineNumber,ptrCommandDirective);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 				}
 				else{
 					errorMsg(20,current->lineNumber,ptrCommandDirective);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 				}
 
 				state = newLine(&errorDetected,&current,&labelFlag,&index);
@@ -88,30 +88,30 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber);
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					}
 					else{
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrCommandDirective);
 						free(ptrCodeChecked);
 						free(ptrCode);
 					}
-					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected,filename);*/
+					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected,filename,current->lineNumber);*/
 				}
 				else if(labelFlag == FLAGOFF){
 					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber);
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					}
 					else{
-						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrCodeChecked);
 						free(ptrCode);
 					}
-					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected,filename);*/
+					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected,filename,current->lineNumber);*/
 				}
 			}
 			if(state == MYDATA){
@@ -120,10 +120,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					}
 					else{
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrCommandDirective);
 						free(ptrDataChecked);
@@ -134,10 +134,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber);
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					}
 					else{
-						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrDataChecked);
 						free(ptrData);
@@ -146,7 +146,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				}
 			}
 			if(current->next == NULL){
-				firstPass(ptrTrash,ptrTrash,ptrTrash,LASTLINE,errorDetected,filename); /*end of file*/	
+				firstPass(ptrTrash,ptrTrash,ptrTrash,LASTLINE,errorDetected,filename,current->lineNumber); /*end of file*/	
 				break;
 			}
 			else{
@@ -156,7 +156,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 		if((index >= MAXLINELEN) && (current->inputChar[index] != '\n')){
 			errorMsg(23,current->lineNumber,ptrCommandDirective);
 			errorDetected = FLAGON;
-			firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+			firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 			state = newLine(&errorDetected,&current,&labelFlag,&index);
 		}
 		if(current->inputChar[index] == '\t' || current->inputChar[index] == ' '){
@@ -169,7 +169,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(state == -1){
 					errorMsg(20,current->lineNumber,ptrCommandDirective);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					free(ptrCommandDirective);
 					continue;
@@ -178,10 +178,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					errorDetected = checkExtraneousChars(&current,&index);
 					if(errorDetected == FLAGON){
 						errorMsg(4,current->lineNumber,NULL);
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);						
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);						
 					}
 					else if(errorDetected == FLAGOFF){
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
@@ -195,7 +195,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(3,current->lineNumber,ptrLabel);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -204,7 +204,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					errorMsg(0,current->lineNumber,ptrLabel);
 					/*printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);*/
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -212,7 +212,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(!((ptrLabel[0] >= 'a' && ptrLabel[0] <= 'z') || (ptrLabel[0] >= 'A' && ptrLabel[0] <= 'Z'))){
 					errorMsg(1,current->lineNumber,ptrLabel);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -223,7 +223,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						if(!((ptrLabel[i] >= 'a' && ptrLabel[i] <= 'z') || (ptrLabel[i] >= 'A' && ptrLabel[i] <= 'Z') || (ptrLabel[i] >= '0' && ptrLabel[i] <= '9'))){
 							errorMsg(2,current->lineNumber,ptrLabel);
 							errorDetected = FLAGON;
-							firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+							firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 							state = newLine(&errorDetected,&current,&labelFlag,&index);
 							breakFlag = FLAGON;
 							/*free(ptrLabel);*/
@@ -237,12 +237,12 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				errorDetected = checkExtraneousChars(&current,&index);
 				if(errorDetected == FLAGON){
 					errorMsg(4,current->lineNumber,NULL);
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);						
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);						
 				}
 				else if(errorDetected == FLAGOFF){
-					firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
 				}
-				/*firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename);*/
+				/*firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);*/
 				state = newLine(&errorDetected,&current,&labelFlag,&index);
 				/*free(ptrFirstWord);*/
 				/*free(ptrLabel);*/
@@ -273,7 +273,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 			if(state == FIRSTWORD){
 				errorMsg(22,current->lineNumber,NULL);
 				errorDetected = FLAGON;
-				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+				firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 				state = newLine(&errorDetected,&current,&labelFlag,&index);
 				continue;
 			}
@@ -282,14 +282,14 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(state == -1){
 					errorMsg(21,current->lineNumber,ptrFirstWord);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
 				else{
 					errorMsg(22,current->lineNumber,NULL);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -300,32 +300,32 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber);
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						free(ptrCode);
 					}
 					else{
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrCommandDirective);
 						free(ptrCodeChecked);
 						free(ptrCode);
 					}
-					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected,filename);*/
+					/*firstPass(ptrFirstWord,ptrCommandDirective,ptrCode,labelFlag,errorDetected,filename,current->lineNumber);*/
 				}
 				else if(labelFlag == FLAGOFF){
 					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber);
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						free(ptrCode);
 					}
 					else{
-						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrCodeChecked);
 						free(ptrCode);
 					}
-					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected,filename);*/
+					/*firstPass(ptrTrash,ptrFirstWord,ptrCode,labelFlag,errorDetected,filename,current->lineNumber);*/
 				}
 			}
 			if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
@@ -334,7 +334,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(3,current->lineNumber,ptrLabel);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -343,7 +343,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					errorMsg(0,current->lineNumber,ptrLabel);
 					/*printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);*/
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -351,7 +351,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(!((ptrLabel[0] >= 'a' && ptrLabel[0] <= 'z') || (ptrLabel[0] >= 'A' && ptrLabel[0] <= 'Z'))){
 					errorMsg(1,current->lineNumber,ptrLabel);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					/*free(ptrLabel);*/
 					continue;
@@ -362,7 +362,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						if(!((ptrLabel[i] >= 'a' && ptrLabel[i] <= 'z') || (ptrLabel[i] >= 'A' && ptrLabel[i] <= 'Z') || (ptrLabel[i] >= '0' && ptrLabel[i] <= '9'))){
 							errorMsg(2,current->lineNumber,ptrLabel);
 							errorDetected = FLAGON;
-							firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+							firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 							state = newLine(&errorDetected,&current,&labelFlag,&index);
 							breakFlag = FLAGON;
 							break;
@@ -373,7 +373,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					}
 				}
 				/*firstPass(ptrFirstWord,ptrLabel,ptrTrash,labelFlag);*/
-				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename);
+				firstPass(ptrTrash,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
 				/*free(ptrFirstWord);*/
 				/*free(ptrLabel);*/
 			} 
@@ -383,13 +383,13 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber);
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						free(ptrCommandDirective);
 						free(ptrDataChecked);
 						free(ptrData);
 					}
 					else{
-						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						free(ptrCommandDirective);
 						free(ptrDataChecked);
 						free(ptrData);
@@ -399,11 +399,11 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber);
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						free(ptrData);
 					}
 					else{
-						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);
 						/*free(ptrFirstWord);*/
 						free(ptrDataChecked);
 						free(ptrData);
@@ -414,20 +414,20 @@ void manageContents(NODE_T *ptrNode, char *filename){
 			if(state == COMMANDORDIRECTIVE){
 				ptrCommandDirective[CommandDirectiveIndex] = '\0';
 				if(!strcmp("stop", ptrCommandDirective)){
-					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					/*free(ptrFirstWord);*/
 					free(ptrCommandDirective);
 				}
 				else if(state != -1){
 					errorMsg(22,current->lineNumber,ptrCommandDirective);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					free(ptrCommandDirective);
 				}
 				else{
 					errorMsg(20,current->lineNumber,ptrCommandDirective);
 					errorDetected = FLAGON;
-					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+					firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 					free(ptrCommandDirective);
 				}
 			}
@@ -468,7 +468,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					if((checkState(ptrFirstWord) != -1) || !strcmp("dh", ptrFirstWord) || !strcmp("dw", ptrFirstWord) || !strcmp("db", ptrFirstWord) || !strcmp("asciz", ptrFirstWord)){
 						errorMsg(3,current->lineNumber,ptrFirstWord);
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
 						/*free(ptrFirstWord);*/
 					}
@@ -476,14 +476,14 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						errorMsg(0,current->lineNumber,ptrFirstWord);
 						/*printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);*/
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
 						/*free(ptrFirstWord);*/
 					}
 					else if(!((ptrFirstWord[0] >= 'a' && ptrFirstWord[0] <= 'z') || (ptrFirstWord[0] >= 'A' && ptrFirstWord[0] <= 'Z'))){
 						errorMsg(1,current->lineNumber,ptrFirstWord);
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
 						/*free(ptrFirstWord);*/
 					}
@@ -492,7 +492,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 							if(!((ptrFirstWord[i] >= 'a' && ptrFirstWord[i] <= 'z') || (ptrFirstWord[i] >= 'A' && ptrFirstWord[i] <= 'Z') || (ptrFirstWord[i] >= '0' && ptrFirstWord[i] <= '9'))){
 								errorMsg(2,current->lineNumber,ptrFirstWord);
 								errorDetected = FLAGON;
-								firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+								firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 								state = newLine(&errorDetected,&current,&labelFlag,&index);
 								/*free(ptrFirstWord);*/
 								break;
@@ -505,7 +505,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					if(state == -1){
 						errorMsg(21,current->lineNumber,ptrFirstWord);
 						errorDetected = FLAGON;
-						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename);
+						firstPass(ptrTrash,ptrTrash,ptrTrash,labelFlag,errorDetected,filename,current->lineNumber);
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
 						/*free(ptrFirstWord);*/
 						break;
@@ -682,6 +682,9 @@ void errorMsg(int error,int lineNumber,char *fieldName)
 			break;
 		case 23:
 			printf("Line %u: Line exceeded maximum length of 80 characters\n",lineNumber);
+			break;
+		case 24:
+			printf("Line %u: Label \"%s\" not found in symbol table\n",lineNumber,fieldName);
 			break;
 		default:
 			printf("Default error message!\n");
