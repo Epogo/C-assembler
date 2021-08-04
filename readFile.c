@@ -40,7 +40,9 @@ void readFile(int argc, char** argv){
 		}
 		
 		handleFileContents(fd,filename);
-		
-		free(filename);
+
+		fclose(fd);
+
+		/*free(filename);*/
 	}
 }

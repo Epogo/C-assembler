@@ -4,7 +4,7 @@
 void handleFileContents(FILE *fd, char *filename){
 	NODE_T *ptrNode; /*initialize pointer to NODE_T, variable ptr_node*/
 	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
-
+	
 	tmpPtr = (NODE_T*)calloc(1, sizeof(NODE_T));
 	if(!tmpPtr)
 	{
@@ -36,7 +36,9 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 
 	while(1){
 		charFromFile = fgetc(fd); /*store character from file in charFromFile variable*/
-		if(!feof(fd)){
+
+		/*if(!feof(fd)){*/
+		if(charFromFile != EOF){
 			/*if(charFromFile != '\n'){*/
 			ptrNode->inputChar[index] = charFromFile;
 			index++;

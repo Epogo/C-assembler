@@ -66,7 +66,6 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char opString[NUM_OF_BITS_OP];/*Operation string*/
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
-    char *immJ;/*A pointer to an immediate value of type j.*/
     char *registers[3];/*An array of pointers of registers.*/
     char *opStrPoint;/*A pointer to a Operation string.*/
     char *binNum,*binNumStart;/*Binary number pointer& A pointer to the the first byte.*/
@@ -75,8 +74,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *zero="0";/*A "zero" string.*/
     char *one="100000000000000000000";/*In case of J command with reg.*/
     char *null="00000000";/*NULL terminator.*/
-    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *temp;/*A Temporary pointer.*/
+    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *newNode;/*An adress of a new node.*/
     lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     opStrPoint=opString;
@@ -232,9 +231,9 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             temp=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for a data node.*/
             node->p=temp;/*Point to the allocated memory.*/
             while (*ptrField3!='\0'){
-                dataCounter+=1;
                 int asciCode=*ptrField3;/*Extracting the ascii code of any letter.*/
                 char *letter=ascizToBin(asciCode);/*Extracting a suitable string from the asciCode.*/
+                dataCounter+=1;
                 strcat(temp->byte,letter);/*Copy the string to byte array within the temp node.*/
                 newNode=(DATA*)calloc(1, sizeof(DATA));/*Allocate memory for the new node.*/
                 temp->next=newNode;/*Point to the new node.*/
@@ -503,17 +502,17 @@ void printList (MEMIM *head)
     int count=0;/*A counter index.*/
     int inCount;/*Inside counter.*/
     int lastNodeFlag=0;/*A flag which signs.*/
-    int bitsNum;/*An integer which represents a number.*/
+    /*int bitsNum;*//*An integer which represents a number.*/
     static int ic=100;/*Instruction counter.*/
     char *bin;/*Binary number pointer.*/
-    char *startArr;/*Stores the first array.*/
+    /*char *startArr;*//*Stores the first array.*/
     char mem[5];/*A temp memory which is used to store regs.*/
     char* printArr;/*The array which will be printed (represented with hexa chars).*/
     char hex;/*Hex char*/
-    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
-    startArr=printArr;
     MEMIM *nodePointer;/*A pointer to a memory image node.*/
     DATA *temp;/*temporary data node.*/
+    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
+    /*startArr=printArr;*/
     nodePointer=head;
     while(nodePointer!=NULL)
     {
@@ -791,17 +790,17 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
     int count=0;/*A counter index.*/
     int inCount;/*Inside counter.*/
     int lastNodeFlag=0;/*A flag which signs.*/
-    int bitsNum;/*An integer which represents a number.*/
+    /*int bitsNum;*//*An integer which represents a number.*/
     static int ic=100;/*Instruction counter.*/
     char *bin;/*Binary number pointer.*/
-    char *startArr;/*Stores the first array.*/
+    /*char *startArr;*//*Stores the first array.*/
     char mem[5];/*A temp memory which is used to store regs.*/
     char* printArr;/*The array which will be printed (represented with hexa chars).*/
     char hex;/*Hex char*/
-    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
-    startArr=printArr;
     MEMIM *nodePointer;/*A pointer to a memory image node.*/
     DATA *temp;/*temporary data node.*/
+    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
+    /*startArr=printArr;*/
     nodePointer=head;
     while(nodePointer!=NULL)
     {
@@ -886,6 +885,7 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
             ic+=4;
         }
         nodePointer=nodePointer->next;
+
     }
     /*free(startArr);*/
 }

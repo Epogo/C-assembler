@@ -16,6 +16,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int step = 1;
 	static MEMIM* headCom;
 	static MEMIM* headData;
+	static char fileNamePrev[100];
 	MEMIM* memImHead;
 	MEMIM* node;
 	static int firstDataFlag = FLAGOFF;
@@ -23,10 +24,15 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
-	
-	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
 
-	
+	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
+	if(strcmp(filename,fileNamePrev)){
+		step = 1;
+		firstDataFlag = FLAGOFF;
+		firstComFlag = FLAGOFF;
+		errorFlag = FLAGOFF;
+	}
+	strcpy(fileNamePrev,filename);
 
 	while(1){
 		switch(step){
@@ -164,7 +170,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 17:
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
-					/*freeLines(linesHead);*/
+					freeLines(linesHead);
 					freeTable(tableHead);
 				}
 				else{
@@ -214,9 +220,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
 				/*printTable(linesHead);*/
-				/*freeLines(linesHead);*/
+				freeLines(linesHead);
 				freeTable(tableHead);
-
 				break;
 	
 				
@@ -270,9 +275,23 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 }
 
 void freeLines(LINE_FIELDS_T* linesPtr){
-    LINE_FIELDS_T *temp;/*A temp node which will be deleted from the linked list*/
+    LINE_FIELDS_T *temp;
+    LINE_FIELDS_T *current;
 
-    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    temp=linesPtr;
+    while(1){
+        if (temp==NULL){
+            break;
+	}
+	current = temp->next;
+        free(temp);
+        temp=current;
+    }
+}
+
+/*void freeLines(LINE_FIELDS_T* linesPtr){
+    LINE_FIELDS_T *temp;
+
     while(1){
         temp=linesPtr;
         if (temp==NULL){
@@ -281,7 +300,7 @@ void freeLines(LINE_FIELDS_T* linesPtr){
         free(temp);
         linesPtr=linesPtr->next;
     }
-}
+}*/
 
 void freeTable(TABLE_NODE_T* tablePtr){
     TABLE_NODE_T *temp;/*A temp node which will be deleted from the linked list*/
