@@ -44,6 +44,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	}
 	strcpy(fileNamePrev,filename);
 
+	/*printf("Filename: %s\n",filename);*/
+
 	while(1){
 		switch(step){
 			case 1:
@@ -104,28 +106,30 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 8;
 				break;
 			case 8:
-				/*Add to "Tmunat Hazikaron"*/
-				if(firstDataFlag == FLAGOFF){
-					headData = memAdd(ptrField1,ptrField2,ptrField3);
-					node = headData;
-					firstDataFlag = FLAGON;
-				}
-				else{
-					/*if(firstComFlag == FLAGOFF){
-						headCom = NULL;
-					}*/
-					/*node = memAdd(ptrField1,ptrField2,ptrField3);
-					addNode(headCom,headData,node);*/
-
-
-					if(firstDataNodeAddflag == FLAGOFF){
-						node = memAdd(ptrField1,ptrField2,ptrField3);
-						addNode(headCom,headData,node,FLAGOFF,firstComNodeAddflag);
-						firstDataNodeAddflag = FLAGON;
+				if(errorFlag == FLAGOFF){
+					/*Add to "Tmunat Hazikaron"*/
+					if(firstDataFlag == FLAGOFF){
+						headData = memAdd(ptrField1,ptrField2,ptrField3);
+						node = headData;
+						firstDataFlag = FLAGON;
 					}
 					else{
-						node = memAdd(ptrField1,ptrField2,ptrField3);
-						addNode(headCom,headData,node,FLAGON,firstComNodeAddflag);
+						/*if(firstComFlag == FLAGOFF){
+							headCom = NULL;
+						}*/
+						/*node = memAdd(ptrField1,ptrField2,ptrField3);
+						addNode(headCom,headData,node);*/
+
+
+						if(firstDataNodeAddflag == FLAGOFF){
+							node = memAdd(ptrField1,ptrField2,ptrField3);
+							addNode(headCom,headData,node,FLAGOFF,firstComNodeAddflag);
+							firstDataNodeAddflag = FLAGON;
+						}
+						else{
+							node = memAdd(ptrField1,ptrField2,ptrField3);
+							addNode(headCom,headData,node,FLAGON,firstComNodeAddflag);
+						}
 					}
 				}
 
@@ -194,36 +198,35 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 15;
 				break;
 			case 15:
-				/*Add to "Tmunat Hazikaron"*/
-				if(firstComFlag == FLAGOFF){
-					headCom = memAdd(ptrField1,ptrField2,ptrField3);
-					firstComFlag = FLAGON;
-				}
-				else{
-					/*if(firstDataFlag == FLAGOFF){
-						headData = NULL;
-					}*/
+				if(errorFlag == FLAGOFF){
+					/*Add to "Tmunat Hazikaron"*/
+					if(firstComFlag == FLAGOFF){
+						headCom = memAdd(ptrField1,ptrField2,ptrField3);
+						firstComFlag = FLAGON;
+					}
+					else{
+						/*if(firstDataFlag == FLAGOFF){
+							headData = NULL;
+						}*/
 
-				/*printf("Start-Filename: %s, Field2: %s\n",filename,ptrField2);
-					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
-				printf("End-Filename: %s, Field2: %s\n",filename,ptrField2);*/
+					/*printf("Start-Filename: %s, Field2: %s\n",filename,ptrField2);
+						addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
+					printf("End-Filename: %s, Field2: %s\n",filename,ptrField2);*/
 
 
 				
-					if(firstComNodeAddflag == FLAGOFF){
-						node = memAdd(ptrField1,ptrField2,ptrField3);
-						addNode(headCom,headData,node,firstDataNodeAddflag,FLAGOFF);
-						firstComNodeAddflag = FLAGON;
+						if(firstComNodeAddflag == FLAGOFF){
+							node = memAdd(ptrField1,ptrField2,ptrField3);
+							addNode(headCom,headData,node,firstDataNodeAddflag,FLAGOFF);
+							firstComNodeAddflag = FLAGON;
+						}
+						else{
+							node = memAdd(ptrField1,ptrField2,ptrField3);
+							addNode(headCom,headData,node,firstDataNodeAddflag,FLAGON);
+						}
+
 					}
-					else{
-						node = memAdd(ptrField1,ptrField2,ptrField3);
-						addNode(headCom,headData,node,firstDataNodeAddflag,FLAGON);
-					}
-
-
-
 				}
-
 				step = 16;
 				break;
 			case 16:
@@ -369,7 +372,9 @@ void freeMemIm(MEMIM* memImHead){
             break;
 	}
 	current = temp->next;
-        free(temp);
+	if(current!=NULL){
+        	free(temp);
+	}
         temp=current;
     }
 }
