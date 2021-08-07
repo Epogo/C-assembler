@@ -333,6 +333,16 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             node->localDc=dataCounter;
         }
     }
+
+    if( !(!strcmp(ptrField2,".asciz") || !strcmp(ptrField2,".db") || !strcmp(ptrField2,".dw") || !strcmp(ptrField2,".dh"))   ){
+        node->p = NULL;
+	node->next = NULL;
+
+    }
+
+
+
+
     strcpy(node->op,opString);/*Copy the opString to the operation field in the node's structure*/
     return node;/*Return the updated node.*/
     free(lineStr);/*Free the line string*/
@@ -440,20 +450,24 @@ char *decToBinDirH(char *number)
     return str;
 }
 
-void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node)
+void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddflag,int firstComNodeAddflag)
 {
     MEMIM *nodePointer;/*A pointer to a memory image node*/
     /*Add a new node the Commands list.*/
     int headDc;
     int prevDc;
-    static int ic=100;
-    static int firstDataNodeAddflag=0;
-    static int firstComNodeAddflag=0;
+    /*static int ic=100;*/
+    static int ic;
+    /*static int firstDataNodeAddflag=0;
+    static int firstComNodeAddflag=0;*/
+    if((firstDataNodeAddflag == FLAGOFF) && (firstComNodeAddflag == FLAGOFF)){
+        ic = 100;
+    }
     if (node->p==NULL){
         nodePointer=headCom;
         if (firstComNodeAddflag==0){
             nodePointer->ic=ic;
-            firstComNodeAddflag=1;
+            /*firstComNodeAddflag=1;*/
         }
         while(nodePointer->next!=NULL)
         {
@@ -475,7 +489,7 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node)
         nodePointer->next=node;
         if (firstDataNodeAddflag==0){
             node->dc=prevDc+node->localDc+headDc;
-            firstDataNodeAddflag=1;
+            /*firstDataNodeAddflag=1;*/
         }
         else
             node->dc=prevDc+node->localDc;
@@ -700,13 +714,13 @@ void symbolAdd(MEMIM *head,TABLE_NODE_T* table){
     }
 }
 
-SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber){
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry){
     char *immJ;
     char *imm;
     char *zero="0";
     static MEMIM *currentMem;
     TABLE_NODE_T *currentTable;
-    static int firstEntry = FLAGON;
+    /*static int firstEntry = FLAGON;*/
     SYMBOL_ADD_STRUCT_T *tmpPtr;
     SYMBOL_ADD_STRUCT_T *structPtr;
 
@@ -723,7 +737,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
 
     if(firstEntry == FLAGON){
     	currentMem = head;
-	firstEntry = FLAGOFF;
+	/*firstEntry = FLAGOFF;*/
     }
     currentTable = table;
     if(currentMem!=NULL){
@@ -731,7 +745,6 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
             while(currentTable!=NULL){
                 if(!strcmp(currentMem->symbol,currentTable->symbol)){
 		    if(currentTable->attribute[0] == EXTERNAL){
-			/*printf("Detected in dis bish!: %u, %s\n", currentMem->ic,currentMem->symbol);*/
 			structPtr->address = currentMem->ic;
 			strcpy(structPtr->label,currentMem->symbol);
 			structPtr->externalFlag = FLAGON;
@@ -791,7 +804,8 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
     int inCount;/*Inside counter.*/
     int lastNodeFlag=0;/*A flag which signs.*/
     /*int bitsNum;*//*An integer which represents a number.*/
-    static int ic=100;/*Instruction counter.*/
+    /*static int ic=100;*//*Instruction counter.*/
+    int ic=100;
     char *bin;/*Binary number pointer.*/
     /*char *startArr;*//*Stores the first array.*/
     char mem[5];/*A temp memory which is used to store regs.*/

@@ -1,13 +1,17 @@
 #include "assembler.h"
 
-TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2){
+TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag){
 	/*printf("\n%s\n",symbol);*/
 
 	TABLE_NODE_T *ptrTableNode; /*initialize pointer to TABLE_NODE_T, variable ptrTableNode*/
 	TABLE_NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type TABLE_NODE_T*/
 	static TABLE_NODE_T *current;
 	static TABLE_NODE_T *head;
-	static int firstSymbolFlag = 1;
+	/*static int firstSymbolFlag = 1;*/
+
+	/*if(firstSymbolFlag == FLAGON){
+		firstSymbolFlag = 1;
+	}*/
 	
 
 	tmpPtr = (TABLE_NODE_T*)calloc(1, sizeof(TABLE_NODE_T));

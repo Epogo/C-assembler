@@ -22,8 +22,13 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int firstDataFlag = FLAGOFF;
 	static int firstComFlag = FLAGOFF;
 	static int errorFlag = FLAGOFF;
+	static int firstLineFlag;
+	static int firstSymbolFlag;
+	static int firstComNodeAddflag;
+	static int firstDataNodeAddflag;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
+	firstLineFlag = FLAGOFF;
 
 	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
 	if(strcmp(filename,fileNamePrev)){
@@ -31,6 +36,10 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 		firstDataFlag = FLAGOFF;
 		firstComFlag = FLAGOFF;
 		errorFlag = FLAGOFF;
+		firstLineFlag = FLAGON;
+		firstSymbolFlag = FLAGOFF;
+		firstComNodeAddflag = FLAGOFF;
+		firstDataNodeAddflag = FLAGOFF;
 	}
 	strcpy(fileNamePrev,filename);
 
@@ -49,7 +58,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						break;
 					}
 				}
-				linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber);
+				linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber,firstLineFlag);
 				if(labelFlag == LASTLINE){
 					step = 17;
 				}
@@ -80,7 +89,13 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 7:
 				if(labelFlag == FLAGON){
-					tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY);
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
+					}
+					else{
+						tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
+					}
 				}
 				step = 8;
 				break;
@@ -95,8 +110,19 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					/*if(firstComFlag == FLAGOFF){
 						headCom = NULL;
 					}*/
-					node = memAdd(ptrField1,ptrField2,ptrField3);
-					addNode(headCom,headData,node);
+					/*node = memAdd(ptrField1,ptrField2,ptrField3);
+					addNode(headCom,headData,node);*/
+
+
+					if(firstDataNodeAddflag == FLAGOFF){
+						node = memAdd(ptrField1,ptrField2,ptrField3);
+						addNode(headCom,headData,node,FLAGOFF,firstComNodeAddflag);
+						firstDataNodeAddflag = FLAGON;
+					}
+					else{
+						node = memAdd(ptrField1,ptrField2,ptrField3);
+						addNode(headCom,headData,node,FLAGON,firstComNodeAddflag);
+					}
 				}
 
 				DC = DC + node->localDc;
@@ -122,14 +148,30 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 11:
 				if(!strcmp(".extern", ptrField2)){
-					tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);
+					/*tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);*/
+
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
+					}
+					else{
+						tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
+					}
 				}
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
 			case 12:
 				if(labelFlag == FLAGON){
-					tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);
+					/*tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);*/
+
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
+					}
+					else{
+						tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+					}
 				}
 				step = 13;
 				break;
@@ -157,7 +199,25 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					/*if(firstDataFlag == FLAGOFF){
 						headData = NULL;
 					}*/
+
+				/*printf("Start-Filename: %s, Field2: %s\n",filename,ptrField2);
 					addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
+				printf("End-Filename: %s, Field2: %s\n",filename,ptrField2);*/
+
+
+				
+					if(firstComNodeAddflag == FLAGOFF){
+						node = memAdd(ptrField1,ptrField2,ptrField3);
+						addNode(headCom,headData,node,firstDataNodeAddflag,FLAGOFF);
+						firstComNodeAddflag = FLAGON;
+					}
+					else{
+						node = memAdd(ptrField1,ptrField2,ptrField3);
+						addNode(headCom,headData,node,firstDataNodeAddflag,FLAGON);
+					}
+
+
+
 				}
 
 				step = 16;
@@ -172,6 +232,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					endWhileFlag = FLAGON;
 					freeLines(linesHead);
 					freeTable(tableHead);
+					freeMemIm(memImHead);
 				}
 				else{
 					if(headCom != NULL){
@@ -222,6 +283,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				/*printTable(linesHead);*/
 				freeLines(linesHead);
 				freeTable(tableHead);
+				freeMemIm(memImHead);
 				break;
 	
 				
@@ -235,12 +297,16 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 }
 
 
-LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber){
+LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag){
 	LINE_FIELDS_T *ptrLineFields;
 	LINE_FIELDS_T *tmpPtr;
 	static LINE_FIELDS_T *current;
 	static LINE_FIELDS_T *head;
-	static int firstSymbolFlag = 1;
+	/*static int firstSymbolFlag = 1;*/
+	static int firstSymbolFlag;
+	if(firstLineFlag == FLAGON){
+		firstSymbolFlag = 1;
+	}
 	
 
 	tmpPtr = (LINE_FIELDS_T*)calloc(1, sizeof(LINE_FIELDS_T));
@@ -279,6 +345,21 @@ void freeLines(LINE_FIELDS_T* linesPtr){
     LINE_FIELDS_T *current;
 
     temp=linesPtr;
+    while(1){
+        if (temp==NULL){
+            break;
+	}
+	current = temp->next;
+        free(temp);
+        temp=current;
+    }
+}
+
+void freeMemIm(MEMIM* memImHead){
+    MEMIM *temp;
+    MEMIM *current;
+
+    temp=memImHead;
     while(1){
         if (temp==NULL){
             break;

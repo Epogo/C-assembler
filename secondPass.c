@@ -8,21 +8,24 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 
 	LINE_FIELDS_T* currentLine;
 	TABLE_NODE_T* tableTmp;
-	int i,directiveFlag,endWhileFlag,lastLineFlag,labelDetected,step,externalFlag;
+	int i,directiveFlag,endWhileFlag,lastLineFlag,labelDetected,step,externalFlag,firstEntryFlag,errorFlag;
     	SYMBOL_ADD_STRUCT_T *structPtr;
     	SYMBOL_ADD_STRUCT_T *externalCurrent;
     	SYMBOL_ADD_STRUCT_T *externalHead;
-	static int errorFlag = FLAGOFF;
+	/*static int errorFlag = FLAGOFF;*/
+	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	lastLineFlag = FLAGOFF;
 	labelDetected = FLAGOFF;
 	externalFlag = FLAGOFF;
 
+	firstEntryFlag = FLAGON;
+
 	step = 1;
 
 	currentLine = linesHead;
-	
+
 	while(1){
 		switch(step){
 			case 1:
@@ -102,7 +105,17 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				/*if(lastLineFlag == FLAGON){
 					symbolAdd(memImHead,tableHead);
 				}*/
-				structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber);
+
+				if(firstEntryFlag == FLAGON){
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
+					firstEntryFlag = FLAGOFF;
+				}
+				else{
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
+				}
+
+
+				/*structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber);*/
 				
 				step = 8;
 				break;
@@ -136,7 +149,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 10:
 				/*printList(memImHead);*/
-				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF);
+				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag);
 				endWhileFlag = FLAGON;
 				break;
 		}
@@ -148,7 +161,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				
 }
 
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF){
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag){
 	TABLE_NODE_T* tableTmp;
 	SYMBOL_ADD_STRUCT_T* externalTmp;
 	FILE *fptrEntry,*fptrExtern,*fptrObject;
@@ -160,79 +173,81 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 	int ICFminus100;
 
 	ICFminus100 = ICF - 100;
+	
 
-	tmpPtr = (char*)calloc(100, sizeof(char));
-	if(!tmpPtr)
-	{
-		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
-		exit(0);
-	}
-	filenameEntry = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
-
-	entryFlag = FLAGOFF;
-
-	tmpPtr = (char*)calloc(100, sizeof(char));
-	if(!tmpPtr)
-	{
-		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
-		exit(0);
-	}
-	filenameExtern = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
-
-	entryFlag = FLAGOFF;
-	externFlag = FLAGOFF;
-
-	tableTmp = tableHead;
-	while(1){
-		if(tableTmp == NULL){
-			break;
+	if(errorFlag == FLAGOFF){
+		tmpPtr = (char*)calloc(100, sizeof(char));
+		if(!tmpPtr)
+		{
+			printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
+			exit(0);
 		}
-		if(tableTmp->attribute[1] == ENTRY){
-			if(entryFlag == FLAGOFF){
-				strcat(filenameEntry,filename);
-				strcat(filenameEntry,".ent");
-				fptrEntry = fopen(filenameEntry,"w");
-				if(fptrEntry == NULL){
+		filenameEntry = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
+
+		entryFlag = FLAGOFF;
+
+		tmpPtr = (char*)calloc(100, sizeof(char));
+		if(!tmpPtr)
+		{
+			printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
+			exit(0);
+		}
+		filenameExtern = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
+
+		entryFlag = FLAGOFF;
+		externFlag = FLAGOFF;
+
+		tableTmp = tableHead;
+		while(1){
+			if(tableTmp == NULL){
+				break;
+			}
+			if(tableTmp->attribute[1] == ENTRY){
+				if(entryFlag == FLAGOFF){
+					strcat(filenameEntry,filename);
+					strcat(filenameEntry,".ent");
+					fptrEntry = fopen(filenameEntry,"w");
+					if(fptrEntry == NULL){
+						printf("Error... Unable to write to file");
+						exit(0);
+					}
+					entryFlag = FLAGON;
+				}
+				fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value);
+				/*printf("%s %u\n",tableTmp->symbol,tableTmp->value);*/
+			}
+			tableTmp = tableTmp->next;
+		}
+		if(entryFlag == FLAGON){
+			fclose(fptrEntry);
+		}
+
+
+
+		externalTmp = externalHead;
+		while(1){
+			if(externalTmp == NULL){
+				break;
+			}
+
+			if(externFlag == FLAGOFF){
+				strcat(filenameExtern,filename);
+				strcat(filenameExtern,".ext");
+				fptrExtern = fopen(filenameExtern,"w");
+				if(fptrExtern == NULL){
 					printf("Error... Unable to write to file");
 					exit(0);
 				}
-				entryFlag = FLAGON;
+				externFlag = FLAGON;
 			}
-			fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value);
-			/*printf("%s %u\n",tableTmp->symbol,tableTmp->value);*/
+			fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
+
+			externalTmp = externalTmp->next;
 		}
-		tableTmp = tableTmp->next;
-	}
-	if(entryFlag == FLAGON){
-		fclose(fptrEntry);
-	}
-
-
-
-	externalTmp = externalHead;
-	while(1){
-		if(externalTmp == NULL){
-			break;
+		if(externFlag == FLAGON){
+			fclose(fptrExtern);
 		}
-
-		if(externFlag == FLAGOFF){
-			strcat(filenameExtern,filename);
-			strcat(filenameExtern,".ext");
-			fptrExtern = fopen(filenameExtern,"w");
-			if(fptrExtern == NULL){
-				printf("Error... Unable to write to file");
-				exit(0);
-			}
-			externFlag = FLAGON;
-		}
-		fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
-
-		externalTmp = externalTmp->next;
 	}
-	if(externFlag == FLAGON){
-		fclose(fptrExtern);
-	}
-
 
 
 
@@ -246,6 +261,7 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 
 	strcat(filenameObject,filename);
 	strcat(filenameObject,".ob");
+
 	fptrObject = fopen(filenameObject,"w");
 	if(fptrObject == NULL){
 		printf("Error... Unable to write to file");
@@ -254,10 +270,12 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 
 	fprintf(fptrObject,"     %u %u\n",ICFminus100,DCF);
 	printListToFile(memImHead,fptrObject);
-
+	/*freeList(memImHead,fptrObject);*/
 
 	fclose(fptrObject);
 
-
+	if(errorFlag == FLAGON){
+		remove(filenameObject);
+	}
 
 }

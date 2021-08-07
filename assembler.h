@@ -86,8 +86,8 @@ void handleFileContents(FILE *fd, char *filename);
 void storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode, char *filename);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename,int lineNumber);
-TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2);
-LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber);
+TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag);
+LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag);
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead);
 void errorMsg(int error,int lineNumber,char *fieldName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
@@ -103,7 +103,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
 void freeNodes(NODE_T *ptrNode);
 void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF);
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag);
 
 MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);
@@ -113,15 +113,16 @@ char *ascizToBin(int);
 char *decToBinDirW(char*);
 char *decToBinDirH(char*);
 void deleteNode(MEMIM*);
-void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node);
+void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddflag,int firstComNodeAddflag);
 void printList(MEMIM *head);
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
 void symbolAdd(MEMIM*,TABLE_NODE_T*);
-SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber);
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry);
 void printListToFile(MEMIM *head,FILE *fptrObject);
 
+void freeMemIm(MEMIM* memImHead);
 
 
 
