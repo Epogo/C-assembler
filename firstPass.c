@@ -31,6 +31,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	firstLineFlag = FLAGOFF;
 
 	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
+
 	if(strcmp(filename,fileNamePrev)){
 		step = 1;
 		firstDataFlag = FLAGOFF;
@@ -58,7 +59,10 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						break;
 					}
 				}
-				linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber,firstLineFlag);
+				if(errorFlag == FLAGOFF){
+					linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber,firstLineFlag);
+				}
+
 				if(labelFlag == LASTLINE){
 					step = 17;
 				}
@@ -230,9 +234,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 17:
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
-					freeLines(linesHead);
+					/*freeLines(linesHead);
 					freeTable(tableHead);
-					freeMemIm(memImHead);
+					freeMemIm(memImHead);*/
 				}
 				else{
 					if(headCom != NULL){
