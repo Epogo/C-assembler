@@ -25,7 +25,6 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 	step = 1;
 
 	currentLine = linesHead;
-
 	while(1){
 		switch(step){
 			case 1:
@@ -148,8 +147,10 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				step = 10;
 				break;
 			case 10:
+
 				/*printList(memImHead);*/
 				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag);
+
 				endWhileFlag = FLAGON;
 				break;
 		}
@@ -267,9 +268,10 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 		printf("Error... Unable to write to file");
 		exit(0);
 	}
-
 	fprintf(fptrObject,"     %u %u\n",ICFminus100,DCF);
+
 	printListToFile(memImHead,fptrObject);
+
 	/*freeList(memImHead,fptrObject);*/
 
 	fclose(fptrObject);

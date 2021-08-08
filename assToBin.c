@@ -337,7 +337,6 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     if( !(!strcmp(ptrField2,".asciz") || !strcmp(ptrField2,".db") || !strcmp(ptrField2,".dw") || !strcmp(ptrField2,".dh"))   ){
         node->p = NULL;
 	node->next = NULL;
-
     }
 
 
@@ -479,6 +478,7 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddfla
     }
     /*Add a new node the Directives list.*/
     else{
+	/*printf("Head data: %p\n",headData->next);*/
         nodePointer=headData;
         headDc=headData->localDc;
         while(nodePointer->next!=NULL)
@@ -816,14 +816,17 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
     printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
     /*startArr=printArr;*/
     nodePointer=head;
+    /*nodePointerP = head->p;*/
+
     while(nodePointer!=NULL)
     {
         if (nodePointer->next==NULL)
             lastNodeFlag=1;/*Set flag to 1 if the current node is the last node.*/
-        if((nodePointer->p)!=NULL){
+        temp = nodePointer->p;
+        if((temp)!=NULL){
             k=0;
-            while((nodePointer->p)!=NULL){
-                bin=nodePointer->p->byte;
+            while((temp)!=NULL){
+                bin=temp->byte;
                 j=0;
                 for(i=0;i<8;i++){
                     mem[j]=*bin;
@@ -841,9 +844,9 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
                 if (k%8==0){
                     printArr = (char *) realloc(printArr, k+8);
                 }
-                temp=nodePointer->p;
-                nodePointer->p=nodePointer->p->next;
-                free(temp);
+                /*temp=nodePointer->p;*/
+                temp=temp->next;
+                /*free(temp);*/
             }
             inCount=0;
             if (count==0)
@@ -901,6 +904,7 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
         nodePointer=nodePointer->next;
 
     }
+
     /*free(startArr);*/
 }
 

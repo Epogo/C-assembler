@@ -2,7 +2,7 @@
 ;sample source code
 
 
-.entry  Next
+.entry  Nexts
 .extern wNumber	 	
 STR:    .asciz  "aBcd"
 MAIN:   add 	$3,$5,$9

@@ -6,6 +6,28 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
+
+void freeHeadData(MEMIM* node){
+    MEMIM *temp;
+    DATA *tempData;
+
+    temp=node;
+    while(1){
+	temp = node;
+        if (temp==NULL){
+            break;
+	}
+	if(temp->p!=NULL){
+		while(temp->p!=NULL){
+			tempData = temp->p;
+			temp->p = temp->p->next;
+			free(tempData);
+		}
+	}
+	node = node->next;
+    }
+}
+
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename,int lineNumber){
 	static int IC,DC;
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
@@ -94,13 +116,15 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}				
 				break;
 			case 7:
-				if(labelFlag == FLAGON){
-					if(firstSymbolFlag == FLAGOFF){
-						tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
-						firstSymbolFlag = FLAGON;
-					}
-					else{
-						tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
+				if(errorFlag == FLAGOFF){
+					if(labelFlag == FLAGON){
+						if(firstSymbolFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
+							firstSymbolFlag = FLAGON;
+						}
+						else{
+							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
+						}
 					}
 				}
 				step = 8;
@@ -155,30 +179,33 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 				break;
 			case 11:
-				if(!strcmp(".extern", ptrField2)){
-					/*tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);*/
-
-					if(firstSymbolFlag == FLAGOFF){
-						tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGON);
-						firstSymbolFlag = FLAGON;
-					}
-					else{
-						tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
+				if(errorFlag == FLAGOFF){
+					if(!strcmp(".extern", ptrField2)){
+						/*tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);*/
+						if(firstSymbolFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGON);
+							firstSymbolFlag = FLAGON;
+						}
+						else{
+							tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
+						}
 					}
 				}
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
 			case 12:
-				if(labelFlag == FLAGON){
-					/*tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);*/
+				if(errorFlag == FLAGOFF){
+					if(labelFlag == FLAGON){
+						/*tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);*/
 
-					if(firstSymbolFlag == FLAGOFF){
-						tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGON);
-						firstSymbolFlag = FLAGON;
-					}
-					else{
-						tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+						if(firstSymbolFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGON);
+							firstSymbolFlag = FLAGON;
+						}
+						else{
+							tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+						}
 					}
 				}
 				step = 13;
@@ -223,8 +250,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						else{
 							node = memAdd(ptrField1,ptrField2,ptrField3);
 							addNode(headCom,headData,node,firstDataNodeAddflag,FLAGON);
-						}
 
+						}
 					}
 				}
 				step = 16;
@@ -287,11 +314,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				endWhileFlag = FLAGON;
 			
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
+
 				/*printTable(linesHead);*/
 				freeLines(linesHead);
 				freeTable(tableHead);
+				/*freeHeadData(headData);*/
 				freeMemIm(memImHead);
-				break;
 	
 				
 		}
@@ -362,7 +390,7 @@ void freeLines(LINE_FIELDS_T* linesPtr){
     }
 }
 
-void freeMemIm(MEMIM* memImHead){
+/*void freeMemIm(MEMIM* memImHead){
     MEMIM *temp;
     MEMIM *current;
 
@@ -377,7 +405,34 @@ void freeMemIm(MEMIM* memImHead){
 	}
         temp=current;
     }
+}*/
+
+
+void freeMemIm(MEMIM* node){
+    MEMIM *temp;
+    /*DATA *tempData;*/
+
+    temp=node;
+    while(1){
+	temp = node;
+        if (temp==NULL){
+            break;
+	}
+
+	/*if(temp->p!=NULL){
+		while(temp->p!=NULL){
+			tempData = temp->p;
+			temp->p = temp->p->next;
+			printf("tempData: %p\n",tempData);
+			free(tempData);
+		}
+	}*/
+	node = node->next;
+
+        free(temp);
+    }
 }
+
 
 /*void freeLines(LINE_FIELDS_T* linesPtr){
     LINE_FIELDS_T *temp;
