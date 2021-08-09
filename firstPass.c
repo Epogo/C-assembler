@@ -52,7 +52,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	endWhileFlag = FLAGOFF;
 	firstLineFlag = FLAGOFF;
 
-	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
+	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
 
 	if(strcmp(filename,fileNamePrev)){
 		step = 1;
@@ -66,7 +66,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	}
 	strcpy(fileNamePrev,filename);
 
-	/*printf("Filename: %s\n",filename);*/
+	printf("Filename: %s\n",filename);
 
 	while(1){
 		switch(step){
@@ -312,14 +312,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-			
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
 
 				/*printTable(linesHead);*/
-				freeLines(linesHead);
+				/*freeLines(linesHead);*/
+
 				freeTable(tableHead);
+
 				/*freeHeadData(headData);*/
+
 				freeMemIm(memImHead);
+
 	
 				
 		}
@@ -410,24 +413,24 @@ void freeLines(LINE_FIELDS_T* linesPtr){
 
 void freeMemIm(MEMIM* node){
     MEMIM *temp;
-    /*DATA *tempData;*/
+    MEMIM *current;
+    DATA *tempData;
 
-    temp=node;
+    current=node;
     while(1){
-	temp = node;
-        if (temp==NULL){
+	temp = current;
+        if (temp->next==NULL){
             break;
 	}
-
-	/*if(temp->p!=NULL){
-		while(temp->p!=NULL){
+	if(temp->p!=NULL){
+		while(temp->p->next!=NULL){
 			tempData = temp->p;
 			temp->p = temp->p->next;
-			printf("tempData: %p\n",tempData);
 			free(tempData);
 		}
-	}*/
-	node = node->next;
+	}
+
+	current = current->next;
 
         free(temp);
     }

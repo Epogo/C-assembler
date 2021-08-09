@@ -478,13 +478,15 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddfla
     }
     /*Add a new node the Directives list.*/
     else{
-	/*printf("Head data: %p\n",headData->next);*/
+	printf("Head data: %p\n",headData->next);
         nodePointer=headData;
         headDc=headData->localDc;
         while(nodePointer->next!=NULL)
         {
+	    printf("Checkcheck: %p\n",nodePointer->next);
             nodePointer = nodePointer->next;
         }
+	printf("Reached here\n");
         prevDc=nodePointer->dc;
         nodePointer->next=node;
         if (firstDataNodeAddflag==0){
