@@ -73,6 +73,8 @@ void freeFields(FIELD_BUFFER_T *head){
 			break;
 		}
 		current = tmp->next;
+		tmp->field = NULL;
+		free(tmp->field);
 		free(tmp);
 	}
 }
