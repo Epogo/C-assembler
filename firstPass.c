@@ -48,6 +48,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int firstSymbolFlag;
 	static int firstComNodeAddflag;
 	static int firstDataNodeAddflag;
+	static int symbolTableInitFlag;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	firstLineFlag = FLAGOFF;
@@ -63,10 +64,15 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 		firstSymbolFlag = FLAGOFF;
 		firstComNodeAddflag = FLAGOFF;
 		firstDataNodeAddflag = FLAGOFF;
+		symbolTableInitFlag = FLAGOFF;
 	}
 	strcpy(fileNamePrev,filename);
 
 	/*printf("Filename: %s\n",filename);*/
+
+	if(labelFlag == FLAGON){
+		symbolTableInitFlag = FLAGON;
+	}
 
 	while(1){
 		switch(step){
@@ -289,21 +295,23 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 19:
 				tableTmp = tableHead;
-				while(1){
-					/*printf("\nSymbol: %s, Value: %d, Attribute 1: %d\n",tableTmp->symbol,tableTmp->value,tableTmp->attribute[0]);*/
-					if(tableTmp->next == NULL){
-						if(tableTmp->attribute[0] == MYDATA){
-							tableTmp->value = tableTmp->value + ICF;
+				if(symbolTableInitFlag == FLAGON){
+					while(1){
+						/*printf("\nSymbol: %s, Value: %d, Attribute 1: %d\n",tableTmp->symbol,tableTmp->value,tableTmp->attribute[0]);*/
+						if(tableTmp->next == NULL){
+							if(tableTmp->attribute[0] == MYDATA){
+								tableTmp->value = tableTmp->value + ICF;
+							}
+							break;
 						}
-						break;
-					}
-					else{
-						if(tableTmp->attribute[0] == MYDATA){
-							tableTmp->value = tableTmp->value + ICF;
+						else{
+							if(tableTmp->attribute[0] == MYDATA){
+								tableTmp->value = tableTmp->value + ICF;
+							}
+							tableTmp = tableTmp->next;
 						}
-						tableTmp = tableTmp->next;
-					}
 					
+					}
 				}
 				step = 20;
 				break;
@@ -312,13 +320,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead);
+
+				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead,symbolTableInitFlag);
 
 				/*printTable(linesHead);*/
 				/*freeLines(linesHead);*/
-
-				freeTable(tableHead);
-
+				if(symbolTableInitFlag == FLAGON){
+					freeTable(tableHead);
+				}
 				/*freeHeadData(headData);*/
 
 				freeMemIm(memImHead);
@@ -463,6 +472,7 @@ void freeTable(TABLE_NODE_T* tablePtr){
             break;
 	}
         free(temp);
+	temp = NULL;
         tablePtr=tablePtr->next;
     }
 }

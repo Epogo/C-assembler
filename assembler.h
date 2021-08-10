@@ -93,7 +93,7 @@ void manageContents(NODE_T *ptrNode, char *filename);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename,int lineNumber);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag);
-void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead);
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag);
 void errorMsg(int error,int lineNumber,char *fieldName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
 int checkExtraneousChars(NODE_T **current,int *index);
@@ -108,7 +108,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
 void freeNodes(NODE_T *ptrNode);
 void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag);
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag);
 
 MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);

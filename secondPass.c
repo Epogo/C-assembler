@@ -4,7 +4,7 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
-void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead){
+void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag){
 
 	LINE_FIELDS_T* currentLine;
 	TABLE_NODE_T* tableTmp;
@@ -147,9 +147,8 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				step = 10;
 				break;
 			case 10:
-
 				/*printList(memImHead);*/
-				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag);
+				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag,symbolTableInitFlag);
 
 				endWhileFlag = FLAGON;
 				break;
@@ -162,7 +161,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				
 }
 
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag){
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag){
 	TABLE_NODE_T* tableTmp;
 	SYMBOL_ADD_STRUCT_T* externalTmp;
 	FILE *fptrEntry,*fptrExtern,*fptrObject;
@@ -198,31 +197,32 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 		entryFlag = FLAGOFF;
 		externFlag = FLAGOFF;
 
-		tableTmp = tableHead;
-		while(1){
-			if(tableTmp == NULL){
-				break;
-			}
-			if(tableTmp->attribute[1] == ENTRY){
-				if(entryFlag == FLAGOFF){
-					strcat(filenameEntry,filename);
-					strcat(filenameEntry,".ent");
-					fptrEntry = fopen(filenameEntry,"w");
-					if(fptrEntry == NULL){
-						printf("Error... Unable to write to file");
-						exit(0);
-					}
-					entryFlag = FLAGON;
+		if(symbolTableInitFlag == FLAGON){
+			tableTmp = tableHead;
+			while(1){
+				if(tableTmp == NULL){
+					break;
 				}
-				fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value);
-				/*printf("%s %u\n",tableTmp->symbol,tableTmp->value);*/
+				if(tableTmp->attribute[1] == ENTRY){
+					if(entryFlag == FLAGOFF){
+						strcat(filenameEntry,filename);
+						strcat(filenameEntry,".ent");
+						fptrEntry = fopen(filenameEntry,"w");
+						if(fptrEntry == NULL){
+							printf("Error... Unable to write to file");
+							exit(0);
+						}
+						entryFlag = FLAGON;
+					}
+					fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value);
+					/*printf("%s %u\n",tableTmp->symbol,tableTmp->value);*/
+				}
+				tableTmp = tableTmp->next;
 			}
-			tableTmp = tableTmp->next;
+			if(entryFlag == FLAGON){
+				fclose(fptrEntry);
+			}
 		}
-		if(entryFlag == FLAGON){
-			fclose(fptrEntry);
-		}
-
 
 
 		externalTmp = externalHead;
