@@ -47,6 +47,11 @@ typedef struct memoryImage{
     struct memoryImage *next;
 } MEMIM;
 
+typedef struct fieldBuffer{
+    char *field;
+    struct fieldBuffer *next;
+}FIELD_BUFFER_T;
+
 struct node {
 	int lineNumber;
 	char inputChar[MAXLINELEN];
@@ -114,11 +119,9 @@ char *decToBinDirW(char*);
 char *decToBinDirH(char*);
 void deleteNode(MEMIM*);
 void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddflag,int firstComNodeAddflag);
-void printList(MEMIM *head);
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
-void symbolAdd(MEMIM*,TABLE_NODE_T*);
 SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry);
 void printListToFile(MEMIM *head,FILE *fptrObject);
 

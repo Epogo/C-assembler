@@ -28,31 +28,6 @@ char *rComFunct[]={"00001","00010","00011","00100","00101"};/*A list of functs f
 char *rOpCode[]={"000000","000001"};/*A list of opcodes for r commands*/
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};/*A list of opcodes for i commands*/
 char *jOpCode[]={"011110","011111","100000","111111"};/*A list of opcodes for j commands*/
-/*
-int main()
-{
-    MEMIM *headCom,*headData;
-    TABLE_NODE_T *tableHead;
-    int ic=INITIC;
-    tableHead = symbolTable("YU",122,0,0);
-    tableHead = symbolTable("ALL2",187,0,0);
-    tableHead = symbolTable("ALL4",210,0,0);
-    tableHead = symbolTable("YU2",152,0,0);
-    tableHead = symbolTable("ALL6",214,0,0);
-    headCom=memAdd(NULL,"add","$3,$5,$9",tableHead);
-    headData=memAdd(NULL,".asciz","a",tableHead);
-    addNode(headCom,headData,memAdd("YU",".db","2,3",tableHead));
-    addNode(headCom,headData,memAdd("YU","add","$4,$8,$9",tableHead));
-    addNode(headCom,headData,memAdd("ALL2","jmp","$9",tableHead));
-    addNode(headCom,headData,memAdd("ALL3","blt","$4,$5,ALL6",tableHead));
-    addNode(headCom,headData,memAdd("ALL4","bne","$7,$8,ALL4",tableHead));
-    addNode(headCom,headData,memAdd("YU2","add","$4,$8,$9",tableHead));
-    addNode(headCom,headData,memAdd(NULL,"stop",NULL,tableHead));
-    concatNodes(headCom,headData);
-    printList(headCom);
-    deleteNode(headCom);
-    return 0;
-}*/
 
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     int count=0;/*A counter*/
@@ -478,15 +453,12 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddfla
     }
     /*Add a new node the Directives list.*/
     else{
-	printf("Head data: %p\n",headData->next);
         nodePointer=headData;
         headDc=headData->localDc;
         while(nodePointer->next!=NULL)
         {
-	    printf("Checkcheck: %p\n",nodePointer->next);
             nodePointer = nodePointer->next;
         }
-	printf("Reached here\n");
         prevDc=nodePointer->dc;
         nodePointer->next=node;
         if (firstDataNodeAddflag==0){
@@ -508,113 +480,6 @@ void concatNodes(MEMIM *headCom,MEMIM *headData){
             nodePointer = nodePointer->next;
         }
         nodePointer->next=headData;
-}
-
-void printList (MEMIM *head)
-{
-    int i=0;
-    int j=0;/*A counter index.*/
-    int k=0;/*A counter index.*/
-    int count=0;/*A counter index.*/
-    int inCount;/*Inside counter.*/
-    int lastNodeFlag=0;/*A flag which signs.*/
-    /*int bitsNum;*//*An integer which represents a number.*/
-    static int ic=100;/*Instruction counter.*/
-    char *bin;/*Binary number pointer.*/
-    /*char *startArr;*//*Stores the first array.*/
-    char mem[5];/*A temp memory which is used to store regs.*/
-    char* printArr;/*The array which will be printed (represented with hexa chars).*/
-    char hex;/*Hex char*/
-    MEMIM *nodePointer;/*A pointer to a memory image node.*/
-    DATA *temp;/*temporary data node.*/
-    printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
-    /*startArr=printArr;*/
-    nodePointer=head;
-    while(nodePointer!=NULL)
-    {
-        if (nodePointer->next==NULL)
-            lastNodeFlag=1;/*Set flag to 1 if the current node is the last node.*/
-        if((nodePointer->p)!=NULL){
-            k=0;
-            while((nodePointer->p)!=NULL){
-                bin=nodePointer->p->byte;
-                j=0;
-                for(i=0;i<8;i++){
-                    mem[j]=*bin;
-                    if((i+1)%4==0){
-                        mem[4]='\0';
-                        hex=binToHex(mem);
-                        j=0;
-                        printArr[k++]=hex;
-                        bin++;
-                        continue;
-                    }
-                    j++;
-                    bin++;
-                }
-                if (k%8==0){
-                    printArr = (char *) realloc(printArr, k+8);
-                }
-                temp=nodePointer->p;
-                nodePointer->p=nodePointer->p->next;
-                free(temp);
-            }
-            inCount=0;
-            if (count==0)
-                printf("%d ",ic);
-            for(i=0;i<k;i+=2){
-                printf("%c",printArr[i]);
-                printf("%c ",printArr[i+1]);
-                inCount+=2;
-                count+=2;
-                if ((count%8==0)){
-                    printf("\n");
-                    ic+=4;
-                    if ((lastNodeFlag==1)&&(inCount==k))
-                        break;
-                    printf("%d ",ic);
-                    
-                }
-                   
-            }
-        }
-        else
-            {
-            bin=nodePointer->op;
-            k=0;
-            for(i=0;i<32;i++){
-                mem[j]=*bin;
-                if((i+1)%4==0){
-                mem[4]='\0';
-                hex=binToHex(mem);
-                printArr[k]=hex;
-                j=0;
-                bin++;
-                k++;
-                continue;
-                }
-                j++;
-                bin++;
-               
-            }
-            int count=0;
-            printf("%d ",ic);
-            for(k=7;k>0;){
-                count++;
-                printf("%c",printArr[k-1]);
-                printf("%c ",printArr[k]);
-                if (count%8==0){
-                    printf("\n");
-                    printf("%d ",ic);
-                }
-                k-=2;
-            }
-            printf("\n");
-            ic+=4;
-        }
-        nodePointer=nodePointer->next;
-    }
-    /*free(startArr);*/
 }
 
 
@@ -659,61 +524,6 @@ char binToHex(char *bin)
     else
         hex = num+55;
     return hex;
-}
-
-void symbolAdd(MEMIM *head,TABLE_NODE_T* table){
-    char *immJ;
-    char *imm;
-    char *zero="0";
-    MEMIM *currentMem;
-    TABLE_NODE_T *currentTable;
-    currentMem = head;
-    currentTable = table;
-    while(currentMem!=NULL){
-        if(currentMem->missLabelFlag==1){
-            while(currentTable!=NULL){
-                if(!strcmp(currentMem->symbol,currentTable->symbol)){
-                    immJ=decToBinJ(currentTable->value);
-                    strcat(currentMem->op,zero);
-                    strcat(currentMem->op,immJ);
-                    free(immJ);
-                    break;
-                }
-		if(currentTable->next!=NULL){
-                    currentTable=currentTable->next;  
-		}
-		else{
-		    break;
-		}
-            }
-            
-        }
-        else if(currentMem->missLabelFlag==2){
-            while(currentTable!=NULL){
-                if(!strcmp(currentMem->symbol,currentTable->symbol)){
-                    imm=decToBin((currentTable->value)-(currentMem->ic));
-                    strcat(currentMem->op,imm);
-                    free(imm);
-                    break;
-                }
-		if(currentTable->next!=NULL){
-                    currentTable=currentTable->next;  
-		} 
-		else{
-		    break;
-		}
-            }
-            
-        }
-	if(currentMem->next!=NULL){
-            currentMem=currentMem->next; 
-	    currentTable = table; 
-	}
-	else{
-	    break;
-	}
-	
-    }
 }
 
 SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry){

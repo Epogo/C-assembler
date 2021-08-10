@@ -52,7 +52,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	endWhileFlag = FLAGOFF;
 	firstLineFlag = FLAGOFF;
 
-	printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);
+	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
 
 	if(strcmp(filename,fileNamePrev)){
 		step = 1;
@@ -66,7 +66,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	}
 	strcpy(fileNamePrev,filename);
 
-	printf("Filename: %s\n",filename);
+	/*printf("Filename: %s\n",filename);*/
 
 	while(1){
 		switch(step){
@@ -364,9 +364,12 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 		head = ptrLineFields;
 	}
 
-	strcpy(ptrLineFields->label,ptrField1);
-	strcpy(ptrLineFields->comOrDir,ptrField2);
-	strcpy(ptrLineFields->values,ptrField3);
+	if(ptrField1 != NULL)
+		strcpy(ptrLineFields->label,ptrField1);
+	if(ptrField2 != NULL)
+		strcpy(ptrLineFields->comOrDir,ptrField2);
+	if(ptrField3 != NULL)
+		strcpy(ptrLineFields->values,ptrField3);
 	ptrLineFields->labelFlag = labelFlag;
 	ptrLineFields->lineNumber = lineNumber;
 	ptrLineFields->next = NULL;

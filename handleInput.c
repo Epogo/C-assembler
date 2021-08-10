@@ -76,10 +76,11 @@ void freeNodes(NODE_T *ptrNode){
     /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
         temp=current;
-        if (temp==NULL){
+        if (temp->next==NULL){
             break;
 	}
         current=current->next;
-        /*free(temp);*/
+	/*printf("Check: %c\n",temp->inputChar[0]);
+        free(temp);*/
     }
 }
