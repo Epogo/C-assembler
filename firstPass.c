@@ -457,8 +457,9 @@ void freeMemIm(MEMIM* node){
         if (temp==NULL){
             break;
 	}
-        free(temp);
         linesPtr=linesPtr->next;
+        free(temp);
+	temp = NULL;
     }
 }*/
 
@@ -471,8 +472,8 @@ void freeTable(TABLE_NODE_T* tablePtr){
         if (temp==NULL){
             break;
 	}
+        tablePtr=tablePtr->next;
         free(temp);
 	temp = NULL;
-        tablePtr=tablePtr->next;
     }
 }
