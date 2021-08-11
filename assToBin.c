@@ -39,10 +39,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *token;/*A pointer to a token*/
     char *reg;/*A char pointer to a register*/
     char opString[NUM_OF_BITS_OP];/*Operation string*/
-    char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
+    /*char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));*//*Memory allocation for immediate value (16 bits).*/
+    char *imm;
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
     char *immJ;
-    char *immPointer;
+    /*char *immPointer;*/
     char *registers[3];/*An array of pointers of registers.*/
     char *opStrPoint;/*A pointer to a Operation string.*/
     char *binNum,*binNumStart;/*Binary number pointer& A pointer to the the first byte.*/
@@ -65,6 +66,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     for(i=0;i<RCOMLEN;i++){
         if(!strcmp(ptrField2,rCommands[i])){
             comFlag=1;
+	    node->p = NULL;
             while( token != NULL ) {
                     reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
                     registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
@@ -111,13 +113,14 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
         for(i=0;i<ICOMLEN;i++){
             if(!strcmp(ptrField2,iCommands[i])){
                 comFlag=1;
+	        node->p = NULL;
                 if(i<5||i>8){
                     while( token != NULL ) {
                             if (count==1)
                             {
                                 registers[count]=NULL;
-				immPointer=decToBin(atoi(token));
-                                strcpy(imm,immPointer);
+				imm=decToBin(atoi(token));
+                                /*strcpy(imm,immPointer);*/
                                 count++;
                                 token = strtok(NULL, s);
                                 continue;
@@ -140,7 +143,6 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                         }
                         strcat(opStrPoint,imm);
                         free(imm);
-			free(immPointer);
                 }
                 else{
                     while( token != NULL ) {
@@ -164,8 +166,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                             strcat(opStrPoint,registers[j]);
                             free(registers[j]);
                         }
-                    strcat(opStrPoint,imm);
-                    free(imm);
+                    /*strcat(opStrPoint,imm);
+                    free(imm);*/
                 }
                 break;
             }    
@@ -177,6 +179,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
         for(i=0;i<JCOMLEN;i++){
             if(!strcmp(ptrField2,jCommands[i])){
                 comFlag=1;
+	        node->p = NULL;
                 if (i<3){
                     strcpy(opStrPoint,jOpCode[i]);
                     /*If the second field is a label field*/
@@ -249,7 +252,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                 temp=newNode;/*Set the temp node to point on the newNode.*/
             }
             node->localDc=dataCounter;
-            newNode->next=NULL;
+            /*newNode->next=NULL;*/
         }
     }
     
@@ -321,7 +324,6 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
         node->p = NULL;
 	node->next = NULL;
     }
-
 
 
 

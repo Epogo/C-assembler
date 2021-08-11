@@ -161,9 +161,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							addNode(headCom,headData,node,FLAGON,firstComNodeAddflag);
 						}
 					}
-				}
 
-				DC = DC + node->localDc;
+					DC = DC + node->localDc;
+				}
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;

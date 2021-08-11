@@ -225,7 +225,6 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 			}
 		}
 
-	printf("Reached1\n");
 		if(externalFlag == FLAGON){
 
 			externalTmp = externalHead;
@@ -233,29 +232,21 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 				if(externalTmp == NULL){
 					break;
 				}
-		printf("Reached2\n");
 
 				if(externFlag == FLAGOFF){
-		printf("Reached21\n");
 					strcat(filenameExtern,filename);
-		printf("Reached22\n");
 					strcat(filenameExtern,".ext");
-		printf("Reached23\n");
 					fptrExtern = fopen(filenameExtern,"w");
-		printf("Reached3\n");
 					if(fptrExtern == NULL){
 						printf("Error... Unable to write to file");
 						exit(0);
 					}
-		printf("Reached4\n");
+
 					externFlag = FLAGON;
 				}
-		printf("Reached45\n");
 				fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
-		printf("Reached5\n");
 
 				externalTmp = externalTmp->next;
-		printf("Reached6\n");
 			}
 			if(externFlag == FLAGON){
 				fclose(fptrExtern);
