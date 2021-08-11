@@ -108,7 +108,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
 void freeNodes(NODE_T *ptrNode);
 void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag);
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag);
 
 MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);

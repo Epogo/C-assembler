@@ -41,6 +41,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char opString[NUM_OF_BITS_OP];/*Operation string*/
     char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));/*Memory allocation for immediate value (16 bits).*/
     char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
+    char *immJ;
+    char *immPointer;
     char *registers[3];/*An array of pointers of registers.*/
     char *opStrPoint;/*A pointer to a Operation string.*/
     char *binNum,*binNumStart;/*Binary number pointer& A pointer to the the first byte.*/
@@ -73,7 +75,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
 
                         count++;
                         continue;
-                    };
+                    }
                     strcpy(registers[count],reg);
                     free(reg);
                     token = strtok(NULL, s);/*Continue to loop over the tokens until the token is null*/
@@ -114,7 +116,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                             if (count==1)
                             {
                                 registers[count]=NULL;
-                                strcpy(imm,decToBin(atoi(token)));
+				immPointer=decToBin(atoi(token));
+                                strcpy(imm,immPointer);
                                 count++;
                                 token = strtok(NULL, s);
                                 continue;
@@ -137,6 +140,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                         }
                         strcat(opStrPoint,imm);
                         free(imm);
+			free(immPointer);
                 }
                 else{
                     while( token != NULL ) {
@@ -190,9 +194,13 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                 }
                 else{
                     strcpy(opStrPoint,jOpCode[i]);/*Copy the immediate for the suitable J-COMMAND*/
-                    strcpy(immStop,decToBinJ(0));/*Copy the immediate 0 to repr*/
+		    immJ=decToBinJ(0);
+                    strcpy(immStop,immJ);/*Copy the immediate 0 to repr*/
                     strcat(immStop,zero);
                     strcat(opStrPoint,immStop);
+		    free(immJ);
+		    free(immStop);
+		    
                 }
                 break;
             }
@@ -318,8 +326,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
 
 
     strcpy(node->op,opString);/*Copy the opString to the operation field in the node's structure*/
-    return node;/*Return the updated node.*/
     free(lineStr);/*Free the line string*/
+    return node;/*Return the updated node.*/
 }
 
 char *Registers(char *reg)
@@ -336,11 +344,6 @@ char *Registers(char *reg)
     }
     temp++;
     num=atoi(temp);/*Convert a temp char string to a integer number.*/
-    if (num>31)
-    {
-        printf("Error: register can be Ri, with i=0,1,...,31\n");
-        exit(EXIT_FAILURE);
-    }
     str[5]='\0';
     j=4;
     while (j>=0)

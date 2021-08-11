@@ -148,7 +148,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 10:
 				/*printList(memImHead);*/
-				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag,symbolTableInitFlag);
+				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
 
 				endWhileFlag = FLAGON;
 				break;
@@ -161,7 +161,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				
 }
 
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag){
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag){
 	TABLE_NODE_T* tableTmp;
 	SYMBOL_ADD_STRUCT_T* externalTmp;
 	FILE *fptrEntry,*fptrExtern,*fptrObject;
@@ -219,37 +219,49 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 				}
 				tableTmp = tableTmp->next;
 			}
+
 			if(entryFlag == FLAGON){
 				fclose(fptrEntry);
 			}
 		}
 
+	printf("Reached1\n");
+		if(externalFlag == FLAGON){
 
-		externalTmp = externalHead;
-		while(1){
-			if(externalTmp == NULL){
-				break;
-			}
-
-			if(externFlag == FLAGOFF){
-				strcat(filenameExtern,filename);
-				strcat(filenameExtern,".ext");
-				fptrExtern = fopen(filenameExtern,"w");
-				if(fptrExtern == NULL){
-					printf("Error... Unable to write to file");
-					exit(0);
+			externalTmp = externalHead;
+			while(1){
+				if(externalTmp == NULL){
+					break;
 				}
-				externFlag = FLAGON;
-			}
-			fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
+		printf("Reached2\n");
 
-			externalTmp = externalTmp->next;
-		}
-		if(externFlag == FLAGON){
-			fclose(fptrExtern);
+				if(externFlag == FLAGOFF){
+		printf("Reached21\n");
+					strcat(filenameExtern,filename);
+		printf("Reached22\n");
+					strcat(filenameExtern,".ext");
+		printf("Reached23\n");
+					fptrExtern = fopen(filenameExtern,"w");
+		printf("Reached3\n");
+					if(fptrExtern == NULL){
+						printf("Error... Unable to write to file");
+						exit(0);
+					}
+		printf("Reached4\n");
+					externFlag = FLAGON;
+				}
+		printf("Reached45\n");
+				fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
+		printf("Reached5\n");
+
+				externalTmp = externalTmp->next;
+		printf("Reached6\n");
+			}
+			if(externFlag == FLAGON){
+				fclose(fptrExtern);
+			}
 		}
 	}
-
 
 
 	tmpPtr = (char*)calloc(100, sizeof(char));
