@@ -91,7 +91,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 	char *ptrCodeChecked;
 	char *ptrDataChecked;
 	FIELD_BUFFER_T *headFields;
-	/*char NULL[1];*/
+	/*char NULL[1];*/ 
 
 	enum status state;
 
