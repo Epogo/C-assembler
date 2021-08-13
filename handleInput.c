@@ -68,6 +68,7 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 		
 }
 
+
 void freeNodes(NODE_T *ptrNode){
     NODE_T *temp;/*A temp node which will be deleted from the linked list*/
     NODE_T *current;/*A temp node which will be deleted from the linked list*/
@@ -76,11 +77,14 @@ void freeNodes(NODE_T *ptrNode){
     /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
         temp=current;
-        if (temp->next==NULL){
+
+        current=current->next;
+	
+        free(temp);
+	if (current==NULL){
             break;
 	}
-        current=current->next;
-	/*printf("Check: %c\n",temp->inputChar[0]);
-        free(temp);*/
     }
 }
+
+

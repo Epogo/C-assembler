@@ -331,7 +331,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead,symbolTableInitFlag);
 
 				/*printTable(linesHead);*/
-				/*freeLines(linesHead);*/
+				freeLines(linesHead);
 				if(symbolTableInitFlag == FLAGON){
 					freeTable(tableHead);
 				}
@@ -397,18 +397,22 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 
 }
 
+
 void freeLines(LINE_FIELDS_T* linesPtr){
     LINE_FIELDS_T *temp;
     LINE_FIELDS_T *current;
 
-    temp=linesPtr;
+    current=linesPtr;
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
-        if (temp==NULL){
+        temp=current;
+
+        current=current->next;
+	
+        free(temp);
+	if (current==NULL){
             break;
 	}
-	current = temp->next;
-        free(temp);
-        temp=current;
     }
 }
 
@@ -430,6 +434,45 @@ void freeLines(LINE_FIELDS_T* linesPtr){
 }*/
 
 
+/*void freeMemIm(MEMIM* node){
+    MEMIM *temp;
+    MEMIM *current;
+    DATA *tempData;
+
+    current=node;
+
+    if(current!=NULL){
+	    while(1){
+		temp = current;
+		if (temp->next==NULL){
+		    free(temp);
+		    break;
+		}
+		if(temp->p!=NULL){
+
+			while(1){
+				tempData = temp->p;
+				if(temp->p->next==NULL){
+					free(tempData);
+					break;
+				}
+				temp->p = temp->p->next;
+				free(tempData);
+			}
+		}
+
+		current = temp->next;
+
+		free(temp);
+	    }
+    }
+}*/
+
+
+
+
+
+
 void freeMemIm(MEMIM* node){
     MEMIM *temp;
     MEMIM *current;
@@ -438,9 +481,7 @@ void freeMemIm(MEMIM* node){
     current=node;
     while(1){
 	temp = current;
-        if (temp->next==NULL){
-            break;
-	}
+
 	if(temp->p!=NULL){
 		/*while(temp->p->next!=NULL){
 			tempData = temp->p;
@@ -461,23 +502,12 @@ void freeMemIm(MEMIM* node){
 	current = current->next;
 
         free(temp);
+	
+	if (current==NULL)
+		break;
     }
 }
 
-
-/*void freeLines(LINE_FIELDS_T* linesPtr){
-    LINE_FIELDS_T *temp;
-
-    while(1){
-        temp=linesPtr;
-        if (temp==NULL){
-            break;
-	}
-        linesPtr=linesPtr->next;
-        free(temp);
-	temp = NULL;
-    }
-}*/
 
 void freeTable(TABLE_NODE_T* tablePtr){
     TABLE_NODE_T *temp;/*A temp node which will be deleted from the linked list*/

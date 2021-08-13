@@ -9,16 +9,20 @@ void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
     SYMBOL_ADD_STRUCT_T *temp;
     SYMBOL_ADD_STRUCT_T *current;
 
-    temp=headStructPtr;
+    current=headStructPtr;
+    /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
-        if (temp==NULL){
+        temp=current;
+
+        current=current->next;
+	
+        free(temp);
+	if (current==NULL){
             break;
 	}
-	current = temp->next;
-        free(temp);
-        temp=current;
     }
 }
+
 
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag){
 
@@ -28,8 +32,6 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
     	SYMBOL_ADD_STRUCT_T *structPtr;
     	SYMBOL_ADD_STRUCT_T *headStructPtr;
     	SYMBOL_ADD_STRUCT_T *currentStructPtr;
-    	SYMBOL_ADD_STRUCT_T *externalCurrent;
-    	SYMBOL_ADD_STRUCT_T *externalHead;
 	/*static int errorFlag = FLAGOFF;*/
 	errorFlag = FLAGOFF;
 	directiveFlag = FLAGOFF;
@@ -144,7 +146,8 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 8:
 				if(structPtr->externalFlag == FLAGON){
-					if(externalFlag == FLAGOFF){
+					externalFlag = FLAGON;
+					/*if(externalFlag == FLAGOFF){
 						externalHead = structPtr;
 						externalCurrent = externalHead;
 						externalCurrent->next = NULL;
@@ -154,7 +157,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 						externalCurrent->next = structPtr;
 						externalCurrent = externalCurrent->next;
 						externalCurrent->next = NULL;	
-					}
+					}*/
 				}
 				if(lastLineFlag == FLAGON){
 					step = 9;
@@ -172,7 +175,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 10:
 				/*printList(memImHead);*/
-				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
+				createOutputFiles(memImHead,tableHead,filename,headStructPtr,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
 
 				freeSymbolAddNewStruct(headStructPtr);
 
@@ -187,9 +190,9 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				
 }
 
-void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag){
+void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *headStructPtr, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag){
 	TABLE_NODE_T* tableTmp;
-	SYMBOL_ADD_STRUCT_T* externalTmp;
+	SYMBOL_ADD_STRUCT_T* tmpStructPtr;
 	FILE *fptrEntry,*fptrExtern,*fptrObject;
 	int entryFlag,externFlag;
 	char *filenameEntry;
@@ -251,7 +254,7 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 			}
 		}
 
-		if(externalFlag == FLAGON){
+		/*if(externalFlag == FLAGON){
 
 			externalTmp = externalHead;
 			while(1){
@@ -277,7 +280,37 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 			if(externFlag == FLAGON){
 				fclose(fptrExtern);
 			}
+		}*/
+
+		if(externalFlag == FLAGON){
+
+			tmpStructPtr = headStructPtr;
+			while(1){
+				if(tmpStructPtr == NULL){
+					break;
+				}
+				if(tmpStructPtr->externalFlag == FLAGON){
+					if(externFlag == FLAGOFF){
+						strcat(filenameExtern,filename);
+						strcat(filenameExtern,".ext");
+						fptrExtern = fopen(filenameExtern,"w");
+						if(fptrExtern == NULL){
+							printf("Error... Unable to write to file");
+							exit(0);
+						}
+
+						externFlag = FLAGON;
+					}
+					fprintf(fptrExtern,"%s 0%u\n",tmpStructPtr->label,tmpStructPtr->address);
+				}
+				tmpStructPtr = tmpStructPtr->next;
+			}
+			if(externFlag == FLAGON){
+				fclose(fptrExtern);
+			}
 		}
+		free(filenameEntry);
+		free(filenameExtern);
 	}
 
 
@@ -308,5 +341,7 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 	if(errorFlag == FLAGON){
 		remove(filenameObject);
 	}
+
+	free(filenameObject);
 
 }

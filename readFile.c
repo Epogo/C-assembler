@@ -8,16 +8,22 @@ void readFile(int argc, char** argv){
 	char *filename;
 	char *tmpPtr;
 
-	tmpPtr = (char*)calloc(100, sizeof(char));
-	if(!tmpPtr)
-	{
-		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
-		exit(0);
-	}
-	filename = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
-
 	
 	for(i=1; i<argc; i++){
+
+
+
+		tmpPtr = (char*)calloc(100, sizeof(char));
+		if(!tmpPtr)
+		{
+			printf("\nError! memory not allocated.");
+			exit(0);
+		}
+		filename = tmpPtr; 
+
+
+
+
 		fileNames = argv; 
 		/*fileNames[i][strlen(fileNames[i])-strlen(".as")] = '\0';*/
 		/*printf("%s \n",fileNames[i]);*/
@@ -43,6 +49,6 @@ void readFile(int argc, char** argv){
 
 		fclose(fd);
 
-		/*free(filename);*/
+		free(filename);
 	}
 }
