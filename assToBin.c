@@ -41,7 +41,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char opString[NUM_OF_BITS_OP];/*Operation string*/
     /*char *imm=(char *)calloc(NUM_OF_BITS_IMM, sizeof(char));*//*Memory allocation for immediate value (16 bits).*/
     char *imm;
-    char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));/*Memory allocation for immediate value (26 bits).*/
+    /*char *immStop=(char *)calloc(NUM_OF_BITS_IMM_STOP, sizeof(char));*//*Memory allocation for immediate value (26 bits).*/
     char *immJ;
     /*char *immPointer;*/
     char *registers[3];/*An array of pointers of registers.*/
@@ -76,6 +76,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                         strcpy(registers[count],emptyReg);/*Set the suitable register to zero.*/
 
                         count++;
+			free(reg);
                         continue;
                     }
                     strcpy(registers[count],reg);
@@ -198,11 +199,13 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                 else{
                     strcpy(opStrPoint,jOpCode[i]);/*Copy the immediate for the suitable J-COMMAND*/
 		    immJ=decToBinJ(0);
-                    strcpy(immStop,immJ);/*Copy the immediate 0 to repr*/
+                    /*strcpy(immStop,immJ);
                     strcat(immStop,zero);
-                    strcat(opStrPoint,immStop);
+                    strcat(opStrPoint,immStop);*/
+		    strcat(immJ,zero);
+		    strcat(opStrPoint,immJ);
 		    free(immJ);
-		    free(immStop);
+		    /*free(immStop);*/
 		    
                 }
                 break;
@@ -374,7 +377,7 @@ char *decToBin(int num)
 char *decToBinJ(int num)
 {
     unsigned int i;
-    char *str=(char*)malloc(26);/*Allocate memory for a binary immediate representation*/
+    char *str=(char*)malloc(26+1);/*Allocate memory for a binary immediate representation*/
     for(i=0; i<25; i++)
     {
       unsigned int mask = 1 << (25 - 1 - i);/*Implement a mask in order to turn on appropriate bits*/
@@ -624,14 +627,14 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
     /*static int ic=100;*//*Instruction counter.*/
     int ic=100;
     char *bin;/*Binary number pointer.*/
-    /*char *startArr;*//*Stores the first array.*/
+    char *startArr;/*Stores the first array.*/
     char mem[5];/*A temp memory which is used to store regs.*/
     char* printArr;/*The array which will be printed (represented with hexa chars).*/
     char hex;/*Hex char*/
     MEMIM *nodePointer;/*A pointer to a memory image node.*/
     DATA *temp;/*temporary data node.*/
     printArr=(char *) malloc(8);/*Memory allocation for the first array.*/
-    /*startArr=printArr;*/
+    startArr=printArr;
     nodePointer=head;
     /*nodePointerP = head->p;*/
 
@@ -660,6 +663,7 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
                 }
                 if (k%8==0){
                     printArr = (char *) realloc(printArr, k+8);
+		    startArr = printArr;
                 }
                 /*temp=nodePointer->p;*/
                 temp=temp->next;
@@ -722,7 +726,7 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
 
     }
 
-    /*free(startArr);*/
+    free(startArr);
 }
 
 

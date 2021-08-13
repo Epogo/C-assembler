@@ -4,12 +4,30 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
+
+void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
+    SYMBOL_ADD_STRUCT_T *temp;
+    SYMBOL_ADD_STRUCT_T *current;
+
+    temp=headStructPtr;
+    while(1){
+        if (temp==NULL){
+            break;
+	}
+	current = temp->next;
+        free(temp);
+        temp=current;
+    }
+}
+
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag){
 
 	LINE_FIELDS_T* currentLine;
 	TABLE_NODE_T* tableTmp;
 	int i,directiveFlag,endWhileFlag,lastLineFlag,labelDetected,step,externalFlag,firstEntryFlag,errorFlag;
     	SYMBOL_ADD_STRUCT_T *structPtr;
+    	SYMBOL_ADD_STRUCT_T *headStructPtr;
+    	SYMBOL_ADD_STRUCT_T *currentStructPtr;
     	SYMBOL_ADD_STRUCT_T *externalCurrent;
     	SYMBOL_ADD_STRUCT_T *externalHead;
 	/*static int errorFlag = FLAGOFF;*/
@@ -108,9 +126,15 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				if(firstEntryFlag == FLAGON){
 					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
 					firstEntryFlag = FLAGOFF;
+					headStructPtr = structPtr;
+					headStructPtr->next = NULL;
+					currentStructPtr = headStructPtr;
 				}
 				else{
 					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
+					currentStructPtr->next = structPtr;
+					currentStructPtr = currentStructPtr->next;
+					currentStructPtr->next = NULL;
 				}
 
 
@@ -149,6 +173,8 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 			case 10:
 				/*printList(memImHead);*/
 				createOutputFiles(memImHead,tableHead,filename,externalHead,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
+
+				freeSymbolAddNewStruct(headStructPtr);
 
 				endWhileFlag = FLAGON;
 				break;

@@ -150,6 +150,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						/*node = memAdd(ptrField1,ptrField2,ptrField3);
 						addNode(headCom,headData,node);*/
 
+						/*if(firstComFlag == FLAGOFF){
+							headCom = NULL;
+						}*/
 
 						if(firstDataNodeAddflag == FLAGOFF){
 							node = memAdd(ptrField1,ptrField2,ptrField3);
@@ -246,6 +249,10 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
 					printf("End-Filename: %s, Field2: %s\n",filename,ptrField2);*/
 
+
+						/*if(firstDataFlag == FLAGOFF){
+							headData = NULL;
+						}*/
 
 				
 						if(firstComNodeAddflag == FLAGOFF){
@@ -435,8 +442,17 @@ void freeMemIm(MEMIM* node){
             break;
 	}
 	if(temp->p!=NULL){
-		while(temp->p->next!=NULL){
+		/*while(temp->p->next!=NULL){
 			tempData = temp->p;
+			temp->p = temp->p->next;
+			free(tempData);
+		}*/
+		while(1){
+			tempData = temp->p;
+			if(temp->p->next==NULL){
+				free(tempData);
+				break;
+			}
 			temp->p = temp->p->next;
 			free(tempData);
 		}
