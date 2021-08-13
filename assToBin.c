@@ -543,6 +543,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
     /*static int firstEntry = FLAGON;*/
     SYMBOL_ADD_STRUCT_T *tmpPtr;
     SYMBOL_ADD_STRUCT_T *structPtr;
+    int labelFoundFlag = FLAGOFF;
 
     tmpPtr = (SYMBOL_ADD_STRUCT_T*)calloc(1, sizeof(SYMBOL_ADD_STRUCT_T));
     if(!tmpPtr)
@@ -564,6 +565,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
         if(currentMem->missLabelFlag==1){
             while(currentTable!=NULL){
                 if(!strcmp(currentMem->symbol,currentTable->symbol)){
+		    labelFoundFlag = FLAGON;
 		    if(currentTable->attribute[0] == EXTERNAL){
 			structPtr->address = currentMem->ic;
 			strcpy(structPtr->label,currentMem->symbol);
@@ -583,11 +585,21 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
 		    break;
 		}
             }
+	    if(labelFoundFlag == FLAGOFF){
+		structPtr->errorFlag = FLAGON;
+		printf("Label \"%s\" not found!\n",currentMem->symbol);
+	    }
             
         }
         else if(currentMem->missLabelFlag==2){
             while(currentTable!=NULL){
                 if(!strcmp(currentMem->symbol,currentTable->symbol)){
+		    labelFoundFlag = FLAGON;
+		    if(currentTable->attribute[0] == EXTERNAL){
+			structPtr->errorFlag = FLAGON;
+			printf("External label \"%s\" used for conditional branching!\n",currentMem->symbol);
+			break;
+		    }
                     imm=decToBin((currentTable->value)-(currentMem->ic));
                     strcat(currentMem->op,imm);
                     free(imm);
@@ -600,6 +612,10 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
 		    break;
 		}
             }
+	    if(labelFoundFlag == FLAGOFF){
+		structPtr->errorFlag = FLAGON;
+		printf("Label \"%s\" not found!\n",currentMem->symbol);
+	    }
             
         }
 	if(currentMem->next!=NULL){
@@ -621,6 +637,7 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
     int j=0;/*A counter index.*/
     int k=0;/*A counter index.*/
     int count=0;/*A counter index.*/
+    int comCount;
     int inCount;/*Inside counter.*/
     int lastNodeFlag=0;/*A flag which signs.*/
     /*int bitsNum;*//*An integer which represents a number.*/
@@ -707,13 +724,13 @@ void printListToFile (MEMIM *head,FILE *fptrObject)
                 bin++;
                
             }
-            int count=0;
+            comCount=0;
             fprintf(fptrObject,"0%d ",ic);
             for(k=7;k>0;){
-                count++;
+                comCount++;
                 fprintf(fptrObject,"%c",printArr[k-1]);
                 fprintf(fptrObject,"%c ",printArr[k]);
-                if (count%8==0){
+                if (comCount%8==0){
                     fprintf(fptrObject,"\n");
                     fprintf(fptrObject,"0%d ",ic);
                 }

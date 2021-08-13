@@ -124,7 +124,6 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				/*if(lastLineFlag == FLAGON){
 					symbolAdd(memImHead,tableHead);
 				}*/
-
 				if(firstEntryFlag == FLAGON){
 					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
 					firstEntryFlag = FLAGOFF;
@@ -139,10 +138,16 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 					currentStructPtr->next = NULL;
 				}
 
-
-				/*structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber);*/
+				if(structPtr->errorFlag == FLAGON){
+					errorFlag = FLAGON;
+					currentLine = currentLine->next;
+					step = 1;
+				}
+				else{
+					step = 8;
+				}
 				
-				step = 8;
+							
 				break;
 			case 8:
 				if(structPtr->externalFlag == FLAGON){
