@@ -91,6 +91,16 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 6:
 				tableTmp = tableHead;
+				while(tableTmp!=NULL){
+					if((!strcmp(tableTmp->symbol,currentLine->values)) && (tableTmp->attribute[0] == EXTERNAL)){
+						printf("Line %u: Entry label \"%s\" defined also as external!\n",currentLine->lineNumber,currentLine->values);
+						errorFlag = FLAGON;
+						break;
+					}
+					tableTmp = tableTmp->next;
+				}
+
+				tableTmp = tableHead;
 				while(1){
 					if(tableTmp->next == NULL){
 						if(!strcmp(currentLine->values,tableTmp->symbol)){

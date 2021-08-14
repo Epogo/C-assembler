@@ -30,10 +30,12 @@ void readFile(int argc, char** argv){
 
 		if(!(fd = fopen(fileNames[i], "r"))){
 			printf("Cannot open file \n"); /*if the file cannot be opened, print error message and exit program*/
+			free(filename);
 			continue;
 		}
 		if(!((fileNames[i][strlen(fileNames[i])-3] == '.') && (fileNames[i][strlen(fileNames[i])-2] == 'a') && (fileNames[i][strlen(fileNames[i])-1] == 's'))){
 			printf("File \"%s\" must be assembly file (.as) \n",fileNames[i]);
+			free(filename);
 			continue;
 		}
 

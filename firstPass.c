@@ -111,7 +111,18 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							firstSymbolFlag = FLAGON;
 						}
 						else{
-							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
+							tableTmp = tableHead;
+							while(tableTmp!=NULL){
+                						if(!strcmp(tableTmp->symbol,ptrField1)){
+									printf("Line %u: Label \"%s\" already defined previously!\n",lineNumber,ptrField1);
+									errorFlag = FLAGON;
+									break;
+								}
+								tableTmp = tableTmp->next;
+							}
+							if(errorFlag == FLAGOFF){
+								tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
+							}
 						}
 					}
 				}
@@ -178,7 +189,18 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							firstSymbolFlag = FLAGON;
 						}
 						else{
-							tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
+							tableTmp = tableHead;
+							while(tableTmp!=NULL){
+                						if((!strcmp(tableTmp->symbol,ptrField3)) && (tableTmp->attribute[0] != EXTERNAL)){
+									printf("Line %u: Label \"%s\" already defined previously not as external!\n",lineNumber,ptrField3);
+									errorFlag = FLAGON;
+									break;
+								}
+								tableTmp = tableTmp->next;
+							}
+							if(errorFlag == FLAGOFF){
+								tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
+							}
 						}
 					}
 				}
@@ -195,7 +217,18 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							firstSymbolFlag = FLAGON;
 						}
 						else{
-							tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+							tableTmp = tableHead;
+							while(tableTmp!=NULL){
+                						if(!strcmp(tableTmp->symbol,ptrField1)){
+									printf("Line %u: Label \"%s\" already defined previously!\n",lineNumber,ptrField1);
+									errorFlag = FLAGON;
+									break;
+								}
+								tableTmp = tableTmp->next;
+							}
+							if(errorFlag == FLAGOFF){
+								tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+							}
 						}
 					}
 				}

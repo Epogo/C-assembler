@@ -53,8 +53,8 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *one="100000000000000000000";/*In case of J command with reg.*/
     char *null="00000000";/*NULL terminator.*/
     DATA *temp;/*A Temporary pointer.*/
-    MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
-    /*MEMIM *node=(MEMIM *)calloc(1,sizeof(MEMIM));*//*Memory allocation for memory image node.*/
+    /*MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));*//*Memory allocation for memory image node.*/
+    MEMIM *node=(MEMIM *)calloc(1,sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *newNode;/*An adress of a new node.*/
     lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     opStrPoint=opString;
