@@ -19,6 +19,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 			while(ptrData[index] != '"'){
 				if(ptrData[index] == '\0' || ptrData[index] == '\n'){
 					errorMsg(17,lineNumber,NULL);
+					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
 				}
@@ -36,6 +37,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 				else{
 					printf("My Data: %c\n",ptrData[index]);
 					errorMsg(9,lineNumber,NULL);
+					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
 				}
@@ -45,6 +47,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 		}
 		else{
 			errorMsg(16,lineNumber,NULL);
+			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
 		}
@@ -55,6 +58,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 		}
 		if(ptrData[index] == '\0' || ptrData[index] == '\n'){
 			errorMsg(22,lineNumber,NULL);
+			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
 		}
@@ -66,6 +70,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 				if(ptrData[index-1] == '-' || ptrData[index-1] == '+'){
 					if(!(ptrData[index] >= '0' && ptrData[index] <= '9')){
 						errorMsg(19,lineNumber,NULL);
+						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
@@ -91,6 +96,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 					}
 					else{
 						errorMsg(10,lineNumber,NULL);
+						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
@@ -101,11 +107,13 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 					}
 					else if(ptrData[index] == ','){
 						errorMsg(6,lineNumber,NULL);
+						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
 					else if(ptrData[index] == '\0' || ptrData[index] == '\n'){
 						errorMsg(9,lineNumber,NULL);
+						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
@@ -116,6 +124,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 			}
 			else{
 				errorMsg(18,lineNumber,NULL);
+				free(ptrDataChecked);
 				ptrDataChecked = NULL;
 				return ptrDataChecked;
 			} 

@@ -7,27 +7,6 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
 
-void freeHeadData(MEMIM* node){
-    MEMIM *temp;
-    DATA *tempData;
-
-    temp=node;
-    while(1){
-	temp = node;
-        if (temp==NULL){
-            break;
-	}
-	if(temp->p!=NULL){
-		while(temp->p!=NULL){
-			tempData = temp->p;
-			temp->p = temp->p->next;
-			free(tempData);
-		}
-	}
-	node = node->next;
-    }
-}
-
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename,int lineNumber){
 	static int IC,DC;
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
@@ -49,6 +28,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int firstComNodeAddflag;
 	static int firstDataNodeAddflag;
 	static int symbolTableInitFlag;
+	static int lineFieldsInitFlag;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	firstLineFlag = FLAGOFF;
@@ -65,12 +45,13 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 		firstComNodeAddflag = FLAGOFF;
 		firstDataNodeAddflag = FLAGOFF;
 		symbolTableInitFlag = FLAGOFF;
+		lineFieldsInitFlag = FLAGOFF;
 	}
 	strcpy(fileNamePrev,filename);
 
 	/*printf("Filename: %s\n",filename);*/
 
-	if(labelFlag == FLAGON){
+	if((labelFlag == FLAGON) && (errorDetected == FLAGOFF) && (errorFlag == FLAGOFF)){
 		symbolTableInitFlag = FLAGON;
 	}
 
@@ -91,6 +72,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 				if(errorFlag == FLAGOFF){
 					linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber,firstLineFlag);
+					lineFieldsInitFlag = FLAGON;
 				}
 
 				if(labelFlag == LASTLINE){
@@ -263,7 +245,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						else{
 							node = memAdd(ptrField1,ptrField2,ptrField3);
 							addNode(headCom,headData,node,firstDataNodeAddflag,FLAGON);
-
 						}
 					}
 				}
@@ -277,9 +258,21 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 17:
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
-					/*freeLines(linesHead);
-					freeTable(tableHead);
-					freeMemIm(memImHead);*/
+
+					if(lineFieldsInitFlag == FLAGON){
+						freeLines(linesHead);
+					}
+					if(symbolTableInitFlag == FLAGON){
+						freeTable(tableHead);
+					}
+					if(firstDataFlag == FLAGON){
+						freeMemIm(headData);
+					}
+					if(firstComFlag == FLAGON){
+						freeMemIm(headCom);
+					}
+
+					/*freeMemIm(memImHead);*/
 				}
 				else{
 					if(headCom != NULL){
@@ -330,14 +323,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead,symbolTableInitFlag);
 
-				/*printTable(linesHead);*/
 				freeLines(linesHead);
 
 				if(symbolTableInitFlag == FLAGON){
 					freeTable(tableHead);
 				}
 
-				/*freeHeadData(headData);*/
 
 				freeMemIm(memImHead);
 		}
@@ -510,15 +501,25 @@ void freeMemIm(MEMIM* node){
 
 void freeTable(TABLE_NODE_T* tablePtr){
     TABLE_NODE_T *temp;/*A temp node which will be deleted from the linked list*/
+    TABLE_NODE_T *current;/*A temp node which will be deleted from the linked list*/
 
+    current = tablePtr;
     /*While the linked list is not null-continue to delete nodes from the linked-list*/
     while(1){
-        temp=tablePtr;
-        if (temp==NULL){
+        temp=current;
+
+        current=current->next;
+	
+        free(temp);
+	if (current==NULL){
             break;
 	}
-        tablePtr=tablePtr->next;
-        free(temp);
-	temp = NULL;
     }
 }
+
+
+
+
+
+
+
