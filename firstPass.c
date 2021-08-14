@@ -332,15 +332,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 
 				/*printTable(linesHead);*/
 				freeLines(linesHead);
+
 				if(symbolTableInitFlag == FLAGON){
 					freeTable(tableHead);
 				}
+
 				/*freeHeadData(headData);*/
 
 				freeMemIm(memImHead);
-
-	
-				
 		}
 		if(endWhileFlag == FLAGON){
 			break;

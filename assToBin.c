@@ -54,10 +54,13 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *null="00000000";/*NULL terminator.*/
     DATA *temp;/*A Temporary pointer.*/
     MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));/*Memory allocation for memory image node.*/
+    /*MEMIM *node=(MEMIM *)calloc(1,sizeof(MEMIM));*//*Memory allocation for memory image node.*/
     DATA *newNode;/*An adress of a new node.*/
     lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     opStrPoint=opString;
-    
+
+    node->next = NULL;
+
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/
     token = strtok(lineStr, s);/*A definition of a token*/
@@ -328,8 +331,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
 	node->next = NULL;
     }
 
-
-
+    /*memcpy(node->op,opString,sizeof(*opString));*/
     strcpy(node->op,opString);/*Copy the opString to the operation field in the node's structure*/
     free(lineStr);/*Free the line string*/
     return node;/*Return the updated node.*/
