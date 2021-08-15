@@ -281,6 +281,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 
 			}
 			state = newLine(&errorDetected,&current,&labelFlag,&index);
+			continue;
 		}
 		if(current->inputChar[index] == '\t' || current->inputChar[index] == ' '){
 			if(state == FIRSTWORD){

@@ -43,7 +43,12 @@ void storeLines(NODE_T *ptrNode, FILE *fd){
 			ptrNode->inputChar[index] = charFromFile;
 			index++;
 			/*}*/
-			if(charFromFile == '\n'){
+			if((charFromFile == '\n') || (index == (MAXLINELEN+1))){
+				if(index == (MAXLINELEN+1)){
+					while(charFromFile != '\n' && charFromFile != EOF){
+						charFromFile = fgetc(fd);
+					}
+				}
 				ptrNode->lineNumber = lineCounter;
 				lineCounter++;
 				current = ptrNode; /*sets the "current" node equal to ptrNode, pointing to the element whose buffer was just filled*/

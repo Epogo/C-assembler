@@ -20,6 +20,6 @@ add: 	.db 	6,-9
  	la 	wNumber
 .extern val1
  	.dh 	27056
-K: 	.dw 	31,-12
+K: 	.dw 	31,-12,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
 END: 	stop 	f	   
-.entry 	K 
+.entry 	Kjfkdsjflsdjfksdjkfljsdkfjsdkjkfdjjkfjkfkfjslf 

@@ -54,7 +54,7 @@ typedef struct fieldBuffer{
 
 struct node {
 	int lineNumber;
-	char inputChar[MAXLINELEN];
+	char inputChar[MAXLINELEN+1];
 	struct node* next; /*pointer to the next node (for linked list)*/
 };
 typedef struct node NODE_T; /*node struct defined as type NODE_T*/
