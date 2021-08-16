@@ -88,7 +88,7 @@ typedef struct symbolAddStruct SYMBOL_ADD_STRUCT_T;
 
 void readFile(int argc, char** argv);
 void handleFileContents(FILE *fd, char *filename);
-void storeLines(NODE_T *ptrNode, FILE *fd);
+int storeLines(NODE_T *ptrNode, FILE *fd);
 void manageContents(NODE_T *ptrNode, char *filename);
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename,int lineNumber);
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag);
