@@ -66,6 +66,10 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 						
 					}
 				}
+				if(!strcmp(".extern", currentLine->comOrDir)){
+					directiveFlag = FLAGON;
+					
+				}
 				if(directiveFlag == FLAGON && strcmp(".entry", currentLine->comOrDir)){
 					if(lastLineFlag == FLAGON){
 						step = 9;
@@ -134,6 +138,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				/*if(lastLineFlag == FLAGON){
 					symbolAdd(memImHead,tableHead);
 				}*/
+
 				if(firstEntryFlag == FLAGON){
 					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
 					firstEntryFlag = FLAGOFF;
@@ -185,6 +190,9 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 			case 9:
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
+					if(firstEntryFlag == FLAGOFF){
+						freeSymbolAddNewStruct(headStructPtr);
+					}
 				}
 				step = 10;
 				break;

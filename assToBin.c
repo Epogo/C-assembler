@@ -589,7 +589,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
             }
 	    if(labelFoundFlag == FLAGOFF){
 		structPtr->errorFlag = FLAGON;
-		printf("Label \"%s\" not found!\n",currentMem->symbol);
+		printf("Line %u: Label \"%s\" not found!\n",lineNumber,currentMem->symbol);
 	    }
             
         }
@@ -599,7 +599,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
 		    labelFoundFlag = FLAGON;
 		    if(currentTable->attribute[0] == EXTERNAL){
 			structPtr->errorFlag = FLAGON;
-			printf("External label \"%s\" used for conditional branching!\n",currentMem->symbol);
+			printf("Line %u: External label \"%s\" used for conditional branching!\n",lineNumber,currentMem->symbol);
 			break;
 		    }
                     imm=decToBin((currentTable->value)-(currentMem->ic));
@@ -616,7 +616,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
             }
 	    if(labelFoundFlag == FLAGOFF){
 		structPtr->errorFlag = FLAGON;
-		printf("Label \"%s\" not found!\n",currentMem->symbol);
+		printf("Line %u: Label \"%s\" not found!\n",lineNumber,currentMem->symbol);
 	    }
             
         }
