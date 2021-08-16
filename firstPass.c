@@ -362,7 +362,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					freeTable(tableHead);
 				}
 
-
 				freeMemIm(memImHead);
 		}
 		if(endWhileFlag == FLAGON){
@@ -496,7 +495,7 @@ void freeLines(LINE_FIELDS_T* linesPtr){
 
 
 
-void freeMemIm(MEMIM* node){
+/*void freeMemIm(MEMIM* node){
     MEMIM *temp;
     MEMIM *current;
     DATA *tempData;
@@ -506,11 +505,6 @@ void freeMemIm(MEMIM* node){
 	temp = current;
 
 	if(temp->p!=NULL){
-		/*while(temp->p->next!=NULL){
-			tempData = temp->p;
-			temp->p = temp->p->next;
-			free(tempData);
-		}*/
 		while(1){
 			tempData = temp->p;
 			if(temp->p->next==NULL){
@@ -529,7 +523,39 @@ void freeMemIm(MEMIM* node){
 	if (current==NULL)
 		break;
     }
+}*/
+
+void freeMemIm(MEMIM* node){
+    MEMIM *temp;
+    MEMIM *current;
+    DATA *tempData;
+    DATA *currentData;
+
+    current=node;
+    while(1){
+	temp = current;
+
+	if(temp->p!=NULL){
+		currentData = temp->p;
+		while(1){
+			tempData = currentData;
+			currentData = currentData->next;
+			free(tempData);
+			if(currentData == NULL){
+				break;
+			}
+		}
+	}
+
+	current = current->next;
+
+        free(temp);
+	
+	if (current==NULL)
+		break;
+    }
 }
+
 
 
 void freeTable(TABLE_NODE_T* tablePtr){

@@ -60,6 +60,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     opStrPoint=opString;
 
     node->next = NULL;
+    opString[0] = '\0';
 
     if (ptrField3)
         strcpy(lineStr,ptrField3);/*If the third field isn't empty-copy the content of this field to the lineStr field.*/

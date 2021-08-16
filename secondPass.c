@@ -50,8 +50,11 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 			case 1:
 				if(currentLine->next == NULL){
 					lastLineFlag = FLAGON;
+					step = 9;
 				}
-				step = 2;
+				else{
+					step = 2;
+				}
 				break;
 			case 2:
 				step = 3;
@@ -198,6 +201,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				break;
 			case 10:
 				/*printList(memImHead);*/
+
 				createOutputFiles(memImHead,tableHead,filename,headStructPtr,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
 
 				freeSymbolAddNewStruct(headStructPtr);
