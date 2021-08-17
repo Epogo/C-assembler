@@ -253,6 +253,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					/*Add to "Tmunat Hazikaron"*/
 					if(firstComFlag == FLAGOFF){
 						headCom = memAdd(ptrField1,ptrField2,ptrField3);
+						headCom->ic = IC;
 						firstComFlag = FLAGON;
 					}
 					else{
@@ -308,7 +309,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					/*freeMemIm(memImHead);*/
 				}
 				else{
-					if(headCom != NULL){
+					/*if(headCom != NULL){
 						memImHead = headCom;
 						concatNodes(headCom,headData);
 					}
@@ -317,7 +318,19 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					}
 					else{
 						memImHead = NULL;
+					}*/
+					if(firstComFlag == FLAGON){
+						memImHead = headCom;
+						if(firstDataFlag == FLAGON)
+							concatNodes(headCom,headData);
 					}
+					else if(firstDataFlag == FLAGON){
+						memImHead = headData;
+					}
+					else{
+						memImHead = NULL;
+					}
+
 					step = 18;
 				}
 				break;
@@ -353,7 +366,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				break;
 			case 21:
 				endWhileFlag = FLAGON;
-
+				
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead,symbolTableInitFlag);
 
 				freeLines(linesHead);
@@ -362,7 +375,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					freeTable(tableHead);
 				}
 
-				freeMemIm(memImHead);
+
+				if(firstDataFlag == FLAGON && firstComFlag == FLAGON){
+					freeMemIm(memImHead);
+				}
+				else if(firstDataFlag == FLAGON && firstComFlag == FLAGOFF){
+					freeMemIm(headData);
+				}
+				else if(firstDataFlag == FLAGOFF && firstComFlag == FLAGON){
+					freeMemIm(headCom);
+				}
+				/*freeMemIm(memImHead);*/
 		}
 		if(endWhileFlag == FLAGON){
 			break;

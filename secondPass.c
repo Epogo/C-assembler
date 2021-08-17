@@ -11,14 +11,15 @@ void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
 
     current=headStructPtr;
     /*While the linked list is not null-continue to delete nodes from the linked-list*/
-    while(1){
-        temp=current;
 
-        current=current->next;
+    while(1){
+	temp=current;
+
+	current=current->next;
 	
-        free(temp);
+	free(temp);
 	if (current==NULL){
-            break;
+	    break;
 	}
     }
 }
@@ -204,7 +205,9 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 
 				createOutputFiles(memImHead,tableHead,filename,headStructPtr,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
 
-				freeSymbolAddNewStruct(headStructPtr);
+				if(firstEntryFlag == FLAGOFF){
+					freeSymbolAddNewStruct(headStructPtr);
+				}
 
 				endWhileFlag = FLAGON;
 				break;

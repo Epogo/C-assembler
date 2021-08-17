@@ -761,6 +761,10 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 	labelFlag = FLAGOFF;
 
 	ptrCodeChecked = calloc(MAXLINELEN,sizeof(char));
+
+	while(ptrCode[index] == '\t' ||	ptrCode[index] == ' '){
+		index++;
+	}
 		
 	if(ptrCode[index] == '$'){
 		ptrCodeChecked[newIndex] = ptrCode[index];
@@ -848,7 +852,12 @@ char* checkCommandlaOrcall(char *ptrCode,int lineNumber){
 	labelFlag = FLAGOFF;
 
 	ptrCodeChecked = calloc(MAXLINELEN,sizeof(char));
-		
+
+	while(ptrCode[index] == '\t' ||	ptrCode[index] == ' '){
+		index++;
+	}	
+
+
 	if((ptrCode[index] >= 'a' && ptrCode[index] <= 'z') || (ptrCode[index] >= 'A' && ptrCode[index]<= 'Z')){
 		ptrCodeChecked[newIndex] = ptrCode[index];
 		index++;
