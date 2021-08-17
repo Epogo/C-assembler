@@ -108,20 +108,9 @@ void manageContents(NODE_T *ptrNode, char *filename){
 	while(1){
 		if(current->inputChar[index] == '\0'){
 			if(state == FIRSTWORD){
-				errorMsg(22,current->lineNumber,NULL);
-				errorDetected = FLAGON;
-				firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
-				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
-				firstFieldFlag = FLAGOFF;
-				state = newLine(&errorDetected,&current,&labelFlag,&index);
-				continue;
-			}
-			if(state == POSTFIRSTWORD){
-				state = checkState(ptrFirstWord);
-				if(state == -1){
-					errorMsg(21,current->lineNumber,ptrFirstWord);
-					errorDetected = FLAGON;
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+				ptrFirstWord[firstWordIndex] = '\0';
+				if(!strcmp("stop", ptrFirstWord)){
+					firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
@@ -135,6 +124,36 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					firstFieldFlag = FLAGOFF;
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
+				}
+			}
+			if(state == POSTFIRSTWORD){
+				if(!strcmp("stop", ptrFirstWord)){
+					firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+					firstFieldFlag = FLAGOFF;
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+				else{
+					state = checkState(ptrFirstWord);
+					if(state == -1){
+						errorMsg(21,current->lineNumber,ptrFirstWord);
+						errorDetected = FLAGON;
+						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+						firstFieldFlag = FLAGOFF;
+						state = newLine(&errorDetected,&current,&labelFlag,&index);
+						continue;
+					}
+					else{
+						errorMsg(22,current->lineNumber,NULL);
+						errorDetected = FLAGON;
+						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+						firstFieldFlag = FLAGOFF;
+						state = newLine(&errorDetected,&current,&labelFlag,&index);
+						continue;
+					}
 				}
 			}
 			
@@ -406,20 +425,9 @@ void manageContents(NODE_T *ptrNode, char *filename){
 		}
 		if(current->inputChar[index] == '\n'){
 			if(state == FIRSTWORD){
-				errorMsg(22,current->lineNumber,NULL);
-				errorDetected = FLAGON;
-				firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
-				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
-				firstFieldFlag = FLAGOFF;
-				state = newLine(&errorDetected,&current,&labelFlag,&index);
-				continue;
-			}
-			if(state == POSTFIRSTWORD){
-				state = checkState(ptrFirstWord);
-				if(state == -1){
-					errorMsg(21,current->lineNumber,ptrFirstWord);
-					errorDetected = FLAGON;
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+				ptrFirstWord[firstWordIndex] = '\0';
+				if(!strcmp("stop", ptrFirstWord)){
+					firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
@@ -433,6 +441,36 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					firstFieldFlag = FLAGOFF;
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
+				}
+			}
+			if(state == POSTFIRSTWORD){
+				if(!strcmp("stop", ptrFirstWord)){
+					firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+					firstFieldFlag = FLAGOFF;
+					state = newLine(&errorDetected,&current,&labelFlag,&index);
+					continue;
+				}
+				else{
+					state = checkState(ptrFirstWord);
+					if(state == -1){
+						errorMsg(21,current->lineNumber,ptrFirstWord);
+						errorDetected = FLAGON;
+						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+						firstFieldFlag = FLAGOFF;
+						state = newLine(&errorDetected,&current,&labelFlag,&index);
+						continue;
+					}
+					else{
+						errorMsg(22,current->lineNumber,NULL);
+						errorDetected = FLAGON;
+						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+						firstFieldFlag = FLAGOFF;
+						state = newLine(&errorDetected,&current,&labelFlag,&index);
+						continue;
+					}
 				}
 			}
 			if(state == CODE){
@@ -657,16 +695,32 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					}
 				}
 				else{
-					state = checkState(ptrFirstWord);
-					if(state == -1){
-						errorMsg(21,current->lineNumber,ptrFirstWord);
-						errorDetected = FLAGON;
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+					if(!strcmp("stop", ptrFirstWord)){
+						errorDetected = checkExtraneousChars(&current,&index);
+						if(errorDetected == FLAGON){
+							errorMsg(4,current->lineNumber,NULL);
+							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);						
+						}
+						else if(errorDetected == FLAGOFF){
+							firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+						}
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 						firstFieldFlag = FLAGOFF;
 						state = newLine(&errorDetected,&current,&labelFlag,&index);
 						break;
-						/*exit(0);*/
+					}
+					else{
+						state = checkState(ptrFirstWord);
+						if(state == -1){
+							errorMsg(21,current->lineNumber,ptrFirstWord);
+							errorDetected = FLAGON;
+							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);
+							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
+							firstFieldFlag = FLAGOFF;
+							state = newLine(&errorDetected,&current,&labelFlag,&index);
+							break;
+							/*exit(0);*/
+						}
 					}
 				}
 				if(state == POSTEXTERN){
