@@ -81,7 +81,7 @@ void freeFields(FIELD_BUFFER_T *head){
 
 
 void manageContents(NODE_T *ptrNode, char *filename){
-	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,dataIndex,codeIndex,errorDetected,i,breakFlag,firstFieldFlag;
+	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,dataIndex,codeIndex,errorDetected,i,breakFlag,firstFieldFlag,labelWithExtEntFlag;
 	NODE_T *current;
 	char *ptrFirstWord;
 	char *ptrLabel;
@@ -103,6 +103,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 	state = PREFIRSTWORD;
 	errorDetected = FLAGOFF;
 	firstFieldFlag = FLAGON;
+	labelWithExtEntFlag = FLAGOFF;
 
 
 	while(1){
@@ -334,6 +335,12 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
+				if(state == POSTEXTERN || state == POSTENTRY){
+					ptrLabel = calloc(MAXLINELEN,sizeof(char));
+					labelIndex = 0;
+					labelWithExtEntFlag = FLAGON;
+					continue;
+				}
 			}
 			else if((state == POSTEXTERN || state == POSTENTRY) && (midLabel == FLAGON)){
 				ptrLabel[labelIndex] = '\0';
@@ -345,6 +352,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -356,6 +367,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -366,6 +381,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -379,6 +398,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 							firstFieldFlag = FLAGOFF;
 							headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+							if(labelWithExtEntFlag == FLAGON){
+								headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+								labelWithExtEntFlag = FLAGOFF;
+							}
 							state = newLine(&errorDetected,&current,&labelFlag,&index);
 							breakFlag = FLAGON;
 							break;
@@ -394,11 +417,20 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber);						
 				}
 				else if(errorDetected == FLAGOFF){
-					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+					if(labelWithExtEntFlag == FLAGON){
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+					}
+					else{
+						firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+					}
 				}
 				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 				firstFieldFlag = FLAGOFF;
 				headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+				if(labelWithExtEntFlag == FLAGON){
+					headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+					labelWithExtEntFlag = FLAGOFF;
+				}
 				state = newLine(&errorDetected,&current,&labelFlag,&index);
 				continue;
 			} 
@@ -518,6 +550,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -529,6 +565,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -539,6 +579,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 					firstFieldFlag = FLAGOFF;
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+					if(labelWithExtEntFlag == FLAGON){
+						headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+						labelWithExtEntFlag = FLAGOFF;
+					}
 					state = newLine(&errorDetected,&current,&labelFlag,&index);
 					continue;
 				}
@@ -553,6 +597,10 @@ void manageContents(NODE_T *ptrNode, char *filename){
 							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 							firstFieldFlag = FLAGOFF;
 							headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+							if(labelWithExtEntFlag == FLAGON){
+								headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+								labelWithExtEntFlag = FLAGOFF;
+							}
 							breakFlag = FLAGON;
 							break;
 						}
@@ -562,10 +610,19 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					}
 				}
 				/*firstPass(ptrFirstWord,ptrLabel,NULL,labelFlag);*/
-				firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+				if(labelWithExtEntFlag == FLAGON){
+					firstPass(ptrFirstWord,ptrCommandDirective,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+				}
+				else{
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber);
+				}
 				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag);
 				firstFieldFlag = FLAGOFF;
 				headFields = addToFieldBuffer(ptrLabel,firstFieldFlag);
+				if(labelWithExtEntFlag == FLAGON){
+					headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag);
+					labelWithExtEntFlag = FLAGOFF;
+				}
 			} 
 			if(state == MYDATA){
 				ptrData[dataIndex] = '\0';
