@@ -29,6 +29,26 @@ char *rOpCode[]={"000000","000001"};/*A list of opcodes for r commands*/
 char *iOpCode[]={"001010","001011","001100","001101","001110","001111","010000","010001","010010","010011","010100","010101","010110","010111","011000"};/*A list of opcodes for i commands*/
 char *jOpCode[]={"011110","011111","100000","111111"};/*A list of opcodes for j commands*/
 
+int binaryToDecimal(int n){
+        int num = n;
+        int decValue = 0;
+ 
+        int base = 1;
+        int temp = num;
+        
+        while (temp > 0) {
+            int last_digit = temp % 10;
+            temp = temp / 10;
+ 
+            decValue += last_digit * base;
+ 
+            base = base * 2;
+        }
+ 
+        return decValue;
+}
+
+
 MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     int count=0;/*A counter*/
     int comFlag=0;/*If a given command or direcrive has been found.*/
@@ -52,12 +72,16 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
     char *zero="0";/*A "zero" string.*/
     char *one="100000000000000000000";/*In case of J command with reg.*/
     char *null="00000000";/*NULL terminator.*/
+    char *regPoint;
     DATA *temp;/*A Temporary pointer.*/
+
     /*MEMIM *node=(MEMIM *)malloc(sizeof(MEMIM));*//*Memory allocation for memory image node.*/
     MEMIM *node=(MEMIM *)calloc(1,sizeof(MEMIM));/*Memory allocation for memory image node.*/
     DATA *newNode;/*An adress of a new node.*/
     lineStr = (char *)calloc(NUM_OF_CHARS_IN_LINE, sizeof(char));/*Memory allocation for a line*/
     opStrPoint=opString;
+
+    node->errorFlag=0;
 
     node->next = NULL;
     opString[0] = '\0';
@@ -73,6 +97,12 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
 	    node->p = NULL;
             while( token != NULL ) {
                     reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+		    regPoint = token;
+		    regPoint++;
+                    if (atoi(regPoint)<0||atoi(regPoint)>31){
+                        node->errorFlag=1;/*The reg is not between 0 and 31.*/
+                        /*break;*/
+                    }
                     registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
                     /*If the command is a copy command*/
                     if((i>4)&&(count==1))
@@ -124,6 +154,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                             if (count==1)
                             {
                                 registers[count]=NULL;
+                                if (atoi(token)>32767||atoi(token)<-32768)
+                                {
+                                    node->errorFlag=2;
+                                    /*break;*/
+                                }
 				imm=decToBin(atoi(token));
                                 /*strcpy(imm,immPointer);*/
                                 count++;
@@ -131,6 +166,12 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                                 continue;
                             }
                             reg=Registers(token);/*Convert the registers tokens to a binary reg string.*/
+			    regPoint = token;
+			    regPoint++;
+                            if (atoi(regPoint)<0||atoi(regPoint)>31){
+                                node->errorFlag=1;/*The reg is not between 0 and 31.*/
+                                /*break;*/
+                            }
                             registers[count]=(char*) malloc(6 * sizeof(char));/*Allocate enough memory to store a reg*/
                             strcpy(registers[count],reg);/*Copy each reg to a place in the registers array*/
                             free(reg);
@@ -195,6 +236,12 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
                     /*If the second field is a register field*/
                     else{
                         reg=Registers(ptrField3);/*Extract reg value from the function.*/
+		        regPoint = token;
+		        regPoint++;
+                        if (atoi(regPoint)<0||atoi(regPoint)>31){
+                            node->errorFlag=1;/*The reg is not between 0 and 31.*/
+                            /*break;*/
+                        }
                         strcat(opStrPoint,one);/*Concat one to the Operation string.*/
                         strcat(opStrPoint,reg);/*Concat reg to the Operation string.*/
                         free(reg);
@@ -248,6 +295,10 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
                 dataCounter+=1;
+                if (atoi(token)>127||atoi(token)<-128){
+                    node->errorFlag=3;
+                    /*break;*/
+                }
                 binNum=ascizToBin(atoi(token));/*Convert a token to binary string.*/
                 strcat(temp->byte,binNum);
                 free(binNum);
@@ -271,6 +322,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             node->p=temp;/*Point to the allocated memory.*/
             while( token != NULL ){
                 dataCounter+=4;
+                if (atol(token)>=2147483647||atol(token)<=(-2147483647 - 1))
+                {
+                    node->errorFlag=4;
+                    /*break;*/
+                }
                 binNum=decToBinDirW(token);/*Convert a token to a binary string.*/
                 binNumStart=binNum;
                 binNum+=24;/*Advance to the last byte in the word*/
@@ -305,6 +361,11 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             
             while( token != NULL ){
                 dataCounter+=2;
+                if (atoi(token)>32767||atoi(token)<-32768)
+                {
+                    node->errorFlag=5;
+                    /*break;*/
+                }
                 binNum=decToBinDirH(token);/*Convert a token to a binary string.*/
                 binNumStart=binNum;
                 binNum+=8;

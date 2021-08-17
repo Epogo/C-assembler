@@ -13,7 +13,7 @@ Next: 	move 	$20,$4	 r	f
 add: 	.db 	6,-9
  	bgt 	$4,$2,END
  	la 	K
- 	sw 	$0,4,$10
+ 	sw 	$0,4,$100
  	bne 	$31,$9, LOOP
  	call 	val1
  	jmp 	$4

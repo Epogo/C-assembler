@@ -29,6 +29,8 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int firstDataNodeAddflag;
 	static int symbolTableInitFlag;
 	static int lineFieldsInitFlag;
+	DATA* tempData;
+	DATA* currentData;
 	directiveFlag = FLAGOFF;
 	endWhileFlag = FLAGOFF;
 	firstLineFlag = FLAGOFF;
@@ -129,6 +131,41 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 8;
 				break;
 			case 8:
+				node = memAdd(ptrField1,ptrField2,ptrField3);
+				if(node->errorFlag==1){
+					printf("Line %u: Register value must be between 0 and 31\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==2){
+					printf("Line %u: Immediate value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==3){
+					printf("Line %u: .db value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==4){
+					printf("Line %u: .dw value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==5){
+					printf("Line %u: .dh value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+
+				if(node->p!=NULL){
+					currentData = node->p;
+					while(1){
+						tempData = currentData;
+						currentData = currentData->next;
+						free(tempData);
+						if(currentData == NULL){
+							break;
+						}
+					}
+				}
+				free(node);
+
 				if(errorFlag == FLAGOFF){
 					/*Add to "Tmunat Hazikaron"*/
 					if(firstDataFlag == FLAGOFF){
@@ -249,6 +286,42 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 15;
 				break;
 			case 15:
+				node = memAdd(ptrField1,ptrField2,ptrField3);
+				if(node->errorFlag==1){
+					printf("Line %u: Register value must be between 0 and 31\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==2){
+					printf("Line %u: Immediate value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==3){
+					printf("Line %u: .db value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==4){
+					printf("Line %u: .dw value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+				else if(node->errorFlag==5){
+					printf("Line %u: .dh value out of range\n",lineNumber);
+					errorFlag = FLAGON;
+				}
+
+
+				if(node->p!=NULL){
+					currentData = node->p;
+					while(1){
+						tempData = currentData;
+						currentData = currentData->next;
+						free(tempData);
+						if(currentData == NULL){
+							break;
+						}
+					}
+				}
+				free(node);
+
 				if(errorFlag == FLAGOFF){
 					/*Add to "Tmunat Hazikaron"*/
 					if(firstComFlag == FLAGOFF){

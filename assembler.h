@@ -44,6 +44,7 @@ typedef struct memoryImage{
     int dc;
     int ic;
     int missLabelFlag;
+    int errorFlag;
     struct memoryImage *next;
 } MEMIM;
 
