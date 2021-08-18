@@ -101,7 +101,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				tableTmp = tableHead;
 				while(tableTmp!=NULL){
 					if((!strcmp(tableTmp->symbol,currentLine->values)) && (tableTmp->attribute[0] == EXTERNAL)){
-						printf("Line %u: Entry label \"%s\" defined also as external!\n",currentLine->lineNumber,currentLine->values);
+						printf("File \"%s.as\", Line %u: Entry label \"%s\" defined also as external!\n",filename,currentLine->lineNumber,currentLine->values);
 						errorFlag = FLAGON;
 						break;
 					}
@@ -126,7 +126,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 					}
 				}
 				if(labelDetected == FLAGOFF){
-					errorMsg(24,currentLine->lineNumber,currentLine->values);
+					errorMsg(24,currentLine->lineNumber,currentLine->values,filename);
 					errorFlag = FLAGON;
 				}
 				labelDetected = FLAGOFF;
@@ -144,14 +144,14 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				}*/
 
 				if(firstEntryFlag == FLAGON){
-					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename);
 					firstEntryFlag = FLAGOFF;
 					headStructPtr = structPtr;
 					headStructPtr->next = NULL;
 					currentStructPtr = headStructPtr;
 				}
 				else{
-					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag);
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename);
 					currentStructPtr->next = structPtr;
 					currentStructPtr = currentStructPtr->next;
 					currentStructPtr->next = NULL;

@@ -1,7 +1,7 @@
 #include "assembler.h"
 
 
-char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
+char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 	char *ptrDataChecked;
 	int index,newIndex;
 
@@ -18,7 +18,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 			index++;
 			while(ptrData[index] != '"'){
 				if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-					errorMsg(17,lineNumber,NULL);
+					errorMsg(17,lineNumber,NULL,filename);
 					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
@@ -35,8 +35,8 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 					index++;
 				}
 				else{
-					printf("My Data: %c\n",ptrData[index]);
-					errorMsg(9,lineNumber,NULL);
+					/*printf("My Data: %c\n",ptrData[index]);*/
+					errorMsg(9,lineNumber,NULL,filename);
 					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
@@ -46,7 +46,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 			return ptrDataChecked;
 		}
 		else{
-			errorMsg(16,lineNumber,NULL);
+			errorMsg(16,lineNumber,NULL,filename);
 			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
@@ -57,7 +57,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 			index++;
 		}
 		if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-			errorMsg(22,lineNumber,NULL);
+			errorMsg(22,lineNumber,NULL,filename);
 			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
@@ -69,7 +69,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 				index++;
 				if(ptrData[index-1] == '-' || ptrData[index-1] == '+'){
 					if(!(ptrData[index] >= '0' && ptrData[index] <= '9')){
-						errorMsg(19,lineNumber,NULL);
+						errorMsg(19,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -95,7 +95,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 						return ptrDataChecked;
 					}
 					else{
-						errorMsg(10,lineNumber,NULL);
+						errorMsg(10,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -106,13 +106,13 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 						index++;
 					}
 					else if(ptrData[index] == ','){
-						errorMsg(6,lineNumber,NULL);
+						errorMsg(6,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
 					else if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-						errorMsg(9,lineNumber,NULL);
+						errorMsg(9,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -123,7 +123,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber){
 				}
 			}
 			else{
-				errorMsg(18,lineNumber,NULL);
+				errorMsg(18,lineNumber,NULL,filename);
 				free(ptrDataChecked);
 				ptrDataChecked = NULL;
 				return ptrDataChecked;

@@ -15,7 +15,7 @@ enum comType {Rcom1,Rcom2,Icom1,Icom2,jumpCom,laOrcallCom};
 
 
 
-char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber){
+char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber,char *filename){
 	int i,currentComType;
 	char *ptrCodeChecked;
 
@@ -48,29 +48,29 @@ char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber){
 
 
 	if(currentComType == Rcom1){
-		ptrCodeChecked = checkCommandR1(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandR1(ptrCode,lineNumber,filename);
 	}
 	else if(currentComType == Rcom2){
-		ptrCodeChecked = checkCommandR2(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandR2(ptrCode,lineNumber,filename);
 	}
 	else if(currentComType == Icom1){
-		ptrCodeChecked = checkCommandI1(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandI1(ptrCode,lineNumber,filename);
 	}
 	else if(currentComType == Icom2){
-		ptrCodeChecked = checkCommandI2(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandI2(ptrCode,lineNumber,filename);
 	}
 	else if(currentComType == jumpCom){
-		ptrCodeChecked = checkCommandjump(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandjump(ptrCode,lineNumber,filename);
 	}
 	else if(currentComType == laOrcallCom){
-		ptrCodeChecked = checkCommandlaOrcall(ptrCode,lineNumber);
+		ptrCodeChecked = checkCommandlaOrcall(ptrCode,lineNumber,filename);
 	}
 	return ptrCodeChecked;
 
 }
 
 
-char* checkCommandR1(char *ptrCode,int lineNumber){
+char* checkCommandR1(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars;
 	char *ptrCodeChecked;
@@ -91,7 +91,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 		if(commaFlag == FLAGON){
 			if(!((ptrCode[index] == '\t') || (ptrCode[index] == ' '))){
 				if(ptrCode[index] == ','){
-					errorMsg(6,lineNumber,NULL);
+					errorMsg(6,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -103,7 +103,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 		}
 		if(dollarFlag == FLAGON){
 			if(!(ptrCode[index] >= '0' && ptrCode[index] <= '9')){
-				errorMsg(7,lineNumber,NULL);
+				errorMsg(7,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -134,7 +134,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 				continue;
 			} 
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -147,19 +147,19 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 			}
 		}
 		else if((expectCommaFlag == FLAGON) && (ptrCode[index] != ',')){
-			errorMsg(11,lineNumber,NULL);
+			errorMsg(11,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		} 
 		else if(endLineFlag == FLAGON){
-			errorMsg(9,lineNumber,NULL);
+			errorMsg(9,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 		else if((dollarCount == 0) && (ptrCode[index] != '$')){
-			errorMsg(5,lineNumber,NULL);
+			errorMsg(5,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
@@ -167,7 +167,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 		else if(ptrCode[index] == ','){
 			expectCommaFlag = FLAGOFF;
 			if(dollarCount>=numDollars){
-				errorMsg(8,lineNumber,NULL);
+				errorMsg(8,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -179,7 +179,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else if(commaFlag == FLAGON){
-				errorMsg(6,lineNumber,NULL);
+				errorMsg(6,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -193,20 +193,20 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 			newIndex++;
 		}
 		else{
-			errorMsg(10,lineNumber,NULL);
+			errorMsg(10,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 	}
 	if(dollarFlag == FLAGON){
-		errorMsg(7,lineNumber,NULL);
+		errorMsg(7,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
 	if(dollarCount<numDollars){
-		errorMsg(12,lineNumber,NULL);
+		errorMsg(12,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
@@ -216,7 +216,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber){
 }
 
 
-char* checkCommandR2(char *ptrCode,int lineNumber){
+char* checkCommandR2(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars;
 	char *ptrCodeChecked;
@@ -237,7 +237,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 		if(commaFlag == FLAGON){
 			if(!((ptrCode[index] == '\t') || (ptrCode[index] == ' '))){
 				if(ptrCode[index] == ','){
-					errorMsg(6,lineNumber,NULL);
+					errorMsg(6,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -249,7 +249,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 		}
 		if(dollarFlag == FLAGON){
 			if(!(ptrCode[index] >= '0' && ptrCode[index] <= '9')){
-				errorMsg(7,lineNumber,NULL);
+				errorMsg(7,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -280,7 +280,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 				continue;
 			} 
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -293,19 +293,19 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 			}
 		}
 		else if((expectCommaFlag == FLAGON) && (ptrCode[index] != ',')){
-			errorMsg(11,lineNumber,NULL);
+			errorMsg(11,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		} 
 		else if(endLineFlag == FLAGON){
-			errorMsg(9,lineNumber,NULL);
+			errorMsg(9,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 		else if((dollarCount == 0) && (ptrCode[index] != '$')){
-			errorMsg(5,lineNumber,NULL);
+			errorMsg(5,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
@@ -313,7 +313,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 		else if(ptrCode[index] == ','){
 			expectCommaFlag = FLAGOFF;
 			if(dollarCount>=numDollars){
-				errorMsg(8,lineNumber,NULL);
+				errorMsg(8,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -325,7 +325,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else if(commaFlag == FLAGON){
-				errorMsg(6,lineNumber,NULL);
+				errorMsg(6,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -339,20 +339,20 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 			newIndex++;
 		}
 		else{
-			errorMsg(10,lineNumber,NULL);
+			errorMsg(10,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 	}
 	if(dollarFlag == FLAGON){
-		errorMsg(7,lineNumber,NULL);
+		errorMsg(7,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
 	if(dollarCount<numDollars){
-		errorMsg(12,lineNumber,NULL);
+		errorMsg(12,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
@@ -362,7 +362,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber){
 }
 
 
-char* checkCommandI1(char *ptrCode,int lineNumber){
+char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars,immediateFlag;
 	char *ptrCodeChecked;
@@ -398,7 +398,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -422,7 +422,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 				continue;
 			}
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -431,7 +431,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 		if(commaFlag == FLAGON){
 			if(!((ptrCode[index] == '\t') || (ptrCode[index] == ' '))){
 				if(ptrCode[index] == ','){
-					errorMsg(6,lineNumber,NULL);
+					errorMsg(6,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -443,7 +443,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 		}
 		if(dollarFlag == FLAGON){
 			if(!(ptrCode[index] >= '0' && ptrCode[index] <= '9')){
-				errorMsg(7,lineNumber,NULL);
+				errorMsg(7,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -474,7 +474,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 				continue;
 			} 
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -487,19 +487,19 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 			}
 		}
 		else if((expectCommaFlag == FLAGON) && (ptrCode[index] != ',')){
-			errorMsg(11,lineNumber,NULL);
+			errorMsg(11,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		} 
 		else if(endLineFlag == FLAGON){
-			errorMsg(9,lineNumber,NULL);
+			errorMsg(9,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 		else if((dollarCount == 0) && (ptrCode[index] != '$')){
-			errorMsg(5,lineNumber,NULL);
+			errorMsg(5,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
@@ -507,7 +507,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 		else if(ptrCode[index] == ','){
 			expectCommaFlag = FLAGOFF;
 			if(dollarCount>=numDollars){
-				errorMsg(8,lineNumber,NULL);
+				errorMsg(8,lineNumber,NULL,filename);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
 			}
@@ -518,7 +518,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else if(commaFlag == FLAGON){
-				errorMsg(6,lineNumber,NULL);
+				errorMsg(6,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -532,20 +532,20 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 			newIndex++;
 		}
 		else{
-			errorMsg(10,lineNumber,NULL);
+			errorMsg(10,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 	}
 	if(dollarFlag == FLAGON){
-		errorMsg(7,lineNumber,NULL);
+		errorMsg(7,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
 	if(dollarCount<numDollars){
-		errorMsg(12,lineNumber,NULL);
+		errorMsg(12,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
@@ -555,7 +555,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber){
 }
 
 
-char* checkCommandI2(char *ptrCode,int lineNumber){
+char* checkCommandI2(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars,labelFlag;
 	char *ptrCodeChecked;
@@ -585,7 +585,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else{
-				errorMsg(1,lineNumber,"");
+				errorMsg(1,lineNumber,"",filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -603,13 +603,13 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 				}
 				else{
 					if(labelFlag == FLAGON){
-						errorMsg(2,lineNumber,"");
+						errorMsg(2,lineNumber,"",filename);
 						free(ptrCodeChecked);
 						ptrCodeChecked = NULL;
 						return ptrCodeChecked;
 					}
 					else if(labelFlag == FLAGOFF){
-						errorMsg(9,lineNumber,NULL);
+						errorMsg(9,lineNumber,NULL,filename);
 						free(ptrCodeChecked);
 						ptrCodeChecked = NULL;
 						return ptrCodeChecked;
@@ -621,7 +621,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 		if(commaFlag == FLAGON){
 			if(!((ptrCode[index] == '\t') || (ptrCode[index] == ' '))){
 				if(ptrCode[index] == ','){
-					errorMsg(6,lineNumber,NULL);
+					errorMsg(6,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -633,7 +633,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 		}
 		if(dollarFlag == FLAGON){
 			if(!(ptrCode[index] >= '0' && ptrCode[index] <= '9')){
-				errorMsg(7,lineNumber,NULL);
+				errorMsg(7,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -664,7 +664,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 				continue;
 			} 
 			else{
-				errorMsg(10,lineNumber,NULL);
+				errorMsg(10,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -677,19 +677,19 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 			}
 		}
 		else if((expectCommaFlag == FLAGON) && (ptrCode[index] != ',')){
-			errorMsg(11,lineNumber,NULL);
+			errorMsg(11,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		} 
 		else if(endLineFlag == FLAGON){
-			errorMsg(9,lineNumber,NULL);
+			errorMsg(9,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 		else if((dollarCount == 0) && (ptrCode[index] != '$')){
-			errorMsg(5,lineNumber,NULL);
+			errorMsg(5,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
@@ -697,7 +697,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 		else if(ptrCode[index] == ','){
 			expectCommaFlag = FLAGOFF;
 			if(dollarCount>=numDollars+1){
-				errorMsg(8,lineNumber,NULL);
+				errorMsg(8,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -709,7 +709,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else if(commaFlag == FLAGON){
-				errorMsg(6,lineNumber,NULL);
+				errorMsg(6,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -723,26 +723,26 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 			newIndex++;
 		}
 		else{
-			errorMsg(10,lineNumber,NULL);
+			errorMsg(10,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
 		}
 	}
 	if(dollarFlag == FLAGON){
-		errorMsg(7,lineNumber,NULL);
+		errorMsg(7,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
 	if(dollarCount<numDollars){
-		errorMsg(12,lineNumber,NULL);
+		errorMsg(12,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
 	if(labelFlag == FLAGON){
-		errorMsg(13,lineNumber,"");
+		errorMsg(13,lineNumber,"",filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;				
@@ -752,7 +752,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber){
 }
 
 
-char* checkCommandjump(char *ptrCode,int lineNumber){
+char* checkCommandjump(char *ptrCode,int lineNumber,char *filename){
 	int index,newIndex,labelFlag;
 	char *ptrCodeChecked;
 
@@ -776,7 +776,7 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 			newIndex++;
 		}
 		else{
-			errorMsg(7,lineNumber,NULL);
+			errorMsg(7,lineNumber,NULL,filename);
 			free(ptrCodeChecked);
 			ptrCodeChecked = NULL;
 			return ptrCodeChecked;
@@ -792,7 +792,7 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 				newIndex++;
 			}
 			else{
-				errorMsg(9,lineNumber,NULL);
+				errorMsg(9,lineNumber,NULL,filename);
 				free(ptrCodeChecked);
 				ptrCodeChecked = NULL;
 				return ptrCodeChecked;
@@ -817,13 +817,13 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 			}
 			else{
 				if(labelFlag == FLAGON){
-					errorMsg(2,lineNumber,"");
+					errorMsg(2,lineNumber,"",filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
 				}
 				else if(labelFlag == FLAGOFF){
-					errorMsg(9,lineNumber,NULL);
+					errorMsg(9,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -832,7 +832,7 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 		}
 	}
 	else{
-		errorMsg(14,lineNumber,NULL);
+		errorMsg(14,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;	
@@ -843,7 +843,7 @@ char* checkCommandjump(char *ptrCode,int lineNumber){
 }
 
 
-char* checkCommandlaOrcall(char *ptrCode,int lineNumber){
+char* checkCommandlaOrcall(char *ptrCode,int lineNumber,char *filename){
 	int index,newIndex,labelFlag;
 	char *ptrCodeChecked;
 
@@ -876,13 +876,13 @@ char* checkCommandlaOrcall(char *ptrCode,int lineNumber){
 			}
 			else{
 				if(labelFlag == FLAGON){
-					errorMsg(2,lineNumber,"");
+					errorMsg(2,lineNumber,"",filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
 				}
 				else if(labelFlag == FLAGOFF){
-					errorMsg(9,lineNumber,NULL);
+					errorMsg(9,lineNumber,NULL,filename);
 					free(ptrCodeChecked);
 					ptrCodeChecked = NULL;
 					return ptrCodeChecked;
@@ -891,7 +891,7 @@ char* checkCommandlaOrcall(char *ptrCode,int lineNumber){
 		}
 	}
 	else{
-		errorMsg(15,lineNumber,NULL);
+		errorMsg(15,lineNumber,NULL,filename);
 		free(ptrCodeChecked);
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;	

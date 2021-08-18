@@ -598,7 +598,7 @@ char binToHex(char *bin)
     return hex;
 }
 
-SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry){
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry,char *filename){
     char *immJ;
     char *imm;
     char *zero="0";
@@ -651,7 +651,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
             }
 	    if(labelFoundFlag == FLAGOFF){
 		structPtr->errorFlag = FLAGON;
-		printf("Line %u: Label \"%s\" not found!\n",lineNumber,currentMem->symbol);
+		printf("File \"%s.as\", Line %u: Label \"%s\" not found!\n",filename,lineNumber,currentMem->symbol);
 	    }
             
         }
@@ -661,7 +661,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
 		    labelFoundFlag = FLAGON;
 		    if(currentTable->attribute[0] == EXTERNAL){
 			structPtr->errorFlag = FLAGON;
-			printf("Line %u: External label \"%s\" used for conditional branching!\n",lineNumber,currentMem->symbol);
+			printf("File \"%s.as\", Line %u: External label \"%s\" used for conditional branching!\n",filename,lineNumber,currentMem->symbol);
 			break;
 		    }
                     imm=decToBin((currentTable->value)-(currentMem->ic));
@@ -678,7 +678,7 @@ SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber
             }
 	    if(labelFoundFlag == FLAGOFF){
 		structPtr->errorFlag = FLAGON;
-		printf("Line %u: Label \"%s\" not found!\n",lineNumber,currentMem->symbol);
+		printf("File \"%s.as\", Line %u: Label \"%s\" not found!\n",filename,lineNumber,currentMem->symbol);
 	    }
             
         }

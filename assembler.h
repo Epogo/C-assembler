@@ -15,6 +15,18 @@
 #define OPENQUOTES 1
 #define CLOSEDQUOTES 2
 #define LASTLINE -1
+#define SINGLENODE 1
+
+#define MAXFILENAMELEN 100
+#define FILEEXTENSIONPOS1 3 /*position from end of file extension "." of ".as"*/
+#define FILEEXTENSIONPOS2 2 /*position from end of file extension "a" of ".as"*/
+#define FILEEXTENSIONPOS3 1 /*position from end of file extension "s" of ".as"*/
+#define ARGCOUNTERSTART 1 /*first index of argument vector with file inputs*/
+
+#define STARTINDEX 0
+
+#define FIRSTLINE 1
+#define EXTRACHARPASTLIMIT 1
 
 #define NUMBIT 16
 #define RCOMLEN 8
@@ -95,17 +107,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag);
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag);
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag);
-void errorMsg(int error,int lineNumber,char *fieldName);
+void errorMsg(int error,int lineNumber,char *fieldName,char *fileName);
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index);
 int checkExtraneousChars(NODE_T **current,int *index);
-char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber);
-char* checkCommandR1(char *ptrCode,int lineNumber);
-char* checkCommandR2(char *ptrCode,int lineNumber);
-char* checkCommandI1(char *ptrCode,int lineNumber);
-char* checkCommandI2(char *ptrCode,int lineNumber);
-char* checkCommandjump(char *ptrCode,int lineNumber);
-char* checkCommandlaOrcall(char *ptrCode,int lineNumber);
-char* checkData(char *ptrData,char *ptrDirective,int lineNumber);
+char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber,char *filename);
+char* checkCommandR1(char *ptrCode,int lineNumber,char *filename);
+char* checkCommandR2(char *ptrCode,int lineNumber,char *filename);
+char* checkCommandI1(char *ptrCode,int lineNumber,char *filename);
+char* checkCommandI2(char *ptrCode,int lineNumber,char *filename);
+char* checkCommandjump(char *ptrCode,int lineNumber,char *filename);
+char* checkCommandlaOrcall(char *ptrCode,int lineNumber,char *filename);
+char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename);
 void freeNodes(NODE_T *ptrNode);
 void freeLines(LINE_FIELDS_T* linesPtr);
 void freeTable(TABLE_NODE_T* tablePtr);
@@ -123,7 +135,7 @@ void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddfla
 char binToHex(char *bin);
 void concatNodes(MEMIM *headCom,MEMIM *headData);
 void printSymbolTable(TABLE_NODE_T *symbolTable);
-SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry);
+SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry,char *filename);
 void printListToFile(MEMIM *head,FILE *fptrObject);
 
 void freeMemIm(MEMIM* memImHead);

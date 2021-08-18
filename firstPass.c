@@ -116,7 +116,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							tableTmp = tableHead;
 							while(tableTmp!=NULL){
                 						if(!strcmp(tableTmp->symbol,ptrField1)){
-									printf("Line %u: Label \"%s\" already defined previously!\n",lineNumber,ptrField1);
+									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
 									errorFlag = FLAGON;
 									break;
 								}
@@ -133,23 +133,23 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 8:
 				node = memAdd(ptrField1,ptrField2,ptrField3);
 				if(node->errorFlag==1){
-					printf("Line %u: Register value must be between 0 and 31\n",lineNumber);
+					printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==2){
-					printf("Line %u: Immediate value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==3){
-					printf("Line %u: .db value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==4){
-					printf("Line %u: .dw value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==5){
-					printf("Line %u: .dh value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 
@@ -229,7 +229,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							tableTmp = tableHead;
 							while(tableTmp!=NULL){
                 						if((!strcmp(tableTmp->symbol,ptrField3)) && (tableTmp->attribute[0] != EXTERNAL)){
-									printf("Line %u: Label \"%s\" already defined previously not as external!\n",lineNumber,ptrField3);
+									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously not as external!\n",filename,lineNumber,ptrField3);
 									errorFlag = FLAGON;
 									break;
 								}
@@ -257,7 +257,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 							tableTmp = tableHead;
 							while(tableTmp!=NULL){
                 						if(!strcmp(tableTmp->symbol,ptrField1)){
-									printf("Line %u: Label \"%s\" already defined previously!\n",lineNumber,ptrField1);
+									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
 									errorFlag = FLAGON;
 									break;
 								}
@@ -288,23 +288,23 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 15:
 				node = memAdd(ptrField1,ptrField2,ptrField3);
 				if(node->errorFlag==1){
-					printf("Line %u: Register value must be between 0 and 31\n",lineNumber);
+					printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==2){
-					printf("Line %u: Immediate value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==3){
-					printf("Line %u: .db value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==4){
-					printf("Line %u: .dw value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 				else if(node->errorFlag==5){
-					printf("Line %u: .dh value out of range\n",lineNumber);
+					printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
 					errorFlag = FLAGON;
 				}
 
