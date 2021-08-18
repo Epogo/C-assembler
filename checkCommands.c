@@ -379,8 +379,9 @@ char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 	immediateFlag = FLAGON;
 
 	ptrCodeChecked = calloc(MAXLINELEN,sizeof(char));
-
+	
 	while(ptrCode[index] != '\0'){
+
 		if((dollarCount == 1) && (commaFlag == FLAGON) && (immediateFlag == FLAGON)){
 			immediateFlag = FLAGOFF;
 			commaFlag = FLAGOFF;
@@ -392,7 +393,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 				index++;
 				newIndex++;
 			}
-			else if((ptrCode[index] == '-' ) && (ptrCode[index+1] >= '0' && ptrCode[index+1] <= '9')){
+			else if((ptrCode[index] == '-' || ptrCode[index] == '+') && (ptrCode[index+1] >= '0' && ptrCode[index+1] <= '9')){
 				ptrCodeChecked[newIndex] = ptrCode[index];
 				index++;
 				newIndex++;
@@ -407,6 +408,9 @@ char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 				ptrCodeChecked[newIndex] = ptrCode[index];
 				index++;
 				newIndex++;
+			}
+			while((ptrCode[index] == '\t') || (ptrCode[index] == ' ')){
+				index++;
 			}
 			if(ptrCode[index] == ','){
 				ptrCodeChecked[newIndex] = ptrCode[index];
@@ -550,7 +554,9 @@ char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 		ptrCodeChecked = NULL;
 		return ptrCodeChecked;
 	}
+
 	ptrCodeChecked[newIndex] = '\0';
+
 	return ptrCodeChecked;
 }
 
