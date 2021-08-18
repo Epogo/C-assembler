@@ -18,7 +18,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 			index++;
 			while(ptrData[index] != '"'){
 				if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-					errorMsg(17,lineNumber,NULL,filename);
+					errorMsg(ERRORTYPE17,lineNumber,NULL,filename);
 					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
@@ -36,7 +36,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 				}
 				else{
 					/*printf("My Data: %c\n",ptrData[index]);*/
-					errorMsg(9,lineNumber,NULL,filename);
+					errorMsg(ERRORTYPE9,lineNumber,NULL,filename);
 					free(ptrDataChecked);
 					ptrDataChecked = NULL;
 					return ptrDataChecked;
@@ -46,7 +46,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 			return ptrDataChecked;
 		}
 		else{
-			errorMsg(16,lineNumber,NULL,filename);
+			errorMsg(ERRORTYPE16,lineNumber,NULL,filename);
 			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
@@ -57,7 +57,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 			index++;
 		}
 		if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-			errorMsg(22,lineNumber,NULL,filename);
+			errorMsg(ERRORTYPE22,lineNumber,NULL,filename);
 			free(ptrDataChecked);
 			ptrDataChecked = NULL;
 			return ptrDataChecked;
@@ -69,7 +69,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 				index++;
 				if(ptrData[index-1] == '-' || ptrData[index-1] == '+'){
 					if(!(ptrData[index] >= '0' && ptrData[index] <= '9')){
-						errorMsg(19,lineNumber,NULL,filename);
+						errorMsg(ERRORTYPE19,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -95,7 +95,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 						return ptrDataChecked;
 					}
 					else{
-						errorMsg(10,lineNumber,NULL,filename);
+						errorMsg(ERRORTYPE10,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -106,13 +106,13 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 						index++;
 					}
 					else if(ptrData[index] == ','){
-						errorMsg(6,lineNumber,NULL,filename);
+						errorMsg(ERRORTYPE6,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
 					}
 					else if(ptrData[index] == '\0' || ptrData[index] == '\n'){
-						errorMsg(9,lineNumber,NULL,filename);
+						errorMsg(ERRORTYPE9,lineNumber,NULL,filename);
 						free(ptrDataChecked);
 						ptrDataChecked = NULL;
 						return ptrDataChecked;
@@ -123,7 +123,7 @@ char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename){
 				}
 			}
 			else{
-				errorMsg(18,lineNumber,NULL,filename);
+				errorMsg(ERRORTYPE18,lineNumber,NULL,filename);
 				free(ptrDataChecked);
 				ptrDataChecked = NULL;
 				return ptrDataChecked;

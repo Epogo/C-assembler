@@ -4,7 +4,6 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
 
-
 void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
     SYMBOL_ADD_STRUCT_T *temp;
     SYMBOL_ADD_STRUCT_T *current;
@@ -126,7 +125,7 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 					}
 				}
 				if(labelDetected == FLAGOFF){
-					errorMsg(24,currentLine->lineNumber,currentLine->values,filename);
+					errorMsg(ERRORTYPE24,currentLine->lineNumber,currentLine->values,filename);
 					errorFlag = FLAGON;
 				}
 				labelDetected = FLAGOFF;
