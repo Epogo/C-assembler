@@ -1,45 +1,42 @@
 #include "assembler.h"
 
-static char *directives[]={".db",".dw", ".dh", ".asciz"};
+static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly directives*/
 
-/*static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};*/
+enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL}; /*enum of symbol table attributes*/
 
-enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
-
+enum steps {STEP1, STEP2, STEP3,  STEP4, STEP5, STEP6, STEP7, STEP8, STEP9, STEP10, STEP11, STEP12, STEP13, STEP14, STEP15, STEP16, STEP17, STEP18, STEP19, STEP20, STEP21};
 
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename,int lineNumber){
-	static int IC,DC;
+	static int IC,DC; /*instruction and data counter*/
 	int i,directiveFlag,endWhileFlag,DCF,ICF;
-	static TABLE_NODE_T* tableHead;
-	static LINE_FIELDS_T* linesHead;
-	TABLE_NODE_T* tableTmp;
-	/*enum Attributes Attribute;*/
-	static int step = 1;
-	static MEMIM* headCom;
-	static MEMIM* headData;
-	static char fileNamePrev[100];
-	MEMIM* memImHead;
-	MEMIM* node;
-	static int firstDataFlag = FLAGOFF;
-	static int firstComFlag = FLAGOFF;
-	static int errorFlag = FLAGOFF;
-	static int firstLineFlag;
-	static int firstSymbolFlag;
-	static int firstComNodeAddflag;
-	static int firstDataNodeAddflag;
-	static int symbolTableInitFlag;
-	static int lineFieldsInitFlag;
-	int prevDetectLabelFlag = FLAGOFF;
-	DATA* tempData;
-	DATA* currentData;
-	directiveFlag = FLAGOFF;
-	endWhileFlag = FLAGOFF;
-	firstLineFlag = FLAGOFF;
+	static TABLE_NODE_T* tableHead; /*pointer to head of symbol table*/
+	static LINE_FIELDS_T* linesHead; /*pointer to head of lines linked list*/
+	TABLE_NODE_T* tableTmp; /*temporary pointer to symbol table*/
+	static int step = STEP1; /*set initial step of state machine of first pass algorithm to 1*/
+	static MEMIM* headCom; /*pointer to head of memory image commands*/
+	static MEMIM* headData; /*pointer to head of memory image data*/
+	static char fileNamePrev[MAXFILENAMELEN]; /*stores name of previous filename analyzed*/
+	MEMIM* memImHead; /*pointer to head of memory image*/
+	MEMIM* node; /*pointer to node of memory image*/
+	static int firstDataFlag = FLAGOFF; /*set firstDataFlag to off for alerting when first data detected*/
+	static int firstComFlag = FLAGOFF; /*set firstComFlag to off for alerting when first command detected*/
+	static int errorFlag = FLAGOFF; /*set errorFlag to off for alerting when error detcted*/
+	static int firstLineFlag; /*declare firstLineFlag for alerting when first line detected*/
+	static int firstSymbolFlag; /*declare firstSymbolFlag for alerting when first symbol (label) detected*/
+	static int firstComNodeAddflag; /*declare firstComNodeAddflag for alerting when first command node added to memory image*/
+	static int firstDataNodeAddflag; /*declare firstDataNodeAddflag for alerting when first data node added to memory image*/
+	static int symbolTableInitFlag; /*declare symbolTableInitFlag for alerting when symbol table initialized*/
+	static int lineFieldsInitFlag; /*declare lineFieldsInitFlag for alerting when line fields initialized*/
+	int prevDetectLabelFlag = FLAGOFF; /*set prevDetectLabelFlag to off*/
+	DATA* tempData; /*temp pointer to data linked list*/
+	DATA* currentData; /*current pointer of data linked list*/
+	directiveFlag = FLAGOFF; /*set directiveFlag to off*/
+	endWhileFlag = FLAGOFF; /*set endWhileFlag to off*/
+	firstLineFlag = FLAGOFF; /*set firstLineFlag to off*/
 
-	/*printf("%s, %s, %s\n",ptrField1,ptrField2,ptrField3);*/
-
+	/*when new file is analyzed reset all flags to initial condition and set step of state machine of first pass algoritm to 1*/
 	if(strcmp(filename,fileNamePrev)){
-		step = 1;
+		step = STEP1;
 		firstDataFlag = FLAGOFF;
 		firstComFlag = FLAGOFF;
 		errorFlag = FLAGOFF;
@@ -50,25 +47,22 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 		symbolTableInitFlag = FLAGOFF;
 		lineFieldsInitFlag = FLAGOFF;
 	}
-	strcpy(fileNamePrev,filename);
+	strcpy(fileNamePrev,filename); /*set current filename to fileNamePrev*/
 
-	/*printf("Filename: %s\n",filename);*/
-
-	/*if((labelFlag == FLAGON) && (errorDetected == FLAGOFF) && (errorFlag == FLAGOFF)){
-		symbolTableInitFlag = FLAGON;
-	}*/
+	/*if labelFlag is on set symbolTableInitFlag to on*/
 	if((labelFlag == FLAGON)){
 		symbolTableInitFlag = FLAGON;
 	}
 
 	while(1){
+		/*switch case for all steps of first pass algorithm*/
 		switch(step){
-			case 1:
-				DC = 0;
-				IC = 100;
-				step = 2;
+			case STEP1:
+				DC = DCINIT; /*initialize data counter to zero*/
+				IC = ICINIT; /*initialize instructions counter to 100*/
+				step = STEP2;
 				break;
-			case 2:
+			case STEP2:
 				if(errorDetected == FLAGON){
 					errorFlag = FLAGON;
 					/*if(labelFlag != LASTLINE){
@@ -82,21 +76,21 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 
 				if(labelFlag == LASTLINE){
-					step = 17;
+					step = STEP17;
 				}
 				else{
-					step = 6;
+					step = STEP6;
 				}
 				break;
-			case 3:
+			case STEP3:
 				break;
-			case 4:
+			case STEP4:
 				break;
-			case 5:
+			case STEP5:
 				break;
-			case 6:
+			case STEP6:
 				if(strcmp(ptrField2,"-1")){
-					for(i=0;i<NUMDIRECTIVES;i++){
+					for(i=STARTINDEX;i<NUMDIRECTIVES;i++){
 						if(!strcmp(directives[i], ptrField2)){
 							directiveFlag = FLAGON;
 						
@@ -104,60 +98,63 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					}
 				}
 				if(directiveFlag == FLAGON){
-					step = 7;
+					step = STEP7;
 					directiveFlag = FLAGOFF; /*check if line necessary*/
 				}
 				else if(directiveFlag == FLAGOFF){
-					step = 9;
+					step = STEP9;
 				}				
 				break;
-			case 7:
-				/*if(errorFlag == FLAGOFF){*/
-					if(labelFlag == FLAGON){
-						if(firstSymbolFlag == FLAGOFF){
-							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
-							firstSymbolFlag = FLAGON;
+			case STEP7:
+				if(labelFlag == FLAGON){
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
+					}
+					else{
+						tableTmp = tableHead;
+						while(tableTmp!=NULL){
+        						if(!strcmp(tableTmp->symbol,ptrField1)){
+								errorMsg(ERRORTYPE33,lineNumber,ptrField1,filename); /*print error message*/
+								errorFlag = FLAGON;
+								prevDetectLabelFlag = FLAGON;
+								break;
+							}
+							tableTmp = tableTmp->next;
 						}
-						else{
-							tableTmp = tableHead;
-							while(tableTmp!=NULL){
-                						if(!strcmp(tableTmp->symbol,ptrField1)){
-									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
-									errorFlag = FLAGON;
-									prevDetectLabelFlag = FLAGON;
-									break;
-								}
-								tableTmp = tableTmp->next;
-							}
-							if(prevDetectLabelFlag == FLAGOFF){
-								tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
-							}
+						if(prevDetectLabelFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
 						}
 					}
-				/*}*/
-				step = 8;
+				}
+				step = STEP8;
 				break;
-			case 8:
+			case STEP8:
 				if(errorDetected == FLAGOFF){
 					node = memAdd(ptrField1,ptrField2,ptrField3);
-					if(node->errorFlag==1){
-						printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
+					/*check if register value in range*/
+					if(node->errorFlag==ERRORFLAG1){
+						errorMsg(ERRORTYPE27,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==2){
-						printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
+					/*check if immediate value in range*/
+					else if(node->errorFlag==ERRORFLAG2){
+						errorMsg(ERRORTYPE28,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==3){
-						printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
+					/*check if .db value in range*/
+					else if(node->errorFlag==ERRORFLAG3){
+						errorMsg(ERRORTYPE29,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==4){
-						printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
+					/*check if .dw value in range*/
+					else if(node->errorFlag==ERRORFLAG4){
+						errorMsg(ERRORTYPE30,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==5){
-						printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
+					/*check if .dh value in range*/
+					else if(node->errorFlag==ERRORFLAG5){
+						errorMsg(ERRORTYPE31,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
 
@@ -176,23 +173,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 
 				if(errorFlag == FLAGOFF){
-					/*Add to "Tmunat Hazikaron"*/
 					if(firstDataFlag == FLAGOFF){
 						headData = memAdd(ptrField1,ptrField2,ptrField3);
 						node = headData;
 						firstDataFlag = FLAGON;
 					}
 					else{
-						/*if(firstComFlag == FLAGOFF){
-							headCom = NULL;
-						}*/
-						/*node = memAdd(ptrField1,ptrField2,ptrField3);
-						addNode(headCom,headData,node);*/
-
-						/*if(firstComFlag == FLAGOFF){
-							headCom = NULL;
-						}*/
-
 						if(firstDataNodeAddflag == FLAGOFF){
 							node = memAdd(ptrField1,ptrField2,ptrField3);
 							addNode(headCom,headData,node,FLAGOFF,firstComNodeAddflag);
@@ -206,117 +192,112 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 
 					DC = DC + node->localDc;
 				}
-				step = 2;
+				step = STEP2;
 				endWhileFlag = FLAGON;
 				break;
-			case 9:
+			case STEP9:
 				if(!strcmp(".extern", ptrField2) || !strcmp(".entry", ptrField2)){
-					step = 10;
+					step = STEP10;
 				}
 				else{
-					step = 12;
+					step = STEP12;
 				}
 				break;
-			case 10:
+			case STEP10:
 				if(!strcmp(".entry", ptrField2)){
-					step = 2;
+					step = STEP2;
 					endWhileFlag = FLAGON;
 				}
 				else{
-					step = 11;
+					step = STEP11;
 				}
 				break;
-			case 11:
-				/*if(errorFlag == FLAGOFF){*/
-					if(!strcmp(".extern", ptrField2)){
-						/*tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);*/
-						if(firstSymbolFlag == FLAGOFF){
-							tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGON);
-							firstSymbolFlag = FLAGON;
+			case STEP11:
+
+				if(!strcmp(".extern", ptrField2)){
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField3,EXTERNVALUE,EXTERNAL,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
+					}
+					else{
+						tableTmp = tableHead;
+						while(tableTmp!=NULL){
+        						if((!strcmp(tableTmp->symbol,ptrField3)) && (tableTmp->attribute[ATTRIBUTE1] != EXTERNAL)){
+								errorMsg(ERRORTYPE32,lineNumber,ptrField3,filename); /*print error message*/
+								errorFlag = FLAGON;
+								prevDetectLabelFlag = FLAGON;
+								break;
+							}
+							tableTmp = tableTmp->next;
 						}
-						else{
-							tableTmp = tableHead;
-							while(tableTmp!=NULL){
-                						if((!strcmp(tableTmp->symbol,ptrField3)) && (tableTmp->attribute[0] != EXTERNAL)){
-									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously not as external!\n",filename,lineNumber,ptrField3);
-									errorFlag = FLAGON;
-									prevDetectLabelFlag = FLAGON;
-									break;
-								}
-								tableTmp = tableTmp->next;
-							}
-							if(prevDetectLabelFlag == FLAGOFF){
-								tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
-							}
+						if(prevDetectLabelFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField3,EXTERNVALUE,EXTERNAL,EMPTY,FLAGOFF);
 						}
 					}
-				/*}*/
-				step = 2;
+				}
+
+				step = STEP2;
 				endWhileFlag = FLAGON;
 				break;
-			case 12:
-				/*if(errorFlag == FLAGOFF){*/
-					if(labelFlag == FLAGON){
-						/*tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);*/
+			case STEP12:
 
-						if(firstSymbolFlag == FLAGOFF){
-							tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGON);
-							firstSymbolFlag = FLAGON;
-						}
-						else{
-							tableTmp = tableHead;
-							while(tableTmp!=NULL){
-                						if(!strcmp(tableTmp->symbol,ptrField1)){
-									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
-									errorFlag = FLAGON;
-									prevDetectLabelFlag = FLAGON;
-									break;
-								}
-								tableTmp = tableTmp->next;
-							}
-							if(prevDetectLabelFlag == FLAGOFF){
-								tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
-							}
-						}
+				if(labelFlag == FLAGON){
+
+					if(firstSymbolFlag == FLAGOFF){
+						tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGON);
+						firstSymbolFlag = FLAGON;
 					}
-				/*}*/
-				step = 13;
-				break;
-			case 13:
-				/*for(i=0;i<NUMCOMMANDS;i++){
-					if(!strcmp(commands[i], ptrField2)){
-						commandFlag = FLAGON;
+					else{
+						tableTmp = tableHead;
+						while(tableTmp!=NULL){
+        						if(!strcmp(tableTmp->symbol,ptrField1)){
+								errorMsg(ERRORTYPE33,lineNumber,ptrField1,filename); /*print error message*/
+								errorFlag = FLAGON;
+								prevDetectLabelFlag = FLAGON;
+								break;
+							}
+							tableTmp = tableTmp->next;
+						}
+						if(prevDetectLabelFlag == FLAGOFF){
+							tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
+						}
 					}
 				}
-				if(commandFlag == FLAGOFF){
-					errorFlag = FLAGON;
-				}*/
-				step = 14;
+
+				step = STEP13;
 				break;
-			case 14:
-				step = 15;
+			case STEP13:
+				step = STEP14;
 				break;
-			case 15:
+			case STEP14:
+				step = STEP15;
+				break;
+			case STEP15:
 				if(errorDetected == FLAGOFF){
 					node = memAdd(ptrField1,ptrField2,ptrField3);
-					if(node->errorFlag==1){
-						printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
+					/*check if register value in range*/
+					if(node->errorFlag==ERRORFLAG1){
+						errorMsg(ERRORTYPE27,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==2){
-						printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
+					/*check if immediate value in range*/
+					else if(node->errorFlag==ERRORFLAG2){
+						errorMsg(ERRORTYPE28,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==3){
-						printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
+					/*check if .db value in range*/
+					else if(node->errorFlag==ERRORFLAG3){
+						errorMsg(ERRORTYPE29,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==4){
-						printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
+					/*check if .dw value in range*/
+					else if(node->errorFlag==ERRORFLAG4){
+						errorMsg(ERRORTYPE30,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
-					else if(node->errorFlag==5){
-						printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
+					/*check if .dh value in range*/
+					else if(node->errorFlag==ERRORFLAG5){
+						errorMsg(ERRORTYPE31,lineNumber,NULL,filename); /*print error message*/
 						errorFlag = FLAGON;
 					}
 
@@ -342,19 +323,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						firstComFlag = FLAGON;
 					}
 					else{
-						/*if(firstDataFlag == FLAGOFF){
-							headData = NULL;
-						}*/
-
-					/*printf("Start-Filename: %s, Field2: %s\n",filename,ptrField2);
-						addNode(headCom,headData,memAdd(ptrField1,ptrField2,ptrField3));
-					printf("End-Filename: %s, Field2: %s\n",filename,ptrField2);*/
-
-
-						/*if(firstDataFlag == FLAGOFF){
-							headData = NULL;
-						}*/
-
 				
 						if(firstComNodeAddflag == FLAGOFF){
 							node = memAdd(ptrField1,ptrField2,ptrField3);
@@ -367,14 +335,14 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						}
 					}
 				}
-				step = 16;
+				step = STEP16;
 				break;
-			case 16:
-				IC = IC + 4;
-				step = 2;
+			case STEP16:
+				IC = IC + ICINCREMENT;
+				step = STEP2;
 				endWhileFlag = FLAGON;
 				break;
-			case 17:
+			case STEP17:
 				if(errorFlag == FLAGON){
 					endWhileFlag = FLAGON;
 
@@ -391,19 +359,9 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						freeMemIm(headCom);
 					}
 
-					/*freeMemIm(memImHead);*/
 				}
 				else{
-					/*if(headCom != NULL){
-						memImHead = headCom;
-						concatNodes(headCom,headData);
-					}
-					else if(headData != NULL){
-						memImHead = headData;
-					}
-					else{
-						memImHead = NULL;
-					}*/
+
 					if(firstComFlag == FLAGON){
 						memImHead = headCom;
 						if(firstDataFlag == FLAGON)
@@ -416,27 +374,26 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 						memImHead = NULL;
 					}
 
-					step = 18;
+					step = STEP18;
 				}
 				break;
-			case 18:
+			case STEP18:
 				DCF = DC;
 				ICF = IC;
-				step = 19;
+				step = STEP19;
 				break;
-			case 19:
+			case STEP19:
 				tableTmp = tableHead;
 				if(symbolTableInitFlag == FLAGON){
 					while(1){
-						/*printf("\nSymbol: %s, Value: %d, Attribute 1: %d\n",tableTmp->symbol,tableTmp->value,tableTmp->attribute[0]);*/
 						if(tableTmp->next == NULL){
-							if(tableTmp->attribute[0] == MYDATA){
+							if(tableTmp->attribute[ATTRIBUTE1] == MYDATA){
 								tableTmp->value = tableTmp->value + ICF;
 							}
 							break;
 						}
 						else{
-							if(tableTmp->attribute[0] == MYDATA){
+							if(tableTmp->attribute[ATTRIBUTE1] == MYDATA){
 								tableTmp->value = tableTmp->value + ICF;
 							}
 							tableTmp = tableTmp->next;
@@ -444,12 +401,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 					
 					}
 				}
-				step = 20;
+				step = STEP20;
 				break;
-			case 20:
-				step = 21;
+			case STEP20:
+				step = STEP21;
 				break;
-			case 21:
+			case STEP21:
 				endWhileFlag = FLAGON;
 				
 				secondPass(linesHead,tableHead,ICF,DCF,filename,memImHead,symbolTableInitFlag);
@@ -470,7 +427,6 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				else if(firstDataFlag == FLAGOFF && firstComFlag == FLAGON){
 					freeMemIm(headCom);
 				}
-				/*freeMemIm(memImHead);*/
 		}
 		if(endWhileFlag == FLAGON){
 			break;
@@ -489,7 +445,7 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 	/*static int firstSymbolFlag = 1;*/
 	static int firstSymbolFlag;
 	if(firstLineFlag == FLAGON){
-		firstSymbolFlag = 1;
+		firstSymbolFlag = FLAGON;
 	}
 	
 
@@ -501,12 +457,12 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 	}
 	ptrLineFields = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
 
-	if(firstSymbolFlag == 0){
+	if(firstSymbolFlag == FLAGOFF){
 		current->next = ptrLineFields;
 	}
 
 
-	if(firstSymbolFlag == 1){
+	if(firstSymbolFlag == FLAGON){
 		head = ptrLineFields;
 	}
 

@@ -2,9 +2,9 @@
 
 enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,MYDATA,CODE};
 
-static char *directives[]={".db",".dw", ".dh", ".asciz"};
+static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly directives*/
 
-static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"};
+static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"}; /*array of assembly commands*/
 
 int checkState(char *ptrInput);
 
@@ -986,6 +986,27 @@ void errorMsg(int error,int lineNumber,char *fieldName,char *fileName)
 			break;
 		case ERRORTYPE26:
 			printf("File \"%s.as\", Line %u: External label \"%s\" used for conditional branching!\n",fileName,lineNumber,fieldName);
+			break;
+		case ERRORTYPE27:
+			printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",fileName,lineNumber);
+			break;
+		case ERRORTYPE28:
+			printf("File \"%s.as\", Line %u: Immediate value out of range\n",fileName,lineNumber);
+			break;
+		case ERRORTYPE29:
+			printf("File \"%s.as\", Line %u: .db value out of range\n",fileName,lineNumber);
+			break;
+		case ERRORTYPE30:
+			printf("File \"%s.as\", Line %u: .dw value out of range\n",fileName,lineNumber);
+			break;
+		case ERRORTYPE31:
+			printf("File \"%s.as\", Line %u: .dh value out of range\n",fileName,lineNumber);
+			break;
+		case ERRORTYPE32:
+			printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously not as external!\n",fileName,lineNumber,fieldName);
+			break;
+		case ERRORTYPE33:
+			printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",fileName,lineNumber,fieldName);
 			break;
 		default:
 			printf("Default error message!\n");
