@@ -98,7 +98,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else{
 					errorMsg(ERRORTYPE22,current->lineNumber,NULL,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -119,7 +119,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					if(state == -1){
 						errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -128,7 +128,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					else{
 						errorMsg(ERRORTYPE22,current->lineNumber,NULL,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -146,12 +146,12 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(state != -1){
 					errorMsg(ERRORTYPE22,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 				}
 				else{
 					errorMsg(ERRORTYPE20,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 				}
 				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 				firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
@@ -167,7 +167,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber,filename);
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -184,7 +184,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber,filename); /*check to see if values after command are formatted correctly*/
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(NULL,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -204,7 +204,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber,filename); /*check to see if values after directive are formatted correctly*/
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -220,7 +220,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber,filename); /*check to see if values after directive are formatted correctly*/
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(NULL,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -248,7 +248,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 		if((index >= MAXLINELEN) && (current->inputChar[index] != '\n')){
 			errorMsg(ERRORTYPE23,current->lineNumber,NULL,filename); /*print error message*/
 			errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-			firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+			firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 			/*check if current state of state machine is FIRSTWORD or POSTFIRSTWORD*/
 			if(state == FIRSTWORD || state == POSTFIRSTWORD){
 				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -305,7 +305,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(state == -1){
 					errorMsg(ERRORTYPE20,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrCommandDirective,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -317,7 +317,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					errorDetected = checkExtraneousChars(&current,&index);
 					if(errorDetected == FLAGON){
 						errorMsg(ERRORTYPE4,current->lineNumber,NULL,filename); /*print error message*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/						
+						firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/						
 					}
 					else if(errorDetected == FLAGOFF){
 						firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -344,7 +344,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(ERRORTYPE3,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -359,7 +359,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(strlen(ptrLabel) >= MAXLABELLEN){
 					errorMsg(ERRORTYPE0,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -374,7 +374,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(!((ptrLabel[0] >= 'a' && ptrLabel[0] <= 'z') || (ptrLabel[0] >= 'A' && ptrLabel[0] <= 'Z'))){
 					errorMsg(ERRORTYPE1,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -392,7 +392,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						if(!((ptrLabel[i] >= 'a' && ptrLabel[i] <= 'z') || (ptrLabel[i] >= 'A' && ptrLabel[i] <= 'Z') || (ptrLabel[i] >= '0' && ptrLabel[i] <= '9'))){
 							errorMsg(ERRORTYPE2,current->lineNumber,ptrLabel,filename); /*print error message*/
 							errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+							firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 							firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 							headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -413,7 +413,12 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				errorDetected = checkExtraneousChars(&current,&index);
 				if(errorDetected == FLAGON){
 					errorMsg(ERRORTYPE4,current->lineNumber,NULL,filename); /*print error message*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/						
+					if(labelWithExtEntFlag == FLAGON){
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/	
+					}
+					else{
+						firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/	
+					}					
 				}
 				else if(errorDetected == FLAGOFF){
 					if(labelWithExtEntFlag == FLAGON){
@@ -472,7 +477,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else{
 					errorMsg(ERRORTYPE22,current->lineNumber,NULL,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -493,7 +498,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					if(state == -1){
 						errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -502,7 +507,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					else{
 						errorMsg(ERRORTYPE22,current->lineNumber,NULL,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -517,7 +522,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrCommandDirective,current->lineNumber,filename); /*check if values after command are valid*/
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -534,7 +539,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrCodeChecked = checkCommand(ptrCode,ptrFirstWord,current->lineNumber,filename); /*check if values after command are valid*/
 					if(ptrCodeChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(NULL,ptrFirstWord,ptrCodeChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -554,7 +559,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(ERRORTYPE3,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -569,7 +574,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(strlen(ptrLabel) >= MAXLABELLEN){
 					errorMsg(ERRORTYPE0,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -584,7 +589,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(!((ptrLabel[0] >= 'a' && ptrLabel[0] <= 'z') || (ptrLabel[0] >= 'A' && ptrLabel[0] <= 'Z'))){
 					errorMsg(ERRORTYPE1,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 					firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 					headFields = addToFieldBuffer(ptrLabel,firstFieldFlag); /*add field to field buffer in order to free later*/
@@ -602,7 +607,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						if(!((ptrLabel[i] >= 'a' && ptrLabel[i] <= 'z') || (ptrLabel[i] >= 'A' && ptrLabel[i] <= 'Z') || (ptrLabel[i] >= '0' && ptrLabel[i] <= '9'))){
 							errorMsg(ERRORTYPE2,current->lineNumber,ptrLabel,filename); /*print error message*/
 							errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+							firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 							state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
 							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 							firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
@@ -642,7 +647,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrCommandDirective,current->lineNumber,filename); /*check if values after directive are valid*/
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(ptrFirstWord,ptrCommandDirective,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -658,7 +663,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					ptrDataChecked = checkData(ptrData,ptrFirstWord,current->lineNumber,filename); /*check if values after directive are valid*/
 					if(ptrDataChecked == NULL){
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(NULL,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 					}
 					else{
 						firstPass(NULL,ptrFirstWord,ptrDataChecked,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -680,12 +685,12 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				else if(state != -1){
 					errorMsg(ERRORTYPE22,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 				}
 				else{
 					errorMsg(ERRORTYPE20,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-					firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 				}
 				headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 				firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
@@ -727,7 +732,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					if((checkState(ptrFirstWord) != -1) || !strcmp("dh", ptrFirstWord) || !strcmp("dw", ptrFirstWord) || !strcmp("db", ptrFirstWord) || !strcmp("asciz", ptrFirstWord)){
 						errorMsg(ERRORTYPE3,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -737,7 +742,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						errorMsg(ERRORTYPE0,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						/*printf("Line %u: Unrecognized command or directive %s (or label with missing :)\n",current->lineNumber,ptrFirstWord);*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -746,7 +751,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					else if(!((ptrFirstWord[0] >= 'a' && ptrFirstWord[0] <= 'z') || (ptrFirstWord[0] >= 'A' && ptrFirstWord[0] <= 'Z'))){
 						errorMsg(ERRORTYPE1,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-						firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 						headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 						firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 						state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -757,7 +762,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 							if(!((ptrFirstWord[i] >= 'a' && ptrFirstWord[i] <= 'z') || (ptrFirstWord[i] >= 'A' && ptrFirstWord[i] <= 'Z') || (ptrFirstWord[i] >= '0' && ptrFirstWord[i] <= '9'))){
 								errorMsg(ERRORTYPE2,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 								errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-								firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+								firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 								headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 								firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 								state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/
@@ -771,7 +776,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						errorDetected = checkExtraneousChars(&current,&index);
 						if(errorDetected == FLAGON){
 							errorMsg(ERRORTYPE4,current->lineNumber,NULL,filename); /*print error message*/
-							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/						
+							firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/						
 						}
 						else if(errorDetected == FLAGOFF){
 							firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
@@ -786,7 +791,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 						if(state == -1){
 							errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename);
 							errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
-							firstPass(NULL,NULL,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
+							firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
 							headFields = addToFieldBuffer(ptrFirstWord,firstFieldFlag); /*add field to field buffer in order to free later*/
 							firstFieldFlag = FLAGOFF; /*set firstFieldFlag to off as the first field has already been analyzed*/
 							state = newLine(&errorDetected,&current,&labelFlag,&index); /*call newLine function to transition to next line in file*/

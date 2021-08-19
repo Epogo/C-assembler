@@ -11,7 +11,7 @@ LOOP^: 	ori 	$9,-5,$2
  	jmp 	Next
 Next: 	move 	$20,$4	 r	f
 add: 	.db 	6,-9
- 	bgt 	$4,$2,END
+add: 	bgt 	$4,$2,END
  	la 	K
  	sw 	$0,4,$100
  	bne 	$31,$9, LOOP

@@ -29,6 +29,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 	static int firstDataNodeAddflag;
 	static int symbolTableInitFlag;
 	static int lineFieldsInitFlag;
+	int prevDetectLabelFlag = FLAGOFF;
 	DATA* tempData;
 	DATA* currentData;
 	directiveFlag = FLAGOFF;
@@ -53,7 +54,10 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 
 	/*printf("Filename: %s\n",filename);*/
 
-	if((labelFlag == FLAGON) && (errorDetected == FLAGOFF) && (errorFlag == FLAGOFF)){
+	/*if((labelFlag == FLAGON) && (errorDetected == FLAGOFF) && (errorFlag == FLAGOFF)){
+		symbolTableInitFlag = FLAGON;
+	}*/
+	if((labelFlag == FLAGON)){
 		symbolTableInitFlag = FLAGON;
 	}
 
@@ -67,10 +71,10 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 2:
 				if(errorDetected == FLAGON){
 					errorFlag = FLAGON;
-					if(labelFlag != LASTLINE){
+					/*if(labelFlag != LASTLINE){
 						endWhileFlag = FLAGON;
 						break;
-					}
+					}*/
 				}
 				if(errorFlag == FLAGOFF){
 					linesHead = storeLineFields(ptrField1,ptrField2,ptrField3,labelFlag,lineNumber,firstLineFlag);
@@ -91,10 +95,12 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			case 5:
 				break;
 			case 6:
-				for(i=0;i<NUMDIRECTIVES;i++){
-					if(!strcmp(directives[i], ptrField2)){
-						directiveFlag = FLAGON;
+				if(strcmp(ptrField2,"-1")){
+					for(i=0;i<NUMDIRECTIVES;i++){
+						if(!strcmp(directives[i], ptrField2)){
+							directiveFlag = FLAGON;
 						
+						}
 					}
 				}
 				if(directiveFlag == FLAGON){
@@ -106,7 +112,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}				
 				break;
 			case 7:
-				if(errorFlag == FLAGOFF){
+				/*if(errorFlag == FLAGOFF){*/
 					if(labelFlag == FLAGON){
 						if(firstSymbolFlag == FLAGOFF){
 							tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGON);
@@ -118,53 +124,56 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
                 						if(!strcmp(tableTmp->symbol,ptrField1)){
 									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
 									errorFlag = FLAGON;
+									prevDetectLabelFlag = FLAGON;
 									break;
 								}
 								tableTmp = tableTmp->next;
 							}
-							if(errorFlag == FLAGOFF){
+							if(prevDetectLabelFlag == FLAGOFF){
 								tableHead = symbolTable(ptrField1,DC,MYDATA,EMPTY,FLAGOFF);
 							}
 						}
 					}
-				}
+				/*}*/
 				step = 8;
 				break;
 			case 8:
-				node = memAdd(ptrField1,ptrField2,ptrField3);
-				if(node->errorFlag==1){
-					printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==2){
-					printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==3){
-					printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==4){
-					printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==5){
-					printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
+				if(errorDetected == FLAGOFF){
+					node = memAdd(ptrField1,ptrField2,ptrField3);
+					if(node->errorFlag==1){
+						printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==2){
+						printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==3){
+						printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==4){
+						printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==5){
+						printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
 
-				if(node->p!=NULL){
-					currentData = node->p;
-					while(1){
-						tempData = currentData;
-						currentData = currentData->next;
-						free(tempData);
-						if(currentData == NULL){
-							break;
+					if(node->p!=NULL){
+						currentData = node->p;
+						while(1){
+							tempData = currentData;
+							currentData = currentData->next;
+							free(tempData);
+							if(currentData == NULL){
+								break;
+							}
 						}
 					}
+					free(node);
 				}
-				free(node);
 
 				if(errorFlag == FLAGOFF){
 					/*Add to "Tmunat Hazikaron"*/
@@ -218,7 +227,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				}
 				break;
 			case 11:
-				if(errorFlag == FLAGOFF){
+				/*if(errorFlag == FLAGOFF){*/
 					if(!strcmp(".extern", ptrField2)){
 						/*tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY);*/
 						if(firstSymbolFlag == FLAGOFF){
@@ -231,21 +240,22 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
                 						if((!strcmp(tableTmp->symbol,ptrField3)) && (tableTmp->attribute[0] != EXTERNAL)){
 									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously not as external!\n",filename,lineNumber,ptrField3);
 									errorFlag = FLAGON;
+									prevDetectLabelFlag = FLAGON;
 									break;
 								}
 								tableTmp = tableTmp->next;
 							}
-							if(errorFlag == FLAGOFF){
+							if(prevDetectLabelFlag == FLAGOFF){
 								tableHead = symbolTable(ptrField3,0,EXTERNAL,EMPTY,FLAGOFF);
 							}
 						}
 					}
-				}
+				/*}*/
 				step = 2;
 				endWhileFlag = FLAGON;
 				break;
 			case 12:
-				if(errorFlag == FLAGOFF){
+				/*if(errorFlag == FLAGOFF){*/
 					if(labelFlag == FLAGON){
 						/*tableHead = symbolTable(ptrField1,IC,CODE,EMPTY);*/
 
@@ -259,16 +269,17 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
                 						if(!strcmp(tableTmp->symbol,ptrField1)){
 									printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",filename,lineNumber,ptrField1);
 									errorFlag = FLAGON;
+									prevDetectLabelFlag = FLAGON;
 									break;
 								}
 								tableTmp = tableTmp->next;
 							}
-							if(errorFlag == FLAGOFF){
+							if(prevDetectLabelFlag == FLAGOFF){
 								tableHead = symbolTable(ptrField1,IC,CODE,EMPTY,FLAGOFF);
 							}
 						}
 					}
-				}
+				/*}*/
 				step = 13;
 				break;
 			case 13:
@@ -286,41 +297,42 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 				step = 15;
 				break;
 			case 15:
-				node = memAdd(ptrField1,ptrField2,ptrField3);
-				if(node->errorFlag==1){
-					printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==2){
-					printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==3){
-					printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==4){
-					printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
-				else if(node->errorFlag==5){
-					printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
-					errorFlag = FLAGON;
-				}
+				if(errorDetected == FLAGOFF){
+					node = memAdd(ptrField1,ptrField2,ptrField3);
+					if(node->errorFlag==1){
+						printf("File \"%s.as\", Line %u: Register value must be between 0 and 31\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==2){
+						printf("File \"%s.as\", Line %u: Immediate value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==3){
+						printf("File \"%s.as\", Line %u: .db value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==4){
+						printf("File \"%s.as\", Line %u: .dw value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
+					else if(node->errorFlag==5){
+						printf("File \"%s.as\", Line %u: .dh value out of range\n",filename,lineNumber);
+						errorFlag = FLAGON;
+					}
 
-
-				if(node->p!=NULL){
-					currentData = node->p;
-					while(1){
-						tempData = currentData;
-						currentData = currentData->next;
-						free(tempData);
-						if(currentData == NULL){
-							break;
+					if(node->p!=NULL){
+						currentData = node->p;
+						while(1){
+							tempData = currentData;
+							currentData = currentData->next;
+							free(tempData);
+							if(currentData == NULL){
+								break;
+							}
 						}
 					}
+					free(node);
 				}
-				free(node);
 
 				if(errorFlag == FLAGOFF){
 					/*Add to "Tmunat Hazikaron"*/
