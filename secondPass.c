@@ -1,29 +1,13 @@
+/*This file contains functions for the second pass algorithm and for outputting files. The file is entered once the secondPass function is called from within the firstPass, and the secondPass algorithm is executed, finally outputting files if no errors were detected.*/
+
 #include "assembler.h"
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"};
 
-enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL};
-
-void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
-    SYMBOL_ADD_STRUCT_T *temp;
-    SYMBOL_ADD_STRUCT_T *current;
-
-    current=headStructPtr;
-    /*While the linked list is not null-continue to delete nodes from the linked-list*/
-
-    while(1){
-	temp=current;
-
-	current=current->next;
-	
-	free(temp);
-	if (current==NULL){
-	    break;
-	}
-    }
-}
+enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL}; /*enum of symbol table attributes*/
 
 
+/*The secondPass function receives linesHead of type pointer to LINE_FIELDS_T, tableHead of type pointer to TABLE_NODE_T, ICF of type int, DCF of type int, filename of type pointer to char, memImHead of type pointer to MEMIM, symbolTableInitFlag of type int, and does not return anything as it is a void function. The function iterates through the second pass algorithm after it is called from the firstPass function using linesHead to iterate through all the lines of the file, and tableHead to iterate through the symbol table, and if no errors were detected, the algorithm proceeds to complete the memory image, using the memImHead passed to the function from the firstPass and finally outputs the corresponding files (.ob,.ext.ent).*/
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag){
 
 	enum steps {STEP1, STEP2, STEP3,  STEP4, STEP5, STEP6, STEP7, STEP8, STEP9, STEP10}; /*enum of all steps of state machine of second pass algorithm*/
@@ -218,6 +202,8 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 				
 }
 
+
+/*The createOutputFiles function receives memImHead of type pointer to MEMIM, tableHead of type pointer to TABLE_NODE_T, filename of type pointer to char, external head of type pointer to SYMBOL_ADD_STRUCT_T, ICF of type int, DCF of type int, errorFlag of type int, symbolTableInitFlag of type int and externalFlag of type int, and does not return anything, but creates and writes to files if necessary. The function creates output files of type .ob,.ext, and .ent. To do this, the file receives as inputs the head of the memory image, memImHead, which is used to print to the object file, the head of the symbol table, tableHead, which is used to create the extern file, the input file name which is used to name the output files, externalHead which is used to create the extern files, ICF and DCF which are used to label the object file, errorFlag which alerts if files should be printed or not, symbolTableInitFlag which alerts if symbol table was initialized, and externalFlag, which alerts if externals were used and if an ext file should be created.*/
 void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *headStructPtr, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag){
 	TABLE_NODE_T* tableTmp; /*temporary pointer to symbol table*/
 	SYMBOL_ADD_STRUCT_T* tmpStructPtr; /*temporary pointer to linked list of structs returned from symbolAddNew*/
@@ -354,4 +340,24 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 
 	free(filenameObject); /*free filenameObject storing name of object file*/
 
+}
+
+/*The freeSymbolAddNewStruct function receives headStructPtr of type SYMBOL_ADD_STRUCT_T* and returns nothing as it is a void function. The function iterates through the list of nodes returned from symbolAddNew and frees every node until the end of the linked list is reached.*/
+void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
+    SYMBOL_ADD_STRUCT_T *temp; /*temporary pointer to SYMBOL_ADD_STRUCT_T*/
+    SYMBOL_ADD_STRUCT_T *current; /*current pointer to SYMBOL_ADD_STRUCT_T*/
+
+    current=headStructPtr; /*set current node to headStructPtr*/
+
+    /*While the linked list is not null-continue to free nodes from the linked-list*/
+    while(1){
+	temp=current; /*set temp node to current node*/
+
+	current=current->next; /*set current node to next node*/
+	
+	free(temp); /*free temp node*/
+	if (current==NULL){
+	    break; /*break from while loop once end of linked list reached*/
+	}
+    }
 }

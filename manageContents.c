@@ -1,3 +1,5 @@
+/*This file contains the manageContents function which analyzes the input file line by line and checks for errors and disects each line into three fields, which include an optional label, command or directive, and corresponding values. Once each line is checked for errors (and printed if necessary, from errorMsg function), the fields from each line are passed into the firstPass function for further analysis.*/
+
 #include "assembler.h"
 
 enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,MYDATA,CODE};
@@ -6,57 +8,8 @@ static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly di
 
 static char *commands[]={"add","sub", "and", "or", "nor", "move", "mvhi","mvlo", "addi", "subi", "andi", "ori","nori", "bne", "beq", "blt", "bgt","lb", "sb", "lw", "sw", "lh","sh", "jmp", "la", "call", "stop"}; /*array of assembly commands*/
 
-int checkState(char *ptrInput);
 
-FIELD_BUFFER_T* addToFieldBuffer(char *field,int firstFieldFlag){
-	static FIELD_BUFFER_T *head;
-	static FIELD_BUFFER_T *current;
-	FIELD_BUFFER_T *ptrNode;
-	FIELD_BUFFER_T *tmpPtr;
-
-	tmpPtr = (FIELD_BUFFER_T*)calloc(SINGLENODE, sizeof(FIELD_BUFFER_T));
-	if(!tmpPtr)
-	{
-		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
-		exit(0);
-	}
-	ptrNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
-
-
-	if(firstFieldFlag == FLAGON){
-		/*printf("entered head condition\n");*/
-		head = ptrNode;
-	}
-	else{
-		current->next = ptrNode;
-	}
-
-	ptrNode->field = field;
-	ptrNode->next = NULL;
-
-	current = ptrNode;
-
-	return head;
-
-}
-
-void freeFields(FIELD_BUFFER_T *head){
-	FIELD_BUFFER_T *current;
-	FIELD_BUFFER_T *tmp;
-	current = head;
-	while(1){
-		tmp = current;
-		if(tmp == NULL){
-			break;
-		}
-		current = tmp->next;
-		/*tmp->field = NULL;*/
-		free(tmp->field);
-		free(tmp);
-	}
-}
-
-
+/*The manageContents function receives ptrNode of type pointer to NODE_T, and filename of type pointer to char. The function iterates over the lines from the input file using ptrNode, which points to the head of the linked list of lines, and analyzes each line for errors and divides the lines into three fields, which include an optional label, command or directive, and corresponding values. These fields are passed into the firstPass function for further analysis. The manageContents function does not return anything as it is a void function but prints out error messages accordingly with the filename from the input and the line number from the ptrNode struct.*/
 void manageContents(NODE_T *ptrNode, char *filename){
 	int index,firstWordIndex,labelFlag,labelIndex,midLabel,CommandDirectiveIndex,dataIndex,codeIndex,errorDetected,i,breakFlag,firstFieldFlag,labelWithExtEntFlag;
 	NODE_T *current;
@@ -116,7 +69,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				}
 				else{
 					state = checkState(ptrFirstWord); /*check state of state machine*/
-					if(state == -1){
+					if(state == UNKNOWNSTATE){
 						errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 						firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -143,7 +96,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(!strcmp("stop", ptrCommandDirective)){
 					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
 				}
-				else if(state != -1){
+				else if(state != UNKNOWNSTATE){
 					errorMsg(ERRORTYPE22,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -302,7 +255,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 			if(state == COMMANDORDIRECTIVE){
 				ptrCommandDirective[CommandDirectiveIndex] = '\0'; /*place null terminator to complete string*/
 				state = checkState(ptrCommandDirective);
-				if(state == -1){
+				if(state == UNKNOWNSTATE){
 					errorMsg(ERRORTYPE20,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -341,7 +294,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				ptrLabel[labelIndex] = '\0'; /*place null terminator to complete string*/
 				midLabel = FLAGOFF;
 				/*check to see if label has same name as saved assembly word*/
-				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
+				if((checkState(ptrLabel) != UNKNOWNSTATE) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(ERRORTYPE3,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -495,7 +448,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				}
 				else{
 					state = checkState(ptrFirstWord);
-					if(state == -1){
+					if(state == UNKNOWNSTATE){
 						errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -556,7 +509,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				ptrLabel[labelIndex] = '\0'; /*place null terminator to complete string*/
 				midLabel = FLAGOFF;
 				/*check to see if label is same as saved assembly word*/
-				if((checkState(ptrLabel) != -1) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
+				if((checkState(ptrLabel) != UNKNOWNSTATE) || !strcmp("dh", ptrLabel) || !strcmp("dw", ptrLabel) || !strcmp("db", ptrLabel) || !strcmp("asciz", ptrLabel)){
 					errorMsg(ERRORTYPE3,current->lineNumber,ptrLabel,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 					firstPass(NULL,ptrFirstWord,ptrLabel,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -682,7 +635,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(!strcmp("stop", ptrCommandDirective)){
 					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber);  /*send fields from current line to firstPass*/
 				}
-				else if(state != -1){
+				else if(state != UNKNOWNSTATE){
 					errorMsg(ERRORTYPE22,current->lineNumber,ptrCommandDirective,filename); /*print error message*/
 					errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 					firstPass(ptrFirstWord,ptrCommandDirective,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -729,7 +682,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				if(labelFlag == FLAGON){
 					state = POSTLABEL; /*set state to POSTLABEL*/
 					/*check if label is same as saved assembly word*/
-					if((checkState(ptrFirstWord) != -1) || !strcmp("dh", ptrFirstWord) || !strcmp("dw", ptrFirstWord) || !strcmp("db", ptrFirstWord) || !strcmp("asciz", ptrFirstWord)){
+					if((checkState(ptrFirstWord) != UNKNOWNSTATE) || !strcmp("dh", ptrFirstWord) || !strcmp("dw", ptrFirstWord) || !strcmp("db", ptrFirstWord) || !strcmp("asciz", ptrFirstWord)){
 						errorMsg(ERRORTYPE3,current->lineNumber,ptrFirstWord,filename); /*print error message*/
 						errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 						firstPass(ptrFirstWord,"-1",NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -788,7 +741,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 					}
 					else{
 						state = checkState(ptrFirstWord);
-						if(state == -1){
+						if(state == UNKNOWNSTATE){
 							errorMsg(ERRORTYPE21,current->lineNumber,ptrFirstWord,filename);
 							errorDetected = FLAGON; /*set errorDetected to on as error has been detected*/
 							firstPass(NULL,ptrFirstWord,NULL,labelFlag,errorDetected,filename,current->lineNumber); /*send errorDetected with flag on to firstPass*/
@@ -863,7 +816,7 @@ void manageContents(NODE_T *ptrNode, char *filename){
 }
 
 
-
+/*The checkState function receives ptrInput of type pointer to char and returns an int of the current state of the state machine in manageContents. The function acheives this by comparing the string in ptrInput to all the possible commands and directives and returns the corresponding state as an integer or UNKNOWNSTATE (-1) if the state is unknown.*/
 int checkState(char *ptrInput){
 	int i;
 	enum status state;
@@ -897,10 +850,10 @@ int checkState(char *ptrInput){
 			return state;
 		}
 	}
-	return -1;
+	return UNKNOWNSTATE; /*if state is unknown*/
 }
 
-
+/*The errorMsg function receives error of type int, lineNumber of type int, fieldName of type pointer to char, and fileName of type pointer to char. The function is void so it does not return anything but it prints error messages according to the error type specified in the error input, along with the corressponding line number from the lineNumber input, field name from the fieldName input, and file name from the fileName input.*/
 void errorMsg(int error,int lineNumber,char *fieldName,char *fileName)
 {
 	/*error input enters switch case and prints out corresponding error message*/
@@ -1016,7 +969,8 @@ void errorMsg(int error,int lineNumber,char *fieldName,char *fileName)
 			break;
 	}
 }
-				
+
+/*The newLine function receives errorDetected of type pointer to int, current of type pointer to pointer to NODE_T, labelFlag of type pointer to int, index of type pointer to int, and returns an int. The newLine function transitions to analyze a new line from the input file by setting the errorDetected flag to off, setting the current node to the next node, setting the labelFlag to off, and setting the index back to zero, and returns an integer of the state back to the initial state (PREFIRSTWORD) of the state machine switch case in manageContents.*/				
 int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index){
 	*errorDetected = FLAGOFF; /*sets errorDetected flag to off*/
 	*current = (*current)->next; /*sets current node to next node (next line)*/
@@ -1025,7 +979,7 @@ int newLine(int *errorDetected,NODE_T **current,int *labelFlag,int *index){
 	return PREFIRSTWORD; /*returns state as PREFIRSTWORD*/
 }
 
-
+/*The checkExtraneousChars function receives current of type pointer to pointer to NODE_T, and index of type pointer to index and returns an int, symboling if an error was detected or not. The function iterates over the remaining characters in the corresponding index in the current node and ensures that only white space characters are found. If only white space characters are detected, then the function returns the error flag as FLAGOFF, and if not the function returns the error flag as FLAGON.*/
 int checkExtraneousChars(NODE_T **current,int *index){
 	/*while null terminator and new line character not reached*/
 	while(((*current)->inputChar[*index] != '\0') && ((*current)->inputChar[*index] != '\n')){
@@ -1037,6 +991,55 @@ int checkExtraneousChars(NODE_T **current,int *index){
 		}
 	}		
 	return FLAGOFF; /*if reached end of line without non-whitespace, return error flag as FLAGOFF (no error detected)*/
+}
+
+/*The function addToFieldBuffer receives field of type pointer to char, and firstFieldFlag of type int and returns a pointer to FIELD_BUFFER_T which is the head of the created linked list. The function uses the firstField flag to specify the head of the linked list when the flag is on and if it is off it continues to add to the linked list. The function creates a linked list of all the fields allocated in manageContents so all the fields can eventually be freed.*/
+FIELD_BUFFER_T* addToFieldBuffer(char *field,int firstFieldFlag){
+	static FIELD_BUFFER_T *head; /*head of the linked list*/
+	static FIELD_BUFFER_T *current; /*current node of the linked list*/
+	FIELD_BUFFER_T *ptrNode; /*pointer to linked list*/
+	FIELD_BUFFER_T *tmpPtr; /*temporary pointer to linked list*/
+
+	tmpPtr = (FIELD_BUFFER_T*)calloc(SINGLENODE, sizeof(FIELD_BUFFER_T)); /*allocating memory for node of linked list*/
+	if(!tmpPtr)
+	{
+		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
+		exit(0);
+	}
+	ptrNode = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
+
+
+	if(firstFieldFlag == FLAGON){
+		head = ptrNode; /*set head to ptrNode if firstFieldFlag is on.*/
+	}
+	else{
+		current->next = ptrNode; /*set next node to ptrNode if firstFieldFlag is off.*/
+	}
+
+	ptrNode->field = field; /*set field in ptrNode struct to field*/
+	ptrNode->next = NULL; /*set next in ptrNode struct to NULL*/
+
+	current = ptrNode; /*set current to ptrNode*/
+
+	return head; /*return head of linked list*/
+
+}
+
+/*The freeFields function receives head of type pointer to FIELD_BUFFER_T and returns nothing as it is a void function. The function receives the head of the field buffer created in the addToFieldBuffer function, and iterates through the buffer and frees each field and struct from within the buffer. The function iterates through the linked list until the final node is reached*/
+void freeFields(FIELD_BUFFER_T *head){
+	FIELD_BUFFER_T *current; /*current node*/
+	FIELD_BUFFER_T *tmp; /*temporary node*/
+	current = head; /*set current node to head*/
+	/*iterate until end of linked list*/
+	while(1){
+		tmp = current; /*set temp to current*/
+		if(tmp == NULL){
+			break; /*break if end of linked list reached*/
+		}
+		current = tmp->next; /*set current node to next node of temp*/
+		free(tmp->field); /*free field from tmp struct*/
+		free(tmp); /*free tmp*/
+	}
 }
 
 

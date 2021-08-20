@@ -25,6 +25,8 @@
 
 #define STARTINDEX 0
 
+#define UNKNOWNSTATE -1
+
 #define FIRSTLINE 1
 #define EXTRACHARPASTLIMIT 1
 
@@ -135,8 +137,10 @@ void handleFileContents(FILE *fd, char *filename);
 /*The storeLines function receives ptrNode of type pointer to NODE_T and fd of type pointer to fd. The function iterates over the characters from the input fd, and stores character from each line in a node of ptrNode, and creates a new node for each line. The function returns an int that is used as a flag to symbol if the file is empty or not.*/
 int storeLines(NODE_T *ptrNode, FILE *fd);
 
-
+/*The manageContents function receives ptrNode of type pointer to NODE_T, and filename of type pointer to char. The function iterates over the lines from the input file using ptrNode, which points to the head of the lines, and analyzes each line for errors and divides the lines into three fields, which include an optional label, command or directive, and corresponding values. These fields are passed into the firstPass function for further analysis. The manageContents function does not return anything as it is a void function but prints out error messages accordingly with the filename from the input and the line number from the ptrNode struct.*/
 void manageContents(NODE_T *ptrNode, char *filename);
+
+/*The firstPass function receives ptrField1 of type pointer to char, ptrField2 of type pointer to char, ptrField3 of type pointer to char, labelFlag of type int, errorDetected of type int, filename of type pointer to char, lineNumber of type int, and returns nothing as it is a void function. The function is called from manageContents for every line of the input file, with ptrField1 containing an optional pointer, ptrField2 containing a command or directive, ptrField3 containing the corresponding values, labelFlag symboling if a label was defined, errorDetected symboling if error was detected, filename with the name of the current file, and lineNumber with the current line number. The function begins to build the symbol table and memory image and calls the secondPass function if no errors were detected.*/
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected, char *filename,int lineNumber);
 
 /*The symbolTable function receives a symbol of type pointer to char, value of type int, attribute1 of type int, attribute 2 of type int, and firstSymbolFlag of type int, and returns the head of the symbol table of type pointer to TABLE_NODE_T. The symbol (label) should be inputted in the first argument, following by its corresponding value (address), attribute1, attribute2, and the final argument, firstSymbolFlag, should be on if it is the first call to the function and the symbol table needs to be initialized, and should be off it is not the first call to the function and an additional node will be added to the existing symbol table. The function returns the head of the symbol table of type pointer to TABLE_NODE_T which contains the fields, symbol of type pointer to char, value of type int, and attributes which is an array of ints, and a pointer to the next node of the symbol table.*/
@@ -145,6 +149,7 @@ TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,i
 /*The storeLineFields function receives ptrField1 of type pointer to char, ptrField2 of type pointer to char, ptrField3 of type pointer to char, labelFlag of type int, lineNumber of type int, and firstLineFlag of type int. The function returns the head of the line fields of type LINE_FIELDS_T. For each line in the input file, the line can be separated into three fields (optional label, command or directive, corresponding values). This function stores each field for each line from the input file, along with a labelFlag alerting if label used in line, corresponding lineNumber, and firstLineFlag to notify if it is the first line of the file. This function is used in the first pass of the file so all the fields and corresponding information can be used in the second pass.*/
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag);
 
+/*The secondPass function receives linesHead of type pointer to LINE_FIELDS_T, tableHead of type pointer to TABLE_NODE_T, ICF of type int, DCF of type int, filename of type pointer to char, memImHead of type pointer to MEMIM, symbolTableInitFlag of type int, and does not return anything as it is a void function. The function iterates through the second pass algorithm after it is called from the firstPass function, and if no errors were detected, the algorithm proceeds to complete the memory image and finally outputs the corresponding files (.ob,.ext.ent).*/
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag);
 
 /*The errorMsg function receives error of type int, lineNumber of type int, fieldName of type pointer to char, and fileName of type pointer to char. It is a void function so it does not return anything but it is used to print out error messages according to the input. The error argument is used to specify the type of error, the lineNumber allows to print out in what line the error was detected, the fieldName allows to print the field of interest, and the fileName allows the print in what file the error was detected.*/
@@ -182,12 +187,31 @@ char* checkCommandlaOrcall(char *ptrCode,int lineNumber,char *filename);
 char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename);
 
 
+/*The checkState function receives ptrInput of type pointer to char and returns an int of the current state of the state machine in manageContents. The function acheives this by comparing the string in ptrInput to all the possible commands and directives and returns the corresponding state as an integer or UNKNOWNSTATE (-1) if the state is unknown.*/
+int checkState(char *ptrInput);
+
+/*The addToFieldBuffer function receives field of type pointer to char and firstFieldFlag of type int and returns a pointer to FIELD_BUFFER_T. The function uses the firstFieldFlag to indicate the head of the buffer (when flag is on) and when to add to the buffer (when flag is off), and creates a buffer of all the fields indicated as input, and returns the head of the buffer. This function is used from manageContents to store all the nodes the are allocated so they can be freed later using the buffer.*/
+FIELD_BUFFER_T* addToFieldBuffer(char *field,int firstFieldFlag);
+
+
+/*The freeFields function receives head of type pointer to FIELD_BUFFER_T and returns nothing as it is a void function. The function receives the head of the field buffer created in the addToFieldBuffer function, and iterates through the buffer and frees each field and struct from within the buffer.*/
+void freeFields(FIELD_BUFFER_T *head);
+
+
+/*The freeMemIm function receives node of type MEMIM* and returns nothing as it is a void function. The function iterates through the memory image and frees every node from the memory image until the end of the memory image is reached. For each node the function also frees the linked list within the p field of the struct.*/
 void freeNodes(NODE_T *ptrNode);
+
+/*The freeLines function receives linesPtr of type LINE_FIELDS_T* and returns nothing as it is a void function. The function iterates through the line fields and frees every node from the line fields until the end of the line fields is reached.*/
 void freeLines(LINE_FIELDS_T* linesPtr);
+
+/*The freeTable function receives tablePtr of type TABLE_NODE_T* and returns nothing as it is a void function. The function iterates through the symbol table and frees every node from the table until the end of the table is reached*/
 void freeTable(TABLE_NODE_T* tablePtr);
 
 /*The createOutputFiles function receives memImHead of type pointer to MEMIM, tableHead of type pointer to TABLE_NODE_T, filename of type pointer to char, external head of type pointer to SYMBOL_ADD_STRUCT_T, ICF of type int, DCF of type int, errorFlag of type int, symbolTableInitFlag of type int and externalFlag of type int, and does not return anything, but creates and writes to files if necessary. The function creates output files of type .ob,.ext, and .ent. To do this, the file receives as inputs the head of the memory image, memImHead, which is used to print to the object file, the head of the symbol table, tableHead, which is used to create the extern file, the input file name which is used to name the output files, externalHead which is used to create the extern files, ICF and DCF which are used to label the object file, errorFlag which alerts if files should be printed or not, symbolTableInitFlag which alerts if symbol table was initialized, and externalFlag, which alerts if externals were used and if an ext file should be created.*/
 void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename, SYMBOL_ADD_STRUCT_T *externalHead, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag);
+
+/*The freeSymbolAddNewStruct function receives headStructPtr of type SYMBOL_ADD_STRUCT_T* and returns nothing as it is a void function. The function iterates through the list of nodes returned from symbolAddNew and frees every node until the end of the linked list is reached.*/
+void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr);
 
 MEMIM *memAdd(char*,char*,char*);
 char *Registers(char*);
@@ -204,6 +228,8 @@ void printSymbolTable(TABLE_NODE_T *symbolTable);
 SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry,char *filename);
 void printListToFile(MEMIM *head,FILE *fptrObject);
 
+
+/*The freeMemIm function receives node of type MEMIM* and returns nothing as it is a void function. The function iterates through the memory image and frees every node from the memory image until the end of the memory image is reached. For each node the function also frees the linked list within the p field of the struct.*/
 void freeMemIm(MEMIM* memImHead);
 
 enum errorTypes {ERRORTYPE0, ERRORTYPE1, ERRORTYPE2, ERRORTYPE3,  ERRORTYPE4, ERRORTYPE5, ERRORTYPE6, ERRORTYPE7, ERRORTYPE8, ERRORTYPE9, ERRORTYPE10, ERRORTYPE11, ERRORTYPE12, ERRORTYPE13, ERRORTYPE14, ERRORTYPE15, ERRORTYPE16, ERRORTYPE17, ERRORTYPE18, ERRORTYPE19, ERRORTYPE20, ERRORTYPE21, ERRORTYPE22, ERRORTYPE23, ERRORTYPE24, ERRORTYPE25, ERRORTYPE26, ERRORTYPE27, ERRORTYPE28, ERRORTYPE29, ERRORTYPE30, ERRORTYPE31, ERRORTYPE32, ERRORTYPE33, ERRORTYPE34};

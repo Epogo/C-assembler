@@ -1,9 +1,13 @@
+/*This file contains the firstPass function which contains the firstPass algorithm. The firstPass function is called from within the manageContents function and continues to analyze the input file line by line and begins to create the symbol table and memory image, and checks for errors. The secondPass function is called if no errors were detected in the current file*/
+
 #include "assembler.h"
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly directives*/
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL}; /*enum of symbol table attributes*/
 
+
+/*The firstPass function receives ptrField1 of type pointer to char, ptrField2 of type pointer to char, ptrField3 of type pointer to char, labelFlag of type int, errorDetected of type int, filename of type pointer to char, lineNumber of type int, and returns nothing as it is a void function. The function is called from manageContents for every line of the input file, with ptrField1 containing an optional pointer, ptrField2 containing a command or directive, ptrField3 containing the corresponding values, labelFlag symboling if a label was defined, errorDetected symboling if error was detected, filename with the name of the current file, and lineNumber with the current line number. The function begins to build the symbol table and memory image and calls the secondPass function if no errors were detected.*/
 void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int errorDetected,char *filename,int lineNumber){
 
 	enum steps {STEP1, STEP2, STEP3,  STEP4, STEP5, STEP6, STEP7, STEP8, STEP9, STEP10, STEP11, STEP12, STEP13, STEP14, STEP15, STEP16, STEP17, STEP18, STEP19, STEP20, STEP21}; /*enum of all steps of state machine of first pass algorithm*/
@@ -456,7 +460,7 @@ void firstPass(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int
 			
 }
 
-
+/*The storeLineFields function receives ptrField1 of type pointer to char, ptrField2 of type pointer to char, and ptrField3 of type pointer to char, labelFlag of type int, lineNumber of type int, firstLineFlag of type int, and returns the head of the line fields of type pointer to LINE_FIELDS_T. The function uses the firstLineFlag to create the head of the linked list when the flag is on and adds nodes when the flag is off. In each line field the three fields from ptrField1, ptrField2, and ptrField3 are stored along with the labelFlag, and lineNumber, so all the lines that were iterated through in the first pass can then be iterated through again in the second pass and then freed.*/
 LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,int labelFlag,int lineNumber,int firstLineFlag){
 	LINE_FIELDS_T *ptrLineFields; /*pointer to line fields*/
 	LINE_FIELDS_T *tmpPtr; /*temporary pointer to line fields*/
@@ -502,71 +506,78 @@ LINE_FIELDS_T* storeLineFields(char *ptrField1,char *ptrField2,char *ptrField3,i
 
 }
 
+
+/*The freeLines function receives linesPtr of type LINE_FIELDS_T* and returns nothing as it is a void function. The function iterates through the line fields and frees every node from the line fields until the end of the line fields is reached.*/
 void freeLines(LINE_FIELDS_T* linesPtr){
-    LINE_FIELDS_T *temp;
-    LINE_FIELDS_T *current;
+    LINE_FIELDS_T *temp; /*temporary pointer to LINE_FIELDS_T*/
+    LINE_FIELDS_T *current; /*current pointer to LINE_FIELDS_T*/
 
-    current=linesPtr;
-    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    current=linesPtr; /*sets current pointer to linesPtr*/
+    /*While the linked list is not null-continue to free nodes from the linked-list*/
     while(1){
-        temp=current;
+        temp=current; /*set temp to current*/
 
-        current=current->next;
+        current=current->next; /*set current to next node*/
 	
-        free(temp);
+        free(temp); /*free temp node*/
 	if (current==NULL){
-            break;
+            break; /*break from while if end of linked list reached*/
 	}
     }
 }
 
+
+/*The freeMemIm function receives node of type MEMIM* and returns nothing as it is a void function. The function iterates through the memory image and frees every node from the memory image until the end of the memory image is reached. For each node the function also frees the linked list within the p field of the struct.*/
 void freeMemIm(MEMIM* node){
-    MEMIM *temp;
-    MEMIM *current;
-    DATA *tempData;
-    DATA *currentData;
+    MEMIM *temp; /*temporary pointer to MEMIM*/
+    MEMIM *current; /*current pointer to MEMIM*/
+    DATA *tempData; /*temporary pointer to DATA*/
+    DATA *currentData; /*current pointer to DATA*/
 
-    current=node;
+    current=node; /*sets current pointer to node*/
+    /*While the linked list is not null-continue to free nodes from the linked-list*/
     while(1){
-	temp = current;
-
+	temp = current; /*set temp to current*/
+	
+	/*check if p field of temp is not null*/
 	if(temp->p!=NULL){
-		currentData = temp->p;
+		currentData = temp->p; /*set currentData to temp->p*/
+    		/*While the linked list is not null-continue to free nodes from the linked-list*/
 		while(1){
-			tempData = currentData;
-			currentData = currentData->next;
-			free(tempData);
+			tempData = currentData; /*set tempData to currentData*/
+			currentData = currentData->next; /*set currentData to next node*/
+			free(tempData); /*free tempData*/
 			if(currentData == NULL){
-				break;
+				break; /*break from while if end of linked list reached*/
 			}
 		}
 	}
 
-	current = current->next;
+	current = current->next; /*set current node to next node*/
 
-        free(temp);
+        free(temp); /*free temp node*/
 	
 	if (current==NULL)
-		break;
+		break; /*break from while if end of linked list reached*/
     }
 }
 
 
-
+/*The freeTable function receives tablePtr of type TABLE_NODE_T* and returns nothing as it is a void function. The function iterates through the symbol table and frees every node from the table until the end of the table is reached*/
 void freeTable(TABLE_NODE_T* tablePtr){
     TABLE_NODE_T *temp;/*A temp node which will be deleted from the linked list*/
     TABLE_NODE_T *current;/*A temp node which will be deleted from the linked list*/
 
-    current = tablePtr;
-    /*While the linked list is not null-continue to delete nodes from the linked-list*/
+    current = tablePtr; /*set current node to tablePtr*/
+    /*While the linked list is not null-continue to free nodes from the linked-list*/
     while(1){
-        temp=current;
+        temp=current; /*set temp to current*/
 
-        current=current->next;
+        current=current->next; /*set current node to next node*/
 	
-        free(temp);
+        free(temp); /*free temp node*/
 	if (current==NULL){
-            break;
+            break; /*break from while if end of linked list reached*/
 	}
     }
 }
