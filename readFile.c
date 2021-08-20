@@ -28,15 +28,15 @@ void readFile(int argc, char** argv){
 
 		fileNames = argv; /*assign argument vector to fileNames variable*/
 
-		if(!(fd = fopen(fileNames[i], "r"))){
-			/*fopen to initialize file pointer fd and if the file cannot be opened print error message, free filename, and continue to next file argument*/
-			printf("Cannot open file \"%s\"\n",fileNames[i]);
-			free(filename);
-			continue;
-		}
 		if(!((fileNames[i][strlen(fileNames[i])-FILEEXTENSIONPOS1] == '.') && (fileNames[i][strlen(fileNames[i])-FILEEXTENSIONPOS2] == 'a') && (fileNames[i][strlen(fileNames[i])-FILEEXTENSIONPOS3] == 's'))){
 			/*if file entered from the command line arguments does not have a .as ending print error message, free filename and continue to next file argument*/
 			printf("File \"%s\" must be assembly file (.as) \n",fileNames[i]);
+			free(filename);
+			continue;
+		}
+		if(!(fd = fopen(fileNames[i], "r"))){
+			/*fopen to initialize file pointer fd and if the file cannot be opened print error message, free filename, and continue to next file argument*/
+			printf("Cannot open file \"%s\"\n",fileNames[i]);
 			free(filename);
 			continue;
 		}

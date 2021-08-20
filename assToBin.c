@@ -225,7 +225,7 @@ MEMIM *memAdd(char *ptrField1,char *ptrField2,char *ptrField3){
             if(!strcmp(ptrField2,jCommands[i])){
                 comFlag=FLAGON;/*Raise a flag to prevent further search for a match*/
 	        node->p = NULL;/*The data linked-list pointer is null (for non-directives memory images).*/
-                if (i<LABEL_IS_MISSING_BRANCH_COM){
+                if (i<INDEX_OF_STOP_COM){
                     strcpy(opStrPoint,jOpCode[i]);/*Copy the relevant operation code to the operation string.*/
                     /*If the second field is a label field*/
                     if(*ptrField3!='$'){
@@ -955,5 +955,4 @@ int isInt(char *str1){
     }
     return FLAGON; /*return flag on*/
 }
-
 

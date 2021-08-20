@@ -4,7 +4,8 @@ DATE: 20.08.21
 The purpose of this project is to implement an "Assembler" which is used as an interpreter only.
 The assembler is able to handle unlimited amount of assembly files (.as files) and each file can contain unlimited
 amount of lines.
-Each line within the file is limited to 80 chars.
+Each line within the file is limited to 80 chars. 
+Each file name is assumed to be limited to 100 chars.
 The assembler will interpret each legal file (a file without any input errors).
 For files which will have errors inside them-those files won't be interpreted, but all the 
 errors which have been detected will be printed to the screen.
