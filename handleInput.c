@@ -1,6 +1,8 @@
+/*The following file is mainly used to analyze the input file line by line and create a linked list of nodes that store the characters of each line of the input file for further analysis.*/
+
 #include "assembler.h"
 
-
+/*The handleFileContents function receives fd of type pointer to FILE and filename of type pointer to char. The function allocates memory for the first node of a linked list to store characters from the input file, with a line of input for each node. The function passes this first node to the storeLines function where the linked list is created and if the file is not empty then the manageContents function is called. The handleFileContents is void and does not return anything.*/
 void handleFileContents(FILE *fd, char *filename){
 	NODE_T *ptrNode; /*initialize pointer to NODE_T, variable ptr_node*/
 	NODE_T *tmpPtr; /*initialize pointer to tmpPtr of type NODE_T*/
@@ -25,7 +27,7 @@ void handleFileContents(FILE *fd, char *filename){
 }
 
 
-
+/*The storeLines function receives ptrNode of type pointer to NODE_T, and fd of type pointer to ptrNode. The first node was allocated in handleFileContents and passed to the function and characters from fd will be stored in ptrNode. Each time a new line is detected, a new node is created and the following characters are stored in the new node. This creates a linked list of characters from each line of the input file. The function returns an int that is used as a flag to alert if the file is empty or not.*/
 int storeLines(NODE_T *ptrNode, FILE *fd){
 	int charFromFile,lineCounter,index,emptyFileFlag;
 	NODE_T *head; /*initialize pointer to head of type NODE_T*/

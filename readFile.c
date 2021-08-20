@@ -1,6 +1,8 @@
+/*This file is used to iterate over all arguments from the command line and open all the files entered as file arguments. The file prints errors, for example, of files that do not exist or files with incorrect extensions. The file calls other functions from other files once each file is successfully opened to further analyze the contents of the file.*/
+
 #include "assembler.h"
 
-
+/*The readFile function receives argc of type int and argv of type pointer to pointer to char as inputs, and is a void function so does not return anything. The argc is the argument counter and is used in a loop to iterate over all arguments entered from the command line, and argv is the argument vector which is used to store the name of each file and attempt to open the file. The function prints out an error if the file does not exist or the extension is not ".as". If the file is sucessfully opened the file pointer is passed to the handleFileContents function for further analysis is closed once the analysis is finished.*/
 void readFile(int argc, char** argv){
 	int i,j; /*declare index variables*/
 	char **fileNames; /*declare pointer to a pointer to a char storing vector of file names*/

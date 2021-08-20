@@ -1,3 +1,5 @@
+/*The following file receives the code following a command and checks the code for errors. The file contains the checkCommand function which analyzes the type of command and calls one of the remaing functions in the file to analyze the code for errors accordingly.*/
+
 #include "assembler.h"
 
 
@@ -12,7 +14,7 @@ static char *Icommands2[]={"bne", "beq", "blt", "bgt"}; /*I commands of type 2*/
 enum comType {Rcom1,Rcom2,Icom1,Icom2,jumpCom,laOrcallCom}; /*enum of all com types to check*/
 
 
-
+/*The checkCommand function receives ptrCode of type pointer to char, ptrCommand of type pointer to char, lineNumber of type int, filename of type pointer to char, and returns a pointer to char which stores the checked code. The function checks the command stored in ptrCommand and calls the corresponding function to analyze the code following the command according to the type of command. The function returns the checked code if no errors were detected, and returns NULL if errors were detected.*/
 char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber,char *filename){
 	int i,currentComType;
 	char *ptrCodeChecked; /*pointer to char to store checked code*/
@@ -74,6 +76,7 @@ char* checkCommand(char *ptrCode,char *ptrCommand,int lineNumber,char *filename)
 }
 
 
+/*The checkCommandR1 function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode (for "add","sub", "and", "or", "nor" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function does this with the assumption that these types of commands contain three registers and they all should be comma separated. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandR1(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars;
@@ -246,7 +249,7 @@ char* checkCommandR1(char *ptrCode,int lineNumber,char *filename){
 	return ptrCodeChecked; /*return checked code*/
 }
 
-
+/*The checkCommandR2 function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode (for "move", "mvhi","mvlo" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function achieves this with the assumption that these types of commands are followed with two comma separated registers. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandR2(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars;
@@ -420,6 +423,7 @@ char* checkCommandR2(char *ptrCode,int lineNumber,char *filename){
 }
 
 
+/*The checkCommandI1 function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode for ("addi", "subi", "andi", "ori","nori","lb", "sb", "lw", "sw", "lh","sh" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function achieves this with the assumption that these types of command are followed by a register, a comma, an immediate value, another comma, and another register. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars,immediateFlag;
@@ -657,6 +661,7 @@ char* checkCommandI1(char *ptrCode,int lineNumber,char *filename){
 }
 
 
+/*The checkCommandI2 function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode (for "bne", "beq", "blt", "bgt" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function achieves this with the assumption that these types of commands are followed by two comma seprated registers, another comma, and a label. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandI2(char *ptrCode,int lineNumber,char *filename){
 
 	int dollarCount, dollarFlag,index,newIndex,commaFlag,numberFlag,endLineFlag,expectCommaFlag,numDollars,labelFlag;
@@ -889,6 +894,7 @@ char* checkCommandI2(char *ptrCode,int lineNumber,char *filename){
 }
 
 
+/*The checkCommandjump function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode (for "jmp" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function achieves this with the assumption that the jmp command is followed by either a label or a register. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandjump(char *ptrCode,int lineNumber,char *filename){
 	int index,newIndex,labelFlag;
 	char *ptrCodeChecked; /*pointer to char to store checked code*/
@@ -994,6 +1000,7 @@ char* checkCommandjump(char *ptrCode,int lineNumber,char *filename){
 }
 
 
+/*The checkCommandlaOrcall function receives ptrCode of type pointer to char, lineNumber of type int, and filename of type pointer to char, and returns a pointer to char storing the checked code. The function analyzes the characters stored in ptrCode (for "la", "call" commands), and prints out an error message if detected, with the line number and filename from the function arguments in the error message. The function achieves this with the assumption that these types of commands are followed by a label. The function returns the checked code if no errors were detected, and returns NULL if an error was detected.*/
 char* checkCommandlaOrcall(char *ptrCode,int lineNumber,char *filename){
 	int index,newIndex,labelFlag;
 	char *ptrCodeChecked; /*pointer to char to store checked code*/
