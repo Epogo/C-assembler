@@ -2,58 +2,57 @@
 #include <stdlib.h> /*standard library header file*/
 #include <string.h> /*string header file*/
 
+#define SINGLEARG 1 /*constant for single argument*/
+
 #define MAXLINELEN 80 /*sets the buffer size to 80*/
-#define ERROR 1
-#define NOERROR 0
+#define ERROR 1 /*constant symboling error*/
+#define NOERROR 0 /*constant symboling no error*/
 #define MAXLABELLEN 32 /*maximum length of label of 31 + 1 for \0*/
 #define MAXDATACODELEN 8 /* maximum length of data or code command (.extern is 7 chars + 1 for \0)*/
-#define FLAGOFF 0
-#define FLAGON 1
-#define NUMDIRECTIVES 4
-#define NUMCOMMANDS 27
-#define NOQUOTES 0
-#define OPENQUOTES 1
-#define CLOSEDQUOTES 2
-#define LASTLINE -1
-#define SINGLENODE 1
+#define FLAGOFF 0 /*constant for flag off*/
+#define FLAGON 1 /*constant for flag on*/
+#define NUMDIRECTIVES 4 /*number of directive types considering only ".dh",".dw",".db",".asciz"*/
+#define NUMCOMMANDS 27 /*number of command types*/
+#define LASTLINE -1 /*last line flag*/
+#define SINGLENODE 1 /*constant symboling single node*/
 
-#define MAXFILENAMELEN 100
+#define MAXFILENAMELEN 100 /*maximum file name length assumed to be 100 characters*/
 #define FILEEXTENSIONPOS1 3 /*position from end of file extension "." of ".as"*/
 #define FILEEXTENSIONPOS2 2 /*position from end of file extension "a" of ".as"*/
 #define FILEEXTENSIONPOS3 1 /*position from end of file extension "s" of ".as"*/
 #define ARGCOUNTERSTART 1 /*first index of argument vector with file inputs*/
 
-#define STARTINDEX 0
+#define STARTINDEX 0 /*zero index*/
 
-#define UNKNOWNSTATE -1
+#define UNKNOWNSTATE -1 /*constant for unknown state*/
 
-#define FIRSTLINE 1
-#define EXTRACHARPASTLIMIT 1
+#define FIRSTLINE 1 /*first line constant*/
+#define EXTRACHARPASTLIMIT 1 /*constant for extraneous char*/
 
-#define NUMRCOM1 5
-#define NUMRCOM2 3
-#define NUMICOM1 11
-#define NUMICOM2 4
-#define NUMREGSR1 3
-#define NUMREGSR2 2
-#define NUMREGSI1 2
-#define NUMREGSI2 2
-#define REGISTER 1
-#define NEXTINDEX 1
+#define NUMRCOM1 5 /*number of R commands of type 1*/
+#define NUMRCOM2 3 /*number of R commands of type 2*/
+#define NUMICOM1 11 /*number of I commands of type 1*/
+#define NUMICOM2 4 /*number of I commands of type 2*/
+#define NUMREGSR1 3 /*number of registers for R1 type command*/
+#define NUMREGSR2 2 /*number of registers for R2 type command*/
+#define NUMREGSI1 2 /*number of registers for I1 type command*/
+#define NUMREGSI2 2 /*number of registers for I2 type command*/
+#define REGISTER 1 /*register number*/
+#define NEXTINDEX 1 /*constant for next index*/
 
-#define PREVINDEX 1
+#define PREVINDEX 1 /*constant for previous index*/
 
-#define DCINIT 0
-#define ICINIT 100
-#define ICINCREMENT 4
-#define ATTRIBUTE1 0
-#define ATTRIBUTE2 1
-#define ERRORFLAG1 1
-#define ERRORFLAG2 2
-#define ERRORFLAG3 3
-#define ERRORFLAG4 4
-#define ERRORFLAG5 5
-#define EXTERNVALUE 0
+#define DCINIT 0 /*initial data counter*/
+#define ICINIT 100 /*initial instruction counter*/
+#define ICINCREMENT 4 /*instruction counter increment*/
+#define ATTRIBUTE1 0 /*index of attribute 1*/
+#define ATTRIBUTE2 1 /*index of attribute 2*/
+#define ERRORFLAG1 1 /*constant for ERRORFLAG1*/
+#define ERRORFLAG2 2 /*constant for ERRORFLAG2*/
+#define ERRORFLAG3 3 /*constant for ERRORFLAG3*/
+#define ERRORFLAG4 4 /*constant for ERRORFLAG4*/
+#define ERRORFLAG5 5 /*constant for ERRORFLAG5*/
+#define EXTERNVALUE 0 /*value for extern in symbol table*/
 
 #define NUMBIT 16
 #define RCOMLEN 8
@@ -68,63 +67,68 @@
 #define NUM_OF_BITS_IMM 17
 #define NUM_OF_BITS_IMM_STOP 27
 
-
+/*struct to store data*/
 typedef struct data{
     char byte[BITSINBYTE];/*Chars array with length of 8 bits (for a byte) and a NULL terminator*/
-    struct data *next;
+    struct data *next; /*next node in linked list*/
 }DATA;
 
-
+/*struct to store memory image*/
 typedef struct memoryImage{
     char symbol[SYMBOL_NUM_OF_CHARS];/*The symbol of a node*/
     char op[NUM_OF_BITS_OP];/*An operation (expressed by binary bits)*/
-    DATA *p;/*A pointer to data*/
+    DATA *p;/*A pointer to data linked list*/
     int localDc;/*Data counter*/
-    int dc;
-    int ic;
-    int missLabelFlag;
-    int errorFlag;
-    struct memoryImage *next;
+    int dc; /*data counter*/
+    int ic; /*instruction counter*/
+    int missLabelFlag; /*indicates missing label*/
+    int errorFlag; /*indicates error*/
+    struct memoryImage *next; /*next node in linked list*/
 } MEMIM;
 
+/*struct to store linked list of line fields*/
 typedef struct fieldBuffer{
-    char *field;
-    struct fieldBuffer *next;
+    char *field; /*stores field (e.g. label or command or directive or values*/
+    struct fieldBuffer *next; /*next node in linked list*/
 }FIELD_BUFFER_T;
 
+/*struct to store linked list of all characters in each line of input file*/
 struct node {
-	int lineNumber;
-	char inputChar[MAXLINELEN+1];
+	int lineNumber; /*stores current line number*/
+	char inputChar[MAXLINELEN+EXTRACHARPASTLIMIT]; /*stores all characters in single line from input file*/
 	struct node* next; /*pointer to the next node (for linked list)*/
 };
 typedef struct node NODE_T; /*node struct defined as type NODE_T*/
 
-#define NUMATTRIBUTES 2
+#define NUMATTRIBUTES 2 /*number of attributes for symbol table*/
 
+/*struct to store linked list of symbol table*/
 struct tableNode{
-	char *symbol;
-	int value;
-	int attribute[NUMATTRIBUTES];
-	struct tableNode* next;
+	char *symbol; /*stores label*/
+	int value; /*stores value (address)*/
+	int attribute[NUMATTRIBUTES]; /*stores attributes of label*/
+	struct tableNode* next; /*pointer to the next node of linked list*/
 };
 typedef struct tableNode TABLE_NODE_T;
 
+/*struct to store linked list of all fields in each line*/
 struct lineFields{
-	char label[MAXLABELLEN];
-	char comOrDir[MAXDATACODELEN];
-	char values[MAXLINELEN];
-	int labelFlag;
-	int lineNumber;
-	struct lineFields* next;
+	char label[MAXLABELLEN]; /*stores label*/
+	char comOrDir[MAXDATACODELEN]; /*stores command or directive*/
+	char values[MAXLINELEN]; /*stores corresponding values*/
+	int labelFlag; /*indicates label detected*/
+	int lineNumber; /*indicates line number*/
+	struct lineFields* next; /*pointer to next node in linked list*/
 };
 typedef struct lineFields LINE_FIELDS_T;
 
+/*struct to store linked list of returns from symbolAddNew*/
 struct symbolAddStruct{
-	char label[MAXLABELLEN];
-	int address;
-	int externalFlag;
-	int errorFlag;
-	struct symbolAddStruct* next;
+	char label[MAXLABELLEN]; /*stores label*/
+	int address; /*stores address*/
+	int externalFlag; /*indicates if external detected*/
+	int errorFlag; /*indicates if label detected*/
+	struct symbolAddStruct* next; /*pointer to next node in linked list*/
 };
 typedef struct symbolAddStruct SYMBOL_ADD_STRUCT_T;
 
@@ -187,17 +191,6 @@ char* checkCommandlaOrcall(char *ptrCode,int lineNumber,char *filename);
 char* checkData(char *ptrData,char *ptrDirective,int lineNumber,char *filename);
 
 
-/*The checkState function receives ptrInput of type pointer to char and returns an int of the current state of the state machine in manageContents. The function acheives this by comparing the string in ptrInput to all the possible commands and directives and returns the corresponding state as an integer or UNKNOWNSTATE (-1) if the state is unknown.*/
-int checkState(char *ptrInput);
-
-/*The addToFieldBuffer function receives field of type pointer to char and firstFieldFlag of type int and returns a pointer to FIELD_BUFFER_T. The function uses the firstFieldFlag to indicate the head of the buffer (when flag is on) and when to add to the buffer (when flag is off), and creates a buffer of all the fields indicated as input, and returns the head of the buffer. This function is used from manageContents to store all the nodes the are allocated so they can be freed later using the buffer.*/
-FIELD_BUFFER_T* addToFieldBuffer(char *field,int firstFieldFlag);
-
-
-/*The freeFields function receives head of type pointer to FIELD_BUFFER_T and returns nothing as it is a void function. The function receives the head of the field buffer created in the addToFieldBuffer function, and iterates through the buffer and frees each field and struct from within the buffer.*/
-void freeFields(FIELD_BUFFER_T *head);
-
-
 /*The freeMemIm function receives node of type MEMIM* and returns nothing as it is a void function. The function iterates through the memory image and frees every node from the memory image until the end of the memory image is reached. For each node the function also frees the linked list within the p field of the struct.*/
 void freeNodes(NODE_T *ptrNode);
 
@@ -213,18 +206,38 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 /*The freeSymbolAddNewStruct function receives headStructPtr of type SYMBOL_ADD_STRUCT_T* and returns nothing as it is a void function. The function iterates through the list of nodes returned from symbolAddNew and frees every node until the end of the linked list is reached.*/
 void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr);
 
+/*This function is responsible for adding nodes the memory image (first pass only).
+@param ptrField1-This parameter is used for the label field.
+@param ptrField2-This parameter is used for the command/directive name.
+@param ptrField3-This parameter is used for the registers/Data.
+@return node-a memory image struct is returned. 
+This function is responsible for converting assembly lines to binary digits lines (binary memory image).
+The function is building the memory image after the first pass, it detects the type of the command or directive
+and converts the content of the assembly line to a bits array (by using "a table" which stores opcodes/functs of each command).
+For commands from J type (excluding "stop" command) and branching commands-the missing symbol value will be completed by using a function
+which has been written in order to perform the second pass.*/
 MEMIM *memAdd(char*,char*,char*);
-char *Registers(char*);
-char *decToBin(int);
-char *decToBinJ(int);
-char *ascizToBin(int);
-char *decToBinDirW(char*);
-char *decToBinDirH(char*);
-void deleteNode(MEMIM*);
+
+
+/*This function takes a memoryImage node and adds the node to the corresponding memoryImage linked-list (of commands or data).
+@param headCom-the head of the memoryImage commands linked-list.
+@param headData-the head of the memoryImage data linked-listd.
+@param node-the node which will be added to one of the memoryImage linked-lists.
+@param firstDataNodeAddflag- flag to indicate if data has been detected already.
+@param firstComNodeAddflag - flag to indicate if com has been detected already..
+The function is checking whether the added node is a "command type" node or "data type" node.
+Correspondingly-the added node will be added to the suitable linked-list.*/
 void addNode(MEMIM *headCom,MEMIM *headData, MEMIM *node,int firstDataNodeAddflag,int firstComNodeAddflag);
-char binToHex(char *bin);
+
+
+/*This function takes two memoryImage linked-list heads and concatenates two lists to a single list.
+The first list is the commands linked-list, the second list is the data linked-list.
+@param headCom-the head of the commands memoryImage linked-list.
+@param headData-the head of the data memoryImage linked-list.
+The function is looping over the commands list until the end of the list has been reached, then-the next field of the last node of the
+commands linked-list is changed to pointed to the head of the data linked-list.*/
 void concatNodes(MEMIM *headCom,MEMIM *headData);
-void printSymbolTable(TABLE_NODE_T *symbolTable);
+
 SYMBOL_ADD_STRUCT_T* symbolAddNew(MEMIM *head,TABLE_NODE_T* table,int lineNumber,int firstEntry,char *filename);
 void printListToFile(MEMIM *head,FILE *fptrObject);
 
@@ -232,6 +245,7 @@ void printListToFile(MEMIM *head,FILE *fptrObject);
 /*The freeMemIm function receives node of type MEMIM* and returns nothing as it is a void function. The function iterates through the memory image and frees every node from the memory image until the end of the memory image is reached. For each node the function also frees the linked list within the p field of the struct.*/
 void freeMemIm(MEMIM* memImHead);
 
+/*enum of all error types*/
 enum errorTypes {ERRORTYPE0, ERRORTYPE1, ERRORTYPE2, ERRORTYPE3,  ERRORTYPE4, ERRORTYPE5, ERRORTYPE6, ERRORTYPE7, ERRORTYPE8, ERRORTYPE9, ERRORTYPE10, ERRORTYPE11, ERRORTYPE12, ERRORTYPE13, ERRORTYPE14, ERRORTYPE15, ERRORTYPE16, ERRORTYPE17, ERRORTYPE18, ERRORTYPE19, ERRORTYPE20, ERRORTYPE21, ERRORTYPE22, ERRORTYPE23, ERRORTYPE24, ERRORTYPE25, ERRORTYPE26, ERRORTYPE27, ERRORTYPE28, ERRORTYPE29, ERRORTYPE30, ERRORTYPE31, ERRORTYPE32, ERRORTYPE33, ERRORTYPE34};
 
 

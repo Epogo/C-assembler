@@ -1,8 +1,9 @@
 /*This file contains the manageContents function which analyzes the input file line by line and checks for errors and disects each line into three fields, which include an optional label, command or directive, and corresponding values. Once each line is checked for errors (and printed if necessary, from errorMsg function), the fields from each line are passed into the firstPass function for further analysis.*/
 
 #include "assembler.h"
+#include "manageContents.h"
 
-enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,MYDATA,CODE};
+enum status {PREFIRSTWORD,FIRSTWORD,POSTFIRSTWORD,POSTCOMMAND,POSTDIRECTIVE,POSTLABEL,POSTEXTERN,POSTENTRY,COMMANDORDIRECTIVE,MYDATA,CODE}; /*states of state machine in manageContents*/
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly directives*/
 
@@ -755,11 +756,11 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				}
 				if(state == POSTEXTERN){
 					ptrLabel = calloc(MAXLINELEN,sizeof(char)); /*allocate memory to store label after extern*/
-					labelIndex = 0;
+					labelIndex = STARTINDEX;
 				}
 				else if(state == POSTENTRY){
 					ptrLabel = calloc(MAXLINELEN,sizeof(char)); /*allocate memory to store label after entry*/
-					labelIndex = 0;
+					labelIndex = STARTINDEX;
 				}
 				else if(state == POSTLABEL){
 					index++;
@@ -767,17 +768,17 @@ void manageContents(NODE_T *ptrNode, char *filename){
 				break;
 			case POSTCOMMAND:
 				ptrCode = calloc(MAXLINELEN,sizeof(char)); /*allocate memory to store label values after command*/ 
-				codeIndex = 0;
+				codeIndex = STARTINDEX;
 				state = CODE; /*set current state to CODE*/			
 				break;
 			case POSTDIRECTIVE:
 				ptrData = calloc(MAXLINELEN,sizeof(char)); /*allocate memory to store label values after directive*/ 
-				dataIndex = 0;
+				dataIndex = STARTINDEX;
 				state = MYDATA; /*set current state to DATA*/
 				break;
 			case POSTLABEL:
 				ptrCommandDirective = calloc(MAXLINELEN,sizeof(char)); /*allocate memory to store command or directive*/ 
-				CommandDirectiveIndex = 0;
+				CommandDirectiveIndex = STARTINDEX;
 				ptrCommandDirective[CommandDirectiveIndex] = current->inputChar[index]; /*store current character in first character of command or directive field*/
 				CommandDirectiveIndex++; /*increment command or directive index*/
 				state = COMMANDORDIRECTIVE; /*set current state to COMMANDORDIRECTIVE*/
@@ -822,7 +823,7 @@ int checkState(char *ptrInput){
 	enum status state;
 
 	/*if input is a directive set state to POSTDIRECTIVE*/
-	for(i=0;i<NUMDIRECTIVES;i++){
+	for(i=STARTINDEX;i<NUMDIRECTIVES;i++){
 		if(!strcmp(directives[i], ptrInput)){
 			state = POSTDIRECTIVE;
 			return state;
@@ -844,7 +845,7 @@ int checkState(char *ptrInput){
 		return state;
 	}
 	/*if input is a command set state to POSTCOMMAND*/
-	for(i=0;i<NUMCOMMANDS;i++){
+	for(i=STARTINDEX;i<NUMCOMMANDS;i++){
 		if(!strcmp(commands[i], ptrInput)){
 			state = POSTCOMMAND;
 			return state;
