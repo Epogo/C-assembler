@@ -1,7 +1,7 @@
 /*The following file receives the code following a command and checks the code for errors. The file contains the checkCommand function which analyzes the type of command and calls one of the remaing functions in the file to analyze the code for errors accordingly.*/
 
-#include "assembler.h"
-
+#include "assembler.h" /*include assembler.h header file*/
+#include "checkCommands.h" /*include checkCommands.h header file*/
 
 static char *Rcommands1[]={"add","sub", "and", "or", "nor"}; /*R commands of type 1*/
 

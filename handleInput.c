@@ -1,6 +1,7 @@
 /*The following file is mainly used to analyze the input file line by line and create a linked list of nodes that store the characters of each line of the input file for further analysis.*/
 
-#include "assembler.h"
+#include "assembler.h" /*include assembler.h header file*/
+#include "handleInput.h" /*include handleInput.h header file*/
 
 /*The handleFileContents function receives fd of type pointer to FILE and filename of type pointer to char. The function allocates memory for the first node of a linked list to store characters from the input file, with a line of input for each node. The function passes this first node to the storeLines function where the linked list is created and if the file is not empty then the manageContents function is called. The handleFileContents is void and does not return anything.*/
 void handleFileContents(FILE *fd, char *filename){

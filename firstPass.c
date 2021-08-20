@@ -1,6 +1,7 @@
 /*This file contains the firstPass function which contains the firstPass algorithm. The firstPass function is called from within the manageContents function and continues to analyze the input file line by line and begins to create the symbol table and memory image, and checks for errors. The secondPass function is called if no errors were detected in the current file*/
 
-#include "assembler.h"
+#include "assembler.h" /*include assembler.h header file*/
+#include "firstPass.h" /*include firstPass.h header file*/
 
 static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of assembly directives*/
 

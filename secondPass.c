@@ -1,8 +1,9 @@
 /*This file contains functions for the second pass algorithm and for outputting files. The file is entered once the secondPass function is called from within the firstPass, and the secondPass algorithm is executed, finally outputting files if no errors were detected.*/
 
-#include "assembler.h"
+#include "assembler.h" /*include assembler.h header file*/
+#include "secondPass.h" /*include secondPass.h header file*/
 
-static char *directives[]={".db",".dw", ".dh", ".asciz"};
+static char *directives[]={".db",".dw", ".dh", ".asciz"}; /*array of directives*/
 
 enum Attributes {EMPTY,CODE,MYDATA,ENTRY,EXTERNAL}; /*enum of symbol table attributes*/
 
