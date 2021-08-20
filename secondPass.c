@@ -26,193 +26,192 @@ void freeSymbolAddNewStruct(SYMBOL_ADD_STRUCT_T *headStructPtr){
 
 void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int DCF, char *filename, MEMIM* memImHead,int symbolTableInitFlag){
 
-	LINE_FIELDS_T* currentLine;
-	TABLE_NODE_T* tableTmp;
+	enum steps {STEP1, STEP2, STEP3,  STEP4, STEP5, STEP6, STEP7, STEP8, STEP9, STEP10}; /*enum of all steps of state machine of second pass algorithm*/
+
+	LINE_FIELDS_T* currentLine; /*pointer to current line of line fields linked list*/
+	TABLE_NODE_T* tableTmp; /*temporary pointer to symbol table*/
 	int i,directiveFlag,endWhileFlag,lastLineFlag,labelDetected,step,externalFlag,firstEntryFlag,errorFlag;
-    	SYMBOL_ADD_STRUCT_T *structPtr;
-    	SYMBOL_ADD_STRUCT_T *headStructPtr;
-    	SYMBOL_ADD_STRUCT_T *currentStructPtr;
-	/*static int errorFlag = FLAGOFF;*/
-	errorFlag = FLAGOFF;
-	directiveFlag = FLAGOFF;
-	endWhileFlag = FLAGOFF;
-	lastLineFlag = FLAGOFF;
-	labelDetected = FLAGOFF;
-	externalFlag = FLAGOFF;
+    	SYMBOL_ADD_STRUCT_T *structPtr; /*pointer to linked list to store nodes from symbolAddNew function*/
+    	SYMBOL_ADD_STRUCT_T *headStructPtr; /*head of linked list to store nodes from symbolAddNew function*/
+    	SYMBOL_ADD_STRUCT_T *currentStructPtr; /*pointer to current node of linked list to store nodes from symbolAddNew function*/
+	errorFlag = FLAGOFF; /*set errorFlag to flag off*/
+	directiveFlag = FLAGOFF; /*set errorFlag to flag off*/
+	endWhileFlag = FLAGOFF; /*set endWhileFlag to flag off*/
+	lastLineFlag = FLAGOFF; /*set lastLineFlag to flag off*/
+	labelDetected = FLAGOFF; /*set labelDetected to flag off*/
+	externalFlag = FLAGOFF; /*set externalFlag to flag off*/
 
-	firstEntryFlag = FLAGON;
+	firstEntryFlag = FLAGON; /*set firstEntryFlag to on*/
 
-	step = 1;
+	step = STEP1; /*set intitial step of state machine of second pass algorithm to step 1*/
 
-	currentLine = linesHead;
+	currentLine = linesHead; /*set current line to head of linked list of lines*/
 	while(1){
+		/*switch case for all steps of second pass algorithm*/
 		switch(step){
-			case 1:
+			case STEP1:
+				/*check if last line reached*/
 				if(currentLine->next == NULL){
-					lastLineFlag = FLAGON;
-					step = 9;
+					lastLineFlag = FLAGON; /*set lastLineFlag to on*/
+					step = STEP9; /*proceed to step 9*/
 				}
 				else{
-					step = 2;
+					step = STEP2; /*proceed to step 2*/
 				}
 				break;
-			case 2:
-				step = 3;
+			case STEP2:
+				step = STEP3; /*proceed to step 3*/
 				break;
-			case 3:
-				step = 4;
+			case STEP3:
+				step = STEP4; /*proceed to step 4*/
 				break;
-			case 4:
-				for(i=0;i<NUMDIRECTIVES;i++){
+			case STEP4:
+				/*check if current line contains directive*/
+				for(i=STARTINDEX;i<NUMDIRECTIVES;i++){
 					if(!strcmp(directives[i], currentLine->comOrDir)){
-						directiveFlag = FLAGON;
+						directiveFlag = FLAGON; /*set directiveFlag to on*/
 						
 					}
 				}
 				if(!strcmp(".extern", currentLine->comOrDir)){
-					directiveFlag = FLAGON;
+					directiveFlag = FLAGON; /*if current line contains ".extern" set directiveFlag to on*/
 					
 				}
+				/*check if directive flag is on and current line does not contain ".entry"*/
 				if(directiveFlag == FLAGON && strcmp(".entry", currentLine->comOrDir)){
 					if(lastLineFlag == FLAGON){
-						step = 9;
+						step = STEP9; /*if lastLineFlag is on proceed to step 9*/
 					}
 					else if(lastLineFlag == FLAGOFF){
-						step = 1;
-						currentLine = currentLine->next;
+						step = STEP1; /*if lastLineFlag is off return to step 1*/
+						currentLine = currentLine->next; /*set current line to next line*/
 					}
 				}
 				else{
-					step = 5;
+					step = STEP5; /*proceed to step 5*/
 				}
 				directiveFlag = FLAGOFF;
 				break;
-			case 5:
+			case STEP5:
+				/*check if current line contains ".entry"*/
 				if(!strcmp(".entry", currentLine->comOrDir)){
-					step = 6;
+					step = STEP6; /*proceed to step 6*/
 				}
 				else{
-					step = 7;
+					step = STEP7; /*proceed to step 7*/
 				}
 				
 				break;
-			case 6:
-				tableTmp = tableHead;
+			case STEP6:
+				tableTmp = tableHead; /*sets temporary pointer to symbol table to point to head*/
+				/*iterates over all of symbol table*/
 				while(tableTmp!=NULL){
-					if((!strcmp(tableTmp->symbol,currentLine->values)) && (tableTmp->attribute[0] == EXTERNAL)){
-						printf("File \"%s.as\", Line %u: Entry label \"%s\" defined also as external!\n",filename,currentLine->lineNumber,currentLine->values);
-						errorFlag = FLAGON;
+					/*check if label of entry also defined as label of external*/
+					if((!strcmp(tableTmp->symbol,currentLine->values)) && (tableTmp->attribute[ATTRIBUTE1] == EXTERNAL)){
+						errorMsg(ERRORTYPE34,currentLine->lineNumber,currentLine->values,filename); /*print error message*/
+						errorFlag = FLAGON; /*set error flag to on*/
 						break;
 					}
-					tableTmp = tableTmp->next;
+					tableTmp = tableTmp->next; /*iterate to next node in symbol table*/
 				}
 
-				tableTmp = tableHead;
+				tableTmp = tableHead;/*set temporary pointer to symbol table back to point to head*/
 				while(1){
+					/*iterates over all of symbol table*/
 					if(tableTmp->next == NULL){
+						/*look for current label in symbol table*/
 						if(!strcmp(currentLine->values,tableTmp->symbol)){
-							tableTmp->attribute[1] = ENTRY;
-							labelDetected = FLAGON;
+							tableTmp->attribute[ATTRIBUTE2] = ENTRY; /*set second attribute to entry*/
+							labelDetected = FLAGON; /*set labelDetected to on*/
 						}
 						break;
 					}
 					else{
+						/*look for current label in symbol table*/
 						if(!strcmp(currentLine->values,tableTmp->symbol)){
-							tableTmp->attribute[1] = ENTRY;
-							labelDetected = FLAGON;
+							tableTmp->attribute[ATTRIBUTE2] = ENTRY; /*set second attribute to entry*/
+							labelDetected = FLAGON; /*set labelDetected to on*/
 						}
-						tableTmp = tableTmp->next;
+						tableTmp = tableTmp->next; /*iterate to next node in symbol table*/
 					}
 				}
+				/*check if labelDetected flag is off*/
 				if(labelDetected == FLAGOFF){
-					errorMsg(ERRORTYPE24,currentLine->lineNumber,currentLine->values,filename);
-					errorFlag = FLAGON;
+					errorMsg(ERRORTYPE24,currentLine->lineNumber,currentLine->values,filename); /*print error message*/
+					errorFlag = FLAGON; /*set error flag to on*/
 				}
-				labelDetected = FLAGOFF;
+				labelDetected = FLAGOFF; /*set labelDetected flag to off*/
 				if(lastLineFlag == FLAGON){
-					step = 9;
+					step = STEP9; /*if last line proceed to step 9*/
 				}
 				else if(lastLineFlag == FLAGOFF){
-					step = 1;
-					currentLine = currentLine->next;
+					step = STEP1; /*if not last line, return to step 1*/
+					currentLine = currentLine->next; /*set current line to next line*/
 				}
 				break;
-			case 7:
-				/*if(lastLineFlag == FLAGON){
-					symbolAdd(memImHead,tableHead);
-				}*/
-
+			case STEP7:
+				/*check if firstEntryFlag is on*/
 				if(firstEntryFlag == FLAGON){
-					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename);
-					firstEntryFlag = FLAGOFF;
-					headStructPtr = structPtr;
-					headStructPtr->next = NULL;
-					currentStructPtr = headStructPtr;
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename); /*complete memory image for current line*/
+					firstEntryFlag = FLAGOFF; /*set firstEntryFlag to off*/
+					headStructPtr = structPtr; /*set head of linked list to current node of struct returned from symbolAddNew*/
+					headStructPtr->next = NULL; /*set next node to null*/
+					currentStructPtr = headStructPtr; /*set current node to head*/
 				}
 				else{
-					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename);
-					currentStructPtr->next = structPtr;
-					currentStructPtr = currentStructPtr->next;
-					currentStructPtr->next = NULL;
+					structPtr = symbolAddNew(memImHead,tableHead,currentLine->lineNumber,firstEntryFlag,filename); /*complete memory image for current line*/
+					currentStructPtr->next = structPtr; /*set next node of current to point to struct returned from symbolAddNew*/
+					currentStructPtr = currentStructPtr->next; /*set current node to next node*/
+					currentStructPtr->next = NULL; /*set next node to NULL*/
 				}
 
+				/*check if errorFlag of struct returned from symbolAddNew is on*/
 				if(structPtr->errorFlag == FLAGON){
-					errorFlag = FLAGON;
-					currentLine = currentLine->next;
-					step = 1;
+					errorFlag = FLAGON; /*set errorFlag to on*/
+					currentLine = currentLine->next; /*set current line to next line*/
+					step = STEP1; /*return to step 1*/
 				}
 				else{
-					step = 8;
+					step = STEP8; /*proceed to step 8*/
 				}
 				
 							
 				break;
-			case 8:
+			case STEP8:
+				/*check if externalFlag is on from struct returned from symbolAddNew*/
 				if(structPtr->externalFlag == FLAGON){
-					externalFlag = FLAGON;
-					/*if(externalFlag == FLAGOFF){
-						externalHead = structPtr;
-						externalCurrent = externalHead;
-						externalCurrent->next = NULL;
-						externalFlag = FLAGON;
-					}
-					else if(externalFlag == FLAGON){
-						externalCurrent->next = structPtr;
-						externalCurrent = externalCurrent->next;
-						externalCurrent->next = NULL;	
-					}*/
+					externalFlag = FLAGON; /*set externalFlag to on*/
 				}
 				if(lastLineFlag == FLAGON){
-					step = 9;
+					step = STEP9; /*if last line, proceed to step 9*/
 				}
 				else if(lastLineFlag == FLAGOFF){
-					step = 1;
-					currentLine = currentLine->next;
+					step = STEP1; /*if not last line, return to step 1*/
+					currentLine = currentLine->next; /*set current line to next line*/
 				}
 				break;
-			case 9:
+			case STEP9:
+				/*check if errorFlag is on*/
 				if(errorFlag == FLAGON){
-					endWhileFlag = FLAGON;
+					endWhileFlag = FLAGON; /*end while loop of state machine of second pass of algorithm and do not output files*/
 					if(firstEntryFlag == FLAGOFF){
-						freeSymbolAddNewStruct(headStructPtr);
+						freeSymbolAddNewStruct(headStructPtr); /*if symbolAddNew entered, free all structs returned from function*/
 					}
 				}
-				step = 10;
+				step = STEP10; /*proceed to step 10*/
 				break;
-			case 10:
-				/*printList(memImHead);*/
-
-				createOutputFiles(memImHead,tableHead,filename,headStructPtr,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag);
+			case STEP10:
+				createOutputFiles(memImHead,tableHead,filename,headStructPtr,ICF,DCF,errorFlag,symbolTableInitFlag,externalFlag); /*call createOutputFiles function to output corresponding files*/
 
 				if(firstEntryFlag == FLAGOFF){
-					freeSymbolAddNewStruct(headStructPtr);
+					freeSymbolAddNewStruct(headStructPtr); /*if symbolAddNew entered, free all structs returned from function*/
 				}
 
-				endWhileFlag = FLAGON;
+				endWhileFlag = FLAGON; /*end while loop of state machine of second pass algorithm*/
 				break;
 		}
 		if(endWhileFlag == FLAGON){
-			break;
+			break; /*break out of while loop of state machine of second pass algorithm*/
 		}
 
 	}
@@ -220,21 +219,21 @@ void secondPass(LINE_FIELDS_T* linesHead, TABLE_NODE_T* tableHead, int ICF, int 
 }
 
 void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename,SYMBOL_ADD_STRUCT_T *headStructPtr, int ICF, int DCF,int errorFlag,int symbolTableInitFlag,int externalFlag){
-	TABLE_NODE_T* tableTmp;
-	SYMBOL_ADD_STRUCT_T* tmpStructPtr;
-	FILE *fptrEntry,*fptrExtern,*fptrObject;
-	int entryFlag,externFlag;
-	char *filenameEntry;
-	char *filenameExtern;
-	char *filenameObject;
-	char *tmpPtr;
-	int ICFminus100;
+	TABLE_NODE_T* tableTmp; /*temporary pointer to symbol table*/
+	SYMBOL_ADD_STRUCT_T* tmpStructPtr; /*temporary pointer to linked list of structs returned from symbolAddNew*/
+	FILE *fptrEntry,*fptrExtern,*fptrObject; /*file pointers for output files*/
+	int entryFlag,externFlag; /*flags to notify if entry or extern in file*/
+	char *filenameEntry; /*pointer to char to store name of output entry file*/
+	char *filenameExtern; /*pointer to char to store name of output extern file*/
+	char *filenameObject; /*pointer to char to store name of output object file*/
+	char *tmpPtr; /*temporary pointer for memory allocation*/
+	int ICFminus100; /*int to store ICF minus initial IC*/
 
-	ICFminus100 = ICF - 100;
+	ICFminus100 = ICF - ICINIT; /*Instruction counter final - initial instruction counter*/
 	
-
+	/*check if errorFlag is off*/
 	if(errorFlag == FLAGOFF){
-		tmpPtr = (char*)calloc(100, sizeof(char));
+		tmpPtr = (char*)calloc(MAXFILENAMELEN, sizeof(char)); /*allocate memory to store name of output entry file*/
 		if(!tmpPtr)
 		{
 			printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
@@ -242,9 +241,9 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 		}
 		filenameEntry = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
 
-		entryFlag = FLAGOFF;
+		entryFlag = FLAGOFF; /*set entryFlag to off*/
 
-		tmpPtr = (char*)calloc(100, sizeof(char));
+		tmpPtr = (char*)calloc(MAXFILENAMELEN, sizeof(char)); /*allocate memory to store name of output extern file*/
 		if(!tmpPtr)
 		{
 			printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
@@ -252,98 +251,81 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 		}
 		filenameExtern = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
 
-		entryFlag = FLAGOFF;
-		externFlag = FLAGOFF;
+		entryFlag = FLAGOFF; /*set entryFlag to off*/
+		externFlag = FLAGOFF; /*set externFlag to off*/
 
+		/*check if symbol table initialized*/
 		if(symbolTableInitFlag == FLAGON){
-			tableTmp = tableHead;
+			tableTmp = tableHead; /*set temporary pointer to symbol table to head of symbol table*/
 			while(1){
+				/*iterate until end of symbol table*/
 				if(tableTmp == NULL){
 					break;
 				}
-				if(tableTmp->attribute[1] == ENTRY){
+				/*check if second attribute of current node in symbol table is entry*/
+				if(tableTmp->attribute[ATTRIBUTE2] == ENTRY){
+					/*check if entryFlag is off*/
 					if(entryFlag == FLAGOFF){
-						strcat(filenameEntry,filename);
-						strcat(filenameEntry,".ent");
-						fptrEntry = fopen(filenameEntry,"w");
+						strcat(filenameEntry,filename); /*place filename in filenameEntry*/
+						strcat(filenameEntry,".ent"); /*add .ent extension to filenameEntry*/
+						fptrEntry = fopen(filenameEntry,"w"); /*open file for writing*/
+						/*check if file successfully opened*/
 						if(fptrEntry == NULL){
 							printf("Error... Unable to write to file");
 							exit(0);
 						}
-						entryFlag = FLAGON;
+						entryFlag = FLAGON; /*set entryFlag to on*/
 					}
-					fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value);
-					/*printf("%s %u\n",tableTmp->symbol,tableTmp->value);*/
+					fprintf(fptrEntry,"%s 0%u\n",tableTmp->symbol,tableTmp->value); /*write to file*/
 				}
-				tableTmp = tableTmp->next;
+				tableTmp = tableTmp->next; /*iterate to next node in symbol table*/
 			}
 
+			/*check if entryFlag is on*/
 			if(entryFlag == FLAGON){
-				fclose(fptrEntry);
+				fclose(fptrEntry); /*close file*/
 			}
 		}
 
-		/*if(externalFlag == FLAGON){
-
-			externalTmp = externalHead;
-			while(1){
-				if(externalTmp == NULL){
-					break;
-				}
-
-				if(externFlag == FLAGOFF){
-					strcat(filenameExtern,filename);
-					strcat(filenameExtern,".ext");
-					fptrExtern = fopen(filenameExtern,"w");
-					if(fptrExtern == NULL){
-						printf("Error... Unable to write to file");
-						exit(0);
-					}
-
-					externFlag = FLAGON;
-				}
-				fprintf(fptrExtern,"%s 0%u\n",externalTmp->label,externalTmp->address);
-
-				externalTmp = externalTmp->next;
-			}
-			if(externFlag == FLAGON){
-				fclose(fptrExtern);
-			}
-		}*/
-
+		/*check if externFlag is on*/
 		if(externalFlag == FLAGON){
 
-			tmpStructPtr = headStructPtr;
+			tmpStructPtr = headStructPtr; /*set temporary struct pointer to point to head of linked list of structs returned from symbolAddNew*/
 			while(1){
+				/*iterate over structs returned from symbolAddNew*/
 				if(tmpStructPtr == NULL){
 					break;
 				}
+				/*check if externalFlag of current struct is on*/
 				if(tmpStructPtr->externalFlag == FLAGON){
+					/*check if externFlag is off*/
 					if(externFlag == FLAGOFF){
-						strcat(filenameExtern,filename);
-						strcat(filenameExtern,".ext");
-						fptrExtern = fopen(filenameExtern,"w");
+						strcat(filenameExtern,filename); /*place filename in filenameExtern*/
+						strcat(filenameExtern,".ext"); /*add .ext extension to filenameExtern*/
+						fptrExtern = fopen(filenameExtern,"w"); /*open file for writing*/
+						/*if file not opened successfully*/
 						if(fptrExtern == NULL){
 							printf("Error... Unable to write to file");
 							exit(0);
 						}
 
-						externFlag = FLAGON;
+						externFlag = FLAGON; /*set externFlag to on*/
 					}
-					fprintf(fptrExtern,"%s 0%u\n",tmpStructPtr->label,tmpStructPtr->address);
+					fprintf(fptrExtern,"%s 0%u\n",tmpStructPtr->label,tmpStructPtr->address); /*write to file*/
 				}
-				tmpStructPtr = tmpStructPtr->next;
+				tmpStructPtr = tmpStructPtr->next; /*iterate to next node of structs returned from symbolAddNew*/
 			}
+			/*check if externFlag is on*/
 			if(externFlag == FLAGON){
-				fclose(fptrExtern);
+				fclose(fptrExtern); /*close file*/
 			}
 		}
-		free(filenameEntry);
-		free(filenameExtern);
+		free(filenameEntry); /*free filenameEntry storing name of entry file*/
+		free(filenameExtern); /*free filenameExtern storing name of extern file*/
 	}
 
 
-	tmpPtr = (char*)calloc(100, sizeof(char));
+	tmpPtr = (char*)calloc(MAXFILENAMELEN, sizeof(char)); /*allocate memory to store name of output object file*/
 	if(!tmpPtr)
 	{
 		printf("\nError! memory not allocated."); /*Prints error message if no more memory could be allocated*/
@@ -351,26 +333,25 @@ void createOutputFiles(MEMIM* memImHead, TABLE_NODE_T* tableHead, char *filename
 	}
 	filenameObject = tmpPtr; /*return the temporary pointer to the original pointer variable pointing to the new element after memory successfully allocated*/
 
-	strcat(filenameObject,filename);
-	strcat(filenameObject,".ob");
+	strcat(filenameObject,filename); /*store filename is filenameObject*/
+	strcat(filenameObject,".ob"); /*add .ob extension to filenameObject*/
 
-	fptrObject = fopen(filenameObject,"w");
+	fptrObject = fopen(filenameObject,"w"); /*open file for writing*/
+	/*if file not opened successfully*/
 	if(fptrObject == NULL){
 		printf("Error... Unable to write to file");
 		exit(0);
 	}
-	fprintf(fptrObject,"     %u %u\n",ICFminus100,DCF);
+	fprintf(fptrObject,"     %u %u\n",ICFminus100,DCF); /*write to file*/
 
-	printListToFile(memImHead,fptrObject);
+	printListToFile(memImHead,fptrObject); /*call printListToFile function to write to file*/
 
-	/*freeList(memImHead,fptrObject);*/
-
-	fclose(fptrObject);
+	fclose(fptrObject); /*close file*/
 
 	if(errorFlag == FLAGON){
-		remove(filenameObject);
+		remove(filenameObject); /*if errorFlag is on remove file*/
 	}
 
-	free(filenameObject);
+	free(filenameObject); /*free filenameObject storing name of object file*/
 
 }

@@ -1008,6 +1008,9 @@ void errorMsg(int error,int lineNumber,char *fieldName,char *fileName)
 		case ERRORTYPE33:
 			printf("File \"%s.as\", Line %u: Label \"%s\" already defined previously!\n",fileName,lineNumber,fieldName);
 			break;
+		case ERRORTYPE34:
+			printf("File \"%s.as\", Line %u: Entry label \"%s\" defined also as external!\n",fileName,lineNumber,fieldName);
+			break;
 		default:
 			printf("Default error message!\n");
 			break;

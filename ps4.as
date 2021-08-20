@@ -26,5 +26,6 @@ LIST: 	.db 	6,-9
  	jmp 	$4
  	la 	wNumber
  	.dh 	27056
-END: 	stop	   
+END: 	stop	
+.entry val1   
 .entry 	K
