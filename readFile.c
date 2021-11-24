@@ -1,4 +1,4 @@
-/*This file is used to iterate over all arguments from the command line and open all the files entered as file arguments. The file prints errors, for example, of files that do not exist or files with incorrect extensions. The file calls other functions from other files once each file is successfully opened to further analyze the contents of the file.*/
+/*This file is used in order to iterate over all arguments from the command line and open all the files entered as file arguments. The file prints errors, for example, of files that do not exist or files with incorrect extensions. The file calls other functions from other files once each file is successfully opened to further analyze the contents of the file.*/
 
 #include "assembler.h" /*include assembler.h header file*/
 #include "readFile.h" /*include readFile.h header file*/
