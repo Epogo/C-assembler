@@ -1,4 +1,4 @@
-/*This file contains the manageContents function which analyzes the input file line by line and checks for errors and disects each line into three fields, which include an optional label, command or directive, and corresponding values. Once each line is checked for errors (and printed if necessary, from errorMsg function), the fields from each line are passed into the firstPass function for further analysis.*/
+/*The file contains the manageContents function which analyzes the input file line by line and checks for errors and disects each line into three fields, which include an optional label, command or directive, and corresponding values. Once each line is checked for errors (and printed if necessary, from errorMsg function), the fields from each line are passed into the firstPass function for further analysis.*/
 
 #include "assembler.h" /*include assembler.h header file*/
 #include "manageContents.h" /*include manageContents.h header file*/
