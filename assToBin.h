@@ -1,4 +1,4 @@
-
+/*Header file*/
 #define MAX_POS_8_BITS_NUM 127 /*max positive number for 8 bits.*/
 #define MAX_NEG_8_BITS_NUM -128 /*max negative number for 8 bits.*/
 #define MAX_POS_16_BITS_NUM 32767 /*max positive number for 16 bits.*/
