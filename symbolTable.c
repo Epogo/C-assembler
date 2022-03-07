@@ -1,6 +1,6 @@
 /*The following file contains the symbolTable function. It creates the symbol table by calling the function from the first pass algorithm with the parameters of symbol, value, attribute1, attribute2, and firstSymbolFlag and returns head of the symbol table. The symbol table is developed by creating a linked list that keeps track of each node of the symbol table with the inputted symbol and its corresponding value and attributes.*/
 
-#include "assembler.h" /*include assembler.h header file*/
+#include "assembler.h" /*include assembler.h header file */
 
 /*The following function, symbolTable, is called from the firstPass function, and receives a symbol of type pointer to char, value of type int, attribute1 of type int, attribute 2 of type int, and firstSymbolFlag of type int, and returns the head of the symbol table of type pointer to TABLE_NODE_T. The function creates the symbol table by creating a linked list of each node of the symbol table. It does this by using the firstSymbol flag to know when to create the head of the table and then each time the function is called it adds another node to the the symbol table.*/
 TABLE_NODE_T* symbolTable(char *symbol,int value,int attribute1,int attribute2,int firstSymbolFlag){
